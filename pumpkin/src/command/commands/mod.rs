@@ -100,10 +100,6 @@ pub async fn default_dispatcher(
     dispatcher.register(tellraw::init_command_tree(), "minecraft:command.tellraw");
     dispatcher.register(title::init_command_tree(), "minecraft:command.title");
     dispatcher.register(summon::init_command_tree(), "minecraft:command.summon");
-    dispatcher.register(
-        experience::init_command_tree(),
-        "minecraft:command.experience",
-    );
     dispatcher.register(weather::init_command_tree(), "minecraft:command.weather");
     dispatcher.register(particle::init_command_tree(), "minecraft:command.particle");
     dispatcher.register(rotate::init_command_tree(), "minecraft:command.rotate");
@@ -153,6 +149,7 @@ pub async fn default_dispatcher(
     };
 
     difficulty::register(&mut dispatcher, registry);
+    experience::register(&mut dispatcher, registry);
     help::register(&mut dispatcher, registry);
     list::register(&mut dispatcher, registry);
     seed::register(&mut dispatcher, registry);
@@ -298,13 +295,6 @@ fn register_level_2_permissions(registry: &mut PermissionRegistry) {
         .register_permission(Permission::new(
             "minecraft:command.summon",
             "Summons an entity",
-            PermissionDefault::Op(PermissionLvl::Two),
-        ))
-        .unwrap();
-    registry
-        .register_permission(Permission::new(
-            "minecraft:command.experience",
-            "Adds, removes or queries player experience",
             PermissionDefault::Op(PermissionLvl::Two),
         ))
         .unwrap();
