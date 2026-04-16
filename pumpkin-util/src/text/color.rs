@@ -282,6 +282,26 @@ pub enum NamedColor {
 }
 
 impl NamedColor {
+    /// All possible values for the [`NamedColor`] enum.
+    pub const VALUES: [Self; 16] = [
+        Self::Black,
+        Self::DarkBlue,
+        Self::DarkGreen,
+        Self::DarkAqua,
+        Self::DarkRed,
+        Self::DarkPurple,
+        Self::Gold,
+        Self::Gray,
+        Self::DarkGray,
+        Self::Blue,
+        Self::Green,
+        Self::Aqua,
+        Self::Red,
+        Self::LightPurple,
+        Self::Yellow,
+        Self::White,
+    ];
+
     /// Converts this named color to its corresponding RGB values.
     ///
     /// # Returns
@@ -305,6 +325,32 @@ impl NamedColor {
             Self::LightPurple => RGBColor::new(255, 85, 255),
             Self::Yellow => RGBColor::new(255, 255, 85),
             Self::White => RGBColor::new(255, 255, 255),
+        }
+    }
+
+    /// Gets the name of this named color in snake-case.
+    ///
+    /// # Returns
+    /// The snake-cased name of the color.
+    #[must_use]
+    pub const fn name(&self) -> &'static str {
+        match self {
+            Self::Black => "black",
+            Self::DarkBlue => "dark_blue",
+            Self::DarkGreen => "dark_green",
+            Self::DarkAqua => "dark_aqua",
+            Self::DarkRed => "dark_red",
+            Self::DarkPurple => "dark_purple",
+            Self::Gold => "gold",
+            Self::Gray => "gray",
+            Self::DarkGray => "dark_gray",
+            Self::Blue => "blue",
+            Self::Green => "green",
+            Self::Aqua => "aqua",
+            Self::Red => "red",
+            Self::LightPurple => "light_purple",
+            Self::Yellow => "yellow",
+            Self::White => "white",
         }
     }
 }

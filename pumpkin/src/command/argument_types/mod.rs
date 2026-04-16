@@ -186,6 +186,7 @@ impl FromStringReader for FloatDegreeBounds {
 }
 
 pub mod argument_type;
+pub mod color;
 pub mod coordinates;
 pub mod core;
 pub mod entity;
