@@ -48,6 +48,7 @@ use pumpkin_data::entity::EntityType;
 use pumpkin_data::item::Item;
 use pumpkin_data::item_stack::ItemStack;
 use pumpkin_data::sound::{Sound, SoundCategory};
+use pumpkin_data::translation::java::CHAT_DISABLED_INVALID_COMMAND_SIGNATURE;
 use pumpkin_data::{Block, BlockDirection, BlockState, translation};
 use pumpkin_inventory::InventoryError;
 use pumpkin_inventory::merchant::merchant_screen_handler::MerchantScreenHandler;
@@ -64,13 +65,14 @@ use pumpkin_protocol::java::client::play::{
 };
 use pumpkin_protocol::java::server::play::{
     Action, ActionType, CommandBlockMode, FLAG_ON_GROUND, SAttack, SChangeGameMode, SChatCommand,
-    SChatMessage, SChunkBatch, SClientCommand, SClientInformationPlay, SCloseContainer,
-    SCommandSuggestion, SConfirmTeleport, SCookieResponse as SPCookieResponse, SInteract,
-    SKeepAlive, SMoveVehicle, SPaddleBoat, SPickItemFromBlock, SPlaceRecipe, SPlayPingRequest,
-    SPlayerAbilities, SPlayerAction, SPlayerCommand, SPlayerInput, SPlayerPosition,
-    SPlayerPositionRotation, SPlayerRotation, SPlayerSession, SRecipeBookChangeSettings,
-    SRecipeBookSeenRecipe, SSelectTrade, SSetCommandBlock, SSetCreativeSlot, SSetHeldItem,
-    SSetPlayerGround, SSwingArm, SUpdateSign, SUseItem, SUseItemOn, Status,
+    SChatCommandSigned, SChatMessage, SChunkBatch, SClientCommand, SClientInformationPlay,
+    SCloseContainer, SCommandSuggestion, SConfirmTeleport, SCookieResponse as SPCookieResponse,
+    SInteract, SKeepAlive, SMoveVehicle, SPaddleBoat, SPickItemFromBlock, SPlaceRecipe,
+    SPlayPingRequest, SPlayerAbilities, SPlayerAction, SPlayerCommand, SPlayerInput,
+    SPlayerPosition, SPlayerPositionRotation, SPlayerRotation, SPlayerSession,
+    SRecipeBookChangeSettings, SRecipeBookSeenRecipe, SSelectTrade, SSetCommandBlock,
+    SSetCreativeSlot, SSetHeldItem, SSetPlayerGround, SSwingArm, SUpdateSign, SUseItem, SUseItemOn,
+    Status,
 };
 use pumpkin_util::math::boundingbox::BoundingBox;
 use pumpkin_util::math::vector3::Vector3;
@@ -658,6 +660,149 @@ impl JavaClient {
         player.update_last_action_time();
         let player_clone = player.clone();
         let server_clone = server.clone();
+        send_cancellable! {{
+            server;
+            PlayerCommandSendEvent {
+                player: player.clone(),
+                command: command.command.clone(),
+                cancelled: false
+            };
+
+            'after: {
+                let command = event.command;
+                let command_clone = command.clone();
+                // Some commands can take a long time to execute. If they do, they block packet processing for the player.
+                // That's why we will spawn a task instead.
+                server.spawn_task(async move {
+                    let dispatcher = server_clone.command_dispatcher.read().await;
+                    dispatcher.handle_command(
+                        &player_clone.get_command_source(&server_clone).await,
+                        &command_clone
+                    ).await;
+                });
+
+                if server.advanced_config.commands.log_console {
+                    info!(
+                        "Player ({}): executed command /{}",
+                        player.gameprofile.name,
+                        command
+                    );
+                }
+            }
+        }}
+    }
+
+    pub async fn handle_chat_command_signed(
+        &self,
+        player: &Arc<Player>,
+        server: &Arc<Server>,
+        command: &SChatCommandSigned,
+    ) {
+        player.update_last_action_time();
+        let player_clone = player.clone();
+        let server_clone = server.clone();
+
+        // These checks are only run in secure chat mode
+        if server.basic_config.allow_chat_reports {
+            let dispatcher = server.command_dispatcher.read().await;
+
+            let parsed = dispatcher
+                .parse_input(
+                    &command.command,
+                    &player_clone.get_command_source(&server_clone).await,
+                )
+                .await;
+
+            let signable_command_args = dispatcher.get_signed_arguments(&parsed);
+            let argument_signatures = &command.argument_signatures;
+
+            if argument_signatures.is_empty() {
+                if !signable_command_args.is_empty() {
+                    warn!("Received no signed arguments for a command that needs them");
+                    player
+                        .send_system_message(&TextComponent::translate_cross(
+                            CHAT_DISABLED_INVALID_COMMAND_SIGNATURE,
+                            CHAT_DISABLED_INVALID_COMMAND_SIGNATURE,
+                            &[],
+                        ))
+                        .await;
+                }
+            } else {
+                let mut signed_args = Vec::new();
+                for signature in argument_signatures {
+                    let expected_argument = signable_command_args
+                        .iter()
+                        .find(|(id, _)| dispatcher.tree[*id].meta.name == signature.name);
+
+                    if let Some(expected_argument) = expected_argument {
+                        signed_args.push(&expected_argument.1);
+                    } else {
+                        // TODO: Break the chain? Don't think that's possible at the moment
+                        player
+                            .send_system_message(&TextComponent::translate_cross(
+                                CHAT_DISABLED_INVALID_COMMAND_SIGNATURE,
+                                CHAT_DISABLED_INVALID_COMMAND_SIGNATURE,
+                                &[],
+                            ))
+                            .await;
+                    }
+                }
+
+                for (_, expected_argument) in &signable_command_args {
+                    if !signed_args.contains(&expected_argument) {
+                        player
+                            .send_system_message(&TextComponent::translate_cross(
+                                CHAT_DISABLED_INVALID_COMMAND_SIGNATURE,
+                                CHAT_DISABLED_INVALID_COMMAND_SIGNATURE,
+                                &[],
+                            ))
+                            .await;
+                    }
+                }
+            }
+
+            if let Err(err) = {
+                let now = SystemTime::now()
+                    .duration_since(UNIX_EPOCH)
+                    .unwrap_or_default()
+                    .as_millis() as i64;
+
+                // Verify message timestamp
+                if command.timestamp > now || command.timestamp < (now - CHAT_MESSAGE_MAX_AGE) {
+                    Err(ChatError::OutOfOrderChat)
+                } else if player.chat_session.lock().await.expires_at < now {
+                    // Verify session expiry
+                    Err(ChatError::ExpiredPublicKey)
+                } else if command.checksum != 0 {
+                    // Validate previous signature checksum (new in 1.21.5)
+                    let checksum = polynomial_rolling_hash(
+                        player.signature_cache.lock().await.last_seen.as_ref(),
+                    );
+                    if checksum == command.checksum {
+                        Ok(())
+                    } else {
+                        Err(ChatError::ChatValidationFailed)
+                    }
+                } else {
+                    Ok(())
+                }
+            } {
+                log_at_level!(
+                    err.severity(),
+                    "{} (uuid {}) {}",
+                    player.gameprofile.name,
+                    player.gameprofile.id,
+                    err
+                );
+                if err.is_kick()
+                    && let Some(reason) = err.client_kick_reason()
+                {
+                    self.kick(TextComponent::text(reason)).await;
+                }
+                return;
+            }
+        }
+
         send_cancellable! {{
             server;
             PlayerCommandSendEvent {

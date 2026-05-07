@@ -61,6 +61,12 @@ pub trait ArgumentType: Send + Sync {
         None
     }
 
+    /// Whether this argument type is signed, (i.e. requires the client to send a signed packet to send the command or not)
+    #[must_use]
+    fn is_signed(&self) -> bool {
+        false
+    }
+
     /// Gets a selected list of examples which are considered
     /// valid when parsed into type `T`.
     ///
@@ -119,6 +125,12 @@ pub trait AnyArgumentType: Sealed + Send + Sync {
         None
     }
 
+    /// Whether this argument type is signed, (i.e. requires the client to send a signed packet to send the command or not)
+    #[must_use]
+    fn is_signed(&self) -> bool {
+        false
+    }
+
     /// Gets a selected list of examples which are considered
     /// valid when parsed into type `T`.
     ///
@@ -173,6 +185,10 @@ impl<U: ArgumentType<Item = T>, T: Send + Sync + 'static> AnyArgumentType for U 
 
     fn override_suggestion_providers(&self) -> Option<SuggestionProviders> {
         self.override_suggestion_providers()
+    }
+
+    fn is_signed(&self) -> bool {
+        self.is_signed()
     }
 
     fn examples(&self) -> Vec<String> {

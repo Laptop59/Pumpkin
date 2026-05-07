@@ -1,6 +1,6 @@
 use crate::command::argument_builder::{ArgumentBuilder, CommandArgumentBuilder};
 use crate::command::context::command_context::{
-    CommandContext, CommandContextBuilder, ContextChain,
+    CommandContext, CommandContextBuilder, ContextChain, ParsedArgument,
 };
 use crate::command::context::command_source::{CommandSource, ReturnValue};
 use crate::command::errors::command_syntax_error::CommandSyntaxError;
@@ -9,7 +9,7 @@ use crate::command::errors::error_types::{
     DISPATCHER_UNKNOWN_COMMAND, LiteralCommandErrorType,
 };
 use crate::command::node::Redirection;
-use crate::command::node::attached::{CommandNodeId, NodeId};
+use crate::command::node::attached::{ArgumentNodeId, CommandNodeId, NodeId};
 use crate::command::node::detached::CommandDetachedNode;
 use crate::command::node::tree::{NodeIdClassification, ROOT_NODE_ID, Tree};
 use crate::command::string_reader::StringReader;
@@ -939,6 +939,58 @@ impl CommandDispatcher {
 
             Some(usage_text)
         })
+    }
+
+    #[must_use]
+    pub fn get_signed_arguments(&self, command: &ParsingResult) -> Vec<(ArgumentNodeId, String)> {
+        let mut arguments = Vec::new();
+        self.visit_arguments(command, &mut |_, argument, value| {
+            let node = &self.tree[argument];
+            let meta = &node.meta;
+
+            if let Some(value) = value
+                && meta.argument_type.is_signed()
+            {
+                arguments.push((
+                    argument,
+                    value.range.slice_from_reader(&command.reader).to_string(),
+                ));
+            }
+        });
+        arguments
+    }
+
+    /// Visits only argument nodes, calling the `output` function for each one encountered.
+    pub fn visit_arguments(
+        &self,
+        command: &ParsingResult,
+        output: &mut impl FnMut(&CommandContextBuilder, ArgumentNodeId, Option<&ParsedArgument>),
+    ) {
+        let root_context = &command.context;
+        self.visit_argument_nodes(root_context, output);
+
+        let mut context = root_context;
+        while let Some(child) = &context.child
+            && child.root != root_context.root
+        {
+            self.visit_argument_nodes(child, output);
+
+            context = child;
+        }
+    }
+
+    fn visit_argument_nodes(
+        &self,
+        context: &CommandContextBuilder,
+        output: &mut impl FnMut(&CommandContextBuilder, ArgumentNodeId, Option<&ParsedArgument>),
+    ) {
+        let arguments = &context.arguments;
+        for node in &context.nodes {
+            if let NodeIdClassification::Argument(id) = self.tree.classify_id(node.node) {
+                let name = self.tree[node.node].name();
+                output(context, id, arguments.get(&name).map(AsRef::as_ref));
+            }
+        }
     }
 }
 

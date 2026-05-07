@@ -1,6 +1,7 @@
 mod attack;
 mod change_game_mode;
 mod chat_command;
+mod chat_command_signed;
 mod chat_message;
 mod chunk_batch;
 mod click_container;
@@ -47,6 +48,7 @@ mod use_item_on;
 pub use attack::*;
 pub use change_game_mode::*;
 pub use chat_command::*;
+pub use chat_command_signed::*;
 pub use chat_message::*;
 pub use chunk_batch::*;
 pub use click_container::*;

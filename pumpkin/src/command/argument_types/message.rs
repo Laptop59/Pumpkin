@@ -46,6 +46,10 @@ impl ArgumentType for MessageArgumentType {
         })
     }
 
+    fn is_signed(&self) -> bool {
+        true
+    }
+
     fn client_side_parser(&'_ self) -> JavaClientArgumentType<'_> {
         JavaClientArgumentType::Message
     }
@@ -94,7 +98,7 @@ impl MessageArgumentType {
                                 Ok(parsed_selector) => break (start, parsed_selector),
                                 Err(error) => {
                                     if !error.is(&MISSING_SELECTOR_TYPE_ERROR_TYPE)
-                                        && error.is(&UNKNOWN_SELECTOR_TYPE_ERROR_TYPE)
+                                        && !error.is(&UNKNOWN_SELECTOR_TYPE_ERROR_TYPE)
                                     {
                                         return Err(error);
                                     }

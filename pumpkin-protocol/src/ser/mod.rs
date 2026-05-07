@@ -74,6 +74,12 @@ pub trait NetworkReadExt {
         &mut self,
         parse: impl Fn(&mut Self) -> Result<G, ReadingError>,
     ) -> Result<Vec<G>, ReadingError>;
+
+    fn get_list_bounded<G>(
+        &mut self,
+        parse: impl Fn(&mut Self) -> Result<G, ReadingError>,
+        max_list_size: usize,
+    ) -> Result<Vec<G>, ReadingError>;
 }
 
 macro_rules! get_number_be {
@@ -215,10 +221,18 @@ impl<R: Read> NetworkReadExt for R {
     ) -> Result<Vec<G>, ReadingError> {
         const MAX_LIST_SIZE: usize = 65536;
 
+        self.get_list_bounded(parse, MAX_LIST_SIZE)
+    }
+
+    fn get_list_bounded<G>(
+        &mut self,
+        parse: impl Fn(&mut Self) -> Result<G, ReadingError>,
+        max_list_size: usize,
+    ) -> Result<Vec<G>, ReadingError> {
         let len = self.get_var_int()?.0 as usize;
-        if len > MAX_LIST_SIZE {
+        if len > max_list_size {
             return Err(ReadingError::TooLarge(format!(
-                "List length {len} exceeds limit"
+                "List length {len} exceeds the limit of {max_list_size}"
             )));
         }
         let mut list = Vec::with_capacity(len);
