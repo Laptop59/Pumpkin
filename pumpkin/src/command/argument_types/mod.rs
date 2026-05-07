@@ -217,12 +217,14 @@ impl FromStringReader for Identifier {
 }
 
 pub mod argument_type;
+pub mod color;
 pub mod coordinates;
 pub mod core;
 pub mod entity;
 pub mod entity_anchor;
 pub mod entity_selector;
 pub mod game_profile;
+pub mod hex_color;
 pub mod identifier;
 pub mod range;
 pub mod time;
