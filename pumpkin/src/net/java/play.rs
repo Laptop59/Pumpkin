@@ -703,104 +703,22 @@ impl JavaClient {
         let server_clone = server.clone();
 
         // These checks are only run in secure chat mode
-        if server.basic_config.allow_chat_reports {
-            let dispatcher = server.command_dispatcher.read().await;
-
-            let parsed = dispatcher
-                .parse_input(
-                    &command.command,
-                    &player_clone.get_command_source(&server_clone).await,
-                )
-                .await;
-
-            let signable_command_args = dispatcher.get_signed_arguments(&parsed);
-            let argument_signatures = &command.argument_signatures;
-
-            if argument_signatures.is_empty() {
-                if !signable_command_args.is_empty() {
-                    warn!("Received no signed arguments for a command that needs them");
-                    player
-                        .send_system_message(&TextComponent::translate_cross(
-                            CHAT_DISABLED_INVALID_COMMAND_SIGNATURE,
-                            CHAT_DISABLED_INVALID_COMMAND_SIGNATURE,
-                            &[],
-                        ))
-                        .await;
-                }
-            } else {
-                let mut signed_args = Vec::new();
-                for signature in argument_signatures {
-                    let expected_argument = signable_command_args
-                        .iter()
-                        .find(|(id, _)| dispatcher.tree[*id].meta.name == signature.name);
-
-                    if let Some(expected_argument) = expected_argument {
-                        signed_args.push(&expected_argument.1);
-                    } else {
-                        // TODO: Break the chain? Don't think that's possible at the moment
-                        player
-                            .send_system_message(&TextComponent::translate_cross(
-                                CHAT_DISABLED_INVALID_COMMAND_SIGNATURE,
-                                CHAT_DISABLED_INVALID_COMMAND_SIGNATURE,
-                                &[],
-                            ))
-                            .await;
-                    }
-                }
-
-                for (_, expected_argument) in &signable_command_args {
-                    if !signed_args.contains(&expected_argument) {
-                        player
-                            .send_system_message(&TextComponent::translate_cross(
-                                CHAT_DISABLED_INVALID_COMMAND_SIGNATURE,
-                                CHAT_DISABLED_INVALID_COMMAND_SIGNATURE,
-                                &[],
-                            ))
-                            .await;
-                    }
-                }
+        if server.basic_config.allow_chat_reports
+            && let Err(err) = self.validate_signed_command(server, player, command).await
+        {
+            log_at_level!(
+                err.severity(),
+                "{} (uuid {}) {}",
+                player.gameprofile.name,
+                player.gameprofile.id,
+                err
+            );
+            if err.is_kick()
+                && let Some(reason) = err.client_kick_reason()
+            {
+                self.kick(TextComponent::text(reason)).await;
             }
-
-            if let Err(err) = {
-                let now = SystemTime::now()
-                    .duration_since(UNIX_EPOCH)
-                    .unwrap_or_default()
-                    .as_millis() as i64;
-
-                // Verify message timestamp
-                if command.timestamp > now || command.timestamp < (now - CHAT_MESSAGE_MAX_AGE) {
-                    Err(ChatError::OutOfOrderChat)
-                } else if player.chat_session.lock().await.expires_at < now {
-                    // Verify session expiry
-                    Err(ChatError::ExpiredPublicKey)
-                } else if command.checksum != 0 {
-                    // Validate previous signature checksum (new in 1.21.5)
-                    let checksum = polynomial_rolling_hash(
-                        player.signature_cache.lock().await.last_seen.as_ref(),
-                    );
-                    if checksum == command.checksum {
-                        Ok(())
-                    } else {
-                        Err(ChatError::ChatValidationFailed)
-                    }
-                } else {
-                    Ok(())
-                }
-            } {
-                log_at_level!(
-                    err.severity(),
-                    "{} (uuid {}) {}",
-                    player.gameprofile.name,
-                    player.gameprofile.id,
-                    err
-                );
-                if err.is_kick()
-                    && let Some(reason) = err.client_kick_reason()
-                {
-                    self.kick(TextComponent::text(reason)).await;
-                }
-                return;
-            }
+            return;
         }
 
         send_cancellable! {{
@@ -1501,6 +1419,92 @@ impl JavaClient {
                 }
             }
         }
+        Ok(())
+    }
+
+    /// Does some checks for validating a command with signed arguments.
+    pub async fn validate_signed_command(
+        &self,
+        server: &Arc<Server>,
+        player: &Arc<Player>,
+        command: &SChatCommandSigned,
+    ) -> Result<(), ChatError> {
+        let dispatcher = server.command_dispatcher.read().await;
+
+        let parsed = dispatcher
+            .parse_input(&command.command, &player.get_command_source(server).await)
+            .await;
+
+        let signable_command_args = dispatcher.get_signed_arguments(&parsed);
+        let argument_signatures = &command.argument_signatures;
+
+        if argument_signatures.is_empty() {
+            if !signable_command_args.is_empty() {
+                warn!("Received no signed arguments for a command that needs them");
+                player
+                    .send_system_message(&TextComponent::translate_cross(
+                        CHAT_DISABLED_INVALID_COMMAND_SIGNATURE,
+                        CHAT_DISABLED_INVALID_COMMAND_SIGNATURE,
+                        &[],
+                    ))
+                    .await;
+            }
+        } else {
+            let mut signed_args = Vec::new();
+            for signature in argument_signatures {
+                let expected_argument = signable_command_args
+                    .iter()
+                    .find(|(id, _)| dispatcher.tree[*id].meta.name == signature.name);
+
+                if let Some(expected_argument) = expected_argument {
+                    signed_args.push(&expected_argument.1);
+                } else {
+                    // TODO: Break the chain? Don't think that's possible at the moment
+                    player
+                        .send_system_message(&TextComponent::translate_cross(
+                            CHAT_DISABLED_INVALID_COMMAND_SIGNATURE,
+                            CHAT_DISABLED_INVALID_COMMAND_SIGNATURE,
+                            &[],
+                        ))
+                        .await;
+                }
+            }
+
+            for (_, expected_argument) in &signable_command_args {
+                if !signed_args.contains(&expected_argument) {
+                    player
+                        .send_system_message(&TextComponent::translate_cross(
+                            CHAT_DISABLED_INVALID_COMMAND_SIGNATURE,
+                            CHAT_DISABLED_INVALID_COMMAND_SIGNATURE,
+                            &[],
+                        ))
+                        .await;
+                }
+            }
+        }
+
+        let now = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_millis() as i64;
+
+        // Verify message timestamp
+        if command.timestamp > now || command.timestamp < (now - CHAT_MESSAGE_MAX_AGE) {
+            return Err(ChatError::OutOfOrderChat);
+        }
+        if player.chat_session.lock().await.expires_at < now {
+            // Verify session expiry
+            return Err(ChatError::ExpiredPublicKey);
+        }
+        if command.checksum != 0 {
+            // Validate previous signature checksum (new in 1.21.5)
+            let checksum =
+                polynomial_rolling_hash(player.signature_cache.lock().await.last_seen.as_ref());
+            if checksum != command.checksum {
+                return Err(ChatError::ChatValidationFailed);
+            }
+        }
+
         Ok(())
     }
 
