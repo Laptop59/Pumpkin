@@ -2,8 +2,8 @@ use crate::command::argument_builder::{ArgumentBuilder, argument, command};
 use crate::command::argument_types::game_profile::GameProfileArgumentType;
 use crate::command::context::command_context::CommandContext;
 use crate::command::errors::error_types::CommandErrorType;
-use crate::command::node::{CommandExecutor, CommandExecutorResult};
 use crate::command::node::dispatcher::CommandDispatcher;
+use crate::command::node::{CommandExecutor, CommandExecutorResult};
 use crate::command::suggestion::provider::{SuggestionProvider, SuggestionProviderResult};
 use crate::command::suggestion::suggestions::SuggestionsBuilder;
 use crate::data::SaveJSONConfiguration;
@@ -78,7 +78,7 @@ impl SuggestionProvider for DeOpSuggestionProvider {
             // Suggest every opped player.
             let ops = context.server().data.operator_config.read().await;
             for op in &ops.ops {
-                builder = builder.suggest(op.name.clone());
+                builder = builder.filter_and_suggest_one(op.name.clone());
             }
             builder.build()
         })

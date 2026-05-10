@@ -4,13 +4,20 @@ use pumpkin_protocol::{
         ArgumentType, CCommands, ProtoNode, ProtoNodeType, StringProtoArgBehavior,
     },
 };
-use std::sync::Arc;
+use rustc_hash::FxHashMap;
+use std::{
+    pin::Pin,
+    sync::Arc,
+};
 
 use super::tree::{Node, NodeType};
-use crate::command::node::{
-    attached::{AttachedNode, NodeId},
-    dispatcher::CommandDispatcher,
-    tree::ROOT_NODE_ID,
+use crate::command::{
+    context::command_source::CommandSource,
+    node::{
+        attached::{AttachedNode, NodeId},
+        dispatcher::CommandDispatcher,
+        tree::{ROOT_NODE_ID, Tree},
+    },
 };
 use crate::entity::player::Player;
 use crate::server::Server;
@@ -23,7 +30,7 @@ use pumpkin_protocol::java::client::play::SuggestionProviders;
 #[expect(clippy::too_many_lines)]
 pub async fn send_c_commands_packet(
     player: &Arc<Player>,
-    server: &Server,
+    server: &Arc<Server>,
     dispatcher: &CommandDispatcher,
 ) {
     let cmd_src = super::CommandSender::Player(player.clone());
@@ -68,59 +75,114 @@ pub async fn send_c_commands_packet(
     let mut proto_nodes = Vec::new();
     let root_node_index = root.build(&mut proto_nodes);
 
-    let node_id_offset = proto_nodes.len();
+    let command_source = player.get_command_source(server).await;
+    let root_node_children_second: Box<[VarInt]> = make_proto_nodes_for_dispatcher(
+        &mut proto_nodes,
+        &command_source,
+        &dispatcher.tree,
+        root_node_index
+            .try_into()
+            .expect("i32 limit reached for ids"),
+    ).await;
 
-    let mut root_node_children_second: Box<[VarInt]> = Box::new([]);
+    if !root_node_children_second.is_empty() {
+        let root_node = &mut proto_nodes[root_node_index];
+        let mut first = std::mem::take(&mut root_node.children).into_vec();
+        first.append(&mut root_node_children_second.into_vec());
+        root_node.children = first.into_boxed_slice();
+    }
 
-    for node in &dispatcher.tree {
-        let children: Box<[VarInt]> = node
-            .children_ref()
-            .values()
-            .copied()
-            .map(|id| resolve_node_id(id, node_id_offset, root_node_index))
-            .map(|i| i.try_into().expect("i32 limit reached for ids"))
-            .collect();
+    let packet = CCommands::new(proto_nodes.into(), VarInt(root_node_index as i32));
+    player.client.enqueue_packet(&packet).await;
+}
 
-        let redirect_target = node
-            .redirect()
-            .and_then(|redirection| dispatcher.tree.resolve(redirection))
-            .map(|id| resolve_node_id(id, node_id_offset, root_node_index))
-            .map(|i| i.try_into().expect("i32 limit reached for ids"));
+async fn make_proto_nodes_for_dispatcher<'a>(
+    nodes: &mut Vec<ProtoNode<'a>>,
+    command_source: &'_ CommandSource,
+    tree: &'a Tree,
+    root_node_index: i32,
+) -> Box<[VarInt]> {
+    // First, index only the usable nodes.
+    let mut map: FxHashMap<NodeId, i32> = FxHashMap::default();
+    map.insert(ROOT_NODE_ID, root_node_index);
 
-        let satisfies_requirements = true;
+    let mut children_indices: Vec<VarInt> = Vec::new();
+    for child_id in tree.get_root_children() {
+        if tree[child_id].owned.requirements.evaluate(command_source).await {
+            children_indices.push(
+                index_usable_nodes(&mut map, nodes, command_source, tree, child_id.into()).await
+                    .into()
+            );
+        }
+    }
 
-        match node {
-            AttachedNode::Root(_) => {
-                root_node_children_second = children;
+    children_indices.into_boxed_slice()
+}
+
+fn index_usable_nodes<'a, 'b>(
+    map: &'b mut FxHashMap<NodeId, i32>,
+    nodes: &'b mut Vec<ProtoNode<'a>>,
+    command_source: &'b CommandSource,
+    tree: &'a Tree,
+    node_id: NodeId,
+) -> Pin<Box<dyn Future<Output = i32> + Send + 'b>> {
+    Box::pin(async move {
+        if let Some(index) = map.get(&node_id) {
+            return *index;
+        }
+
+        let node = &tree[node_id];
+
+        let redirect_target = {
+            if let Some(id) = node
+                .redirect()
+                .and_then(|redirection| tree.resolve(redirection))
+            {
+                Some(index_usable_nodes(map, nodes, command_source, tree, id).await)
+            } else {
+                None
             }
-            AttachedNode::Literal(literal_attached_node) => {
-                let node = ProtoNode {
-                    children,
-                    node_type: ProtoNodeType::Literal {
-                        name: &literal_attached_node.meta.literal,
-                        is_executable: literal_attached_node.owned.command.is_some(),
-                        redirect_target,
-                        restricted: !satisfies_requirements,
-                    },
-                };
-                proto_nodes.push(node);
+        };
+
+        let mut children = Vec::with_capacity(node.children_ref().len());
+        for child_id in node.children_ref().values() {
+            let child = &tree[*child_id];
+            if child.requirements().evaluate(command_source).await {
+                let index =
+                    index_usable_nodes(map, nodes, command_source, tree, *child_id).await;
+                children.push(index.into());
             }
-            AttachedNode::Command(command_attached_node) => {
-                let node = ProtoNode {
-                    children,
-                    node_type: ProtoNodeType::Literal {
-                        name: &command_attached_node.meta.literal,
-                        is_executable: command_attached_node.owned.command.is_some(),
-                        redirect_target,
-                        restricted: !satisfies_requirements,
-                    },
-                };
-                proto_nodes.push(node);
-            }
+        }
+        let children = children.into_boxed_slice();
+
+        let restricted = false;
+
+        let proto_node = match node {
+            AttachedNode::Root(_) => ProtoNode {
+                children,
+                node_type: ProtoNodeType::Root,
+            },
+            AttachedNode::Literal(literal_attached_node) => ProtoNode {
+                children,
+                node_type: ProtoNodeType::Literal {
+                    name: &literal_attached_node.meta.literal,
+                    is_executable: literal_attached_node.owned.command.is_some(),
+                    redirect_target,
+                    restricted,
+                },
+            },
+            AttachedNode::Command(command_attached_node) => ProtoNode {
+                children,
+                node_type: ProtoNodeType::Literal {
+                    name: &command_attached_node.meta.literal,
+                    is_executable: command_attached_node.owned.command.is_some(),
+                    redirect_target,
+                    restricted,
+                },
+            },
             AttachedNode::Argument(argument_attached_node) => {
                 let arg_type = &argument_attached_node.meta.argument_type;
-
-                let node = ProtoNode {
+                ProtoNode {
                     children,
                     node_type: ProtoNodeType::Argument {
                         name: &argument_attached_node.meta.name,
@@ -136,36 +198,17 @@ pub async fn send_c_commands_packet(
                             arg_type.override_suggestion_providers()
                         },
                         redirect_target,
-                        restricted: !satisfies_requirements,
+                        restricted,
                     },
-                };
-                proto_nodes.push(node);
+                }
             }
-        }
-    }
+        };
 
-    if !root_node_children_second.is_empty() {
-        let root_node = &mut proto_nodes[root_node_index];
-        let mut first = std::mem::take(&mut root_node.children).into_vec();
-        first.append(&mut root_node_children_second.into_vec());
-        root_node.children = first.into_boxed_slice();
-    }
-
-    let packet = CCommands::new(proto_nodes.into(), VarInt(root_node_index as i32));
-    player.client.enqueue_packet(&packet).await;
-}
-
-fn resolve_node_id(node_id: NodeId, node_id_offset: usize, root_node_index: usize) -> usize {
-    if node_id == ROOT_NODE_ID {
-        root_node_index
-    } else {
-        const FIRST_NONROOT_ID: usize = 2;
-        debug_assert!(
-            node_id.0.get() >= FIRST_NONROOT_ID,
-            "Root node should have been handled in the if body"
-        );
-        node_id_offset + node_id.0.get() - FIRST_NONROOT_ID
-    }
+        let i = nodes.len().try_into().expect("i32 limit reached for ids");
+        nodes.push(proto_node);
+        map.insert(node_id, i);
+        i
+    })
 }
 
 struct ProtoNodeBuilder<'a> {

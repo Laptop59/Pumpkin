@@ -97,7 +97,7 @@ impl SuggestionProvider for OpSuggestionProvider {
             let ops = context.server().data.operator_config.read().await;
             for player in context.source.server().get_all_players() {
                 if ops.ops.iter().all(|op| op.uuid != player.gameprofile.id) {
-                    builder = builder.suggest(player.gameprofile.name.clone());
+                    builder = builder.filter_and_suggest_one(player.gameprofile.name.clone());
                 }
             }
             builder.build()

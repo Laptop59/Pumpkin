@@ -32,17 +32,17 @@ pub struct RootNodeId;
 /// Represents the unique integral number
 /// of a specific literal node, with respect to a tree.
 #[derive(Copy, Clone, PartialEq, Eq, Debug, Hash)]
-pub struct LiteralNodeId(pub NonZero<usize>);
+pub struct LiteralNodeId(pub(super) NonZero<usize>);
 
 /// Represents the unique integral number
 /// of a specific command node, with respect to a tree.
 #[derive(Copy, Clone, PartialEq, Eq, Debug, Hash)]
-pub struct CommandNodeId(pub NonZero<usize>);
+pub struct CommandNodeId(pub(super) NonZero<usize>);
 
 /// Represents the unique integral number
 /// of a specific argument node, with respect to a tree.
 #[derive(Copy, Clone, PartialEq, Eq, Debug, Hash)]
-pub struct ArgumentNodeId(pub NonZero<usize>);
+pub struct ArgumentNodeId(pub(super) NonZero<usize>);
 
 impl From<RootNodeId> for NodeId {
     fn from(_id: RootNodeId) -> Self {
@@ -137,7 +137,7 @@ pub enum NodeClassification {
     Argument,
 }
 
-/// Represents a node not attached to a [`Tree`] yet.
+/// Represents a node that has been attached to a [`Tree`].
 #[derive(Clone)]
 pub enum AttachedNode {
     Root(RootAttachedNode),
