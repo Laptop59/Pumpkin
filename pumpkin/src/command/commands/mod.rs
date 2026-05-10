@@ -125,7 +125,6 @@ pub async fn default_dispatcher(
     );
     dispatcher.register(data::init_command_tree(), "minecraft:command.data");
     // Three
-    dispatcher.register(deop::init_command_tree(), "minecraft:command.deop");
     dispatcher.register(kick::init_command_tree(), "minecraft:command.kick");
     dispatcher.register(plugin::init_command_tree(), "pumpkin:command.plugin");
     dispatcher.register(plugins::init_command_tree(), "pumpkin:command.plugins");
@@ -147,6 +146,7 @@ pub async fn default_dispatcher(
 
     banlist::register(&mut dispatcher, registry);
     difficulty::register(&mut dispatcher, registry);
+    deop::register(&mut dispatcher, registry);
     help::register(&mut dispatcher, registry);
     kill::register(&mut dispatcher, registry);
     op::register(&mut dispatcher, registry);
@@ -404,13 +404,6 @@ fn register_level_3_permissions(registry: &mut PermissionRegistry) {
         .register_permission(Permission::new(
             "minecraft:command.setworldspawn",
             "Sets the world spawn point",
-            PermissionDefault::Op(PermissionLvl::Three),
-        ))
-        .unwrap();
-    registry
-        .register_permission(Permission::new(
-            "minecraft:command.deop",
-            "Revokes operator status from a player",
             PermissionDefault::Op(PermissionLvl::Three),
         ))
         .unwrap();

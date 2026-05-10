@@ -1,41 +1,37 @@
-use crate::command::CommandResult;
-use crate::{
-    command::{
-        CommandError, CommandExecutor, CommandSender,
-        args::{
-            Arg, ConsumedArgs,
-            gameprofile::{GameProfileSuggestionMode, GameProfilesArgumentConsumer},
-        },
-        tree::CommandTree,
-        tree::builder::argument,
-    },
-    data::SaveJSONConfiguration,
-};
-use CommandError::InvalidConsumption;
+use crate::command::argument_builder::{ArgumentBuilder, argument, command};
+use crate::command::argument_types::game_profile::GameProfileArgumentType;
+use crate::command::context::command_context::CommandContext;
+use crate::command::errors::error_types::CommandErrorType;
+use crate::command::node::{CommandExecutor, CommandExecutorResult};
+use crate::command::node::dispatcher::CommandDispatcher;
+use crate::command::suggestion::provider::{SuggestionProvider, SuggestionProviderResult};
+use crate::command::suggestion::suggestions::SuggestionsBuilder;
+use crate::data::SaveJSONConfiguration;
+use pumpkin_data::translation;
+use pumpkin_util::PermissionLvl;
+use pumpkin_util::permission::{Permission, PermissionDefault, PermissionRegistry};
 use pumpkin_util::text::TextComponent;
 
-const NAMES: [&str; 1] = ["deop"];
+pub const NOT_OP_ERROR_TYPE: CommandErrorType<0> = CommandErrorType::new(
+    translation::java::COMMANDS_DEOP_FAILED,
+    translation::bedrock::COMMANDS_DEOP_FAILED,
+);
+
 const DESCRIPTION: &str = "Revokes operator status from a player.";
+const PERMISSION: &str = "minecraft:command.deop";
 const ARG_TARGETS: &str = "targets";
 
-struct Executor;
+struct DeOpCommandExecutor;
 
-impl CommandExecutor for Executor {
-    fn execute<'a>(
-        &'a self,
-        sender: &'a CommandSender,
-        server: &'a crate::server::Server,
-        args: &'a ConsumedArgs<'a>,
-    ) -> CommandResult<'a> {
+impl CommandExecutor for DeOpCommandExecutor {
+    fn execute<'a>(&'a self, context: &'a CommandContext) -> CommandExecutorResult<'a> {
         Box::pin(async move {
+            let server = context.server();
+            let profiles = GameProfileArgumentType::get(context, ARG_TARGETS).await?;
             let mut config = server.data.operator_config.write().await;
 
-            let Some(Arg::GameProfiles(targets)) = args.get(&ARG_TARGETS) else {
-                return Err(InvalidConsumption(Some(ARG_TARGETS.into())));
-            };
-
-            let mut succeeded_deops: i32 = 0;
-            for profile in targets {
+            let mut succeeded_deops: usize = 0;
+            for profile in profiles {
                 if let Some(op_index) = config.ops.iter().position(|o| o.uuid == profile.id) {
                     config.ops.remove(op_index);
                     succeeded_deops += 1;
@@ -52,37 +48,55 @@ impl CommandExecutor for Executor {
                     }
 
                     let msg = TextComponent::translate_cross(
-                        "commands.deop.success",
-                        "commands.deop.success",
+                        translation::java::COMMANDS_DEOP_SUCCESS,
+                        translation::bedrock::COMMANDS_DEOP_SUCCESS,
                         [TextComponent::text(profile.name.clone())],
                     );
-                    sender.send_message(msg).await;
+                    context.source.send_feedback(msg, true).await;
                 }
             }
 
-            if succeeded_deops > 0 {
-                config.save();
-            }
-
             if succeeded_deops == 0 {
-                Err(CommandError::CommandFailed(TextComponent::translate_cross(
-                    "commands.deop.failed",
-                    "commands.deop.failed",
-                    [],
-                )))
+                Err(NOT_OP_ERROR_TYPE.create_without_context())
             } else {
-                Ok(succeeded_deops)
+                config.save();
+                Ok(succeeded_deops as i32)
             }
         })
     }
 }
 
-pub fn init_command_tree() -> CommandTree {
-    CommandTree::new(NAMES, DESCRIPTION).then(
-        argument(
-            ARG_TARGETS,
-            GameProfilesArgumentConsumer::new(GameProfileSuggestionMode::OpNames, false),
-        )
-        .execute(Executor),
-    )
+struct DeOpSuggestionProvider;
+
+impl SuggestionProvider for DeOpSuggestionProvider {
+    fn suggest<'a>(
+        &'a self,
+        context: &'a CommandContext,
+        mut builder: SuggestionsBuilder,
+    ) -> SuggestionProviderResult<'a> {
+        Box::pin(async move {
+            // Suggest every opped player.
+            let ops = context.server().data.operator_config.read().await;
+            for op in &ops.ops {
+                builder = builder.suggest(op.name.clone());
+            }
+            builder.build()
+        })
+    }
+}
+
+pub fn register(dispatcher: &mut CommandDispatcher, registry: &mut PermissionRegistry) {
+    registry.register_permission_or_panic(Permission::new(
+        PERMISSION,
+        DESCRIPTION,
+        PermissionDefault::Op(PermissionLvl::Three),
+    ));
+
+    dispatcher.register(
+        command("deop", DESCRIPTION).requires(PERMISSION).then(
+            argument(ARG_TARGETS, GameProfileArgumentType)
+                .suggests(DeOpSuggestionProvider)
+                .executes(DeOpCommandExecutor),
+        ),
+    );
 }
