@@ -4,11 +4,8 @@ use pumpkin_protocol::{
         ArgumentType, CCommands, ProtoNode, ProtoNodeType, StringProtoArgBehavior,
     },
 };
-use rustc_hash::FxHashMap;
-use std::{
-    pin::Pin,
-    sync::Arc,
-};
+use rustc_hash::{FxHashMap, FxHashSet};
+use std::sync::Arc;
 
 use super::tree::{Node, NodeType};
 use crate::command::{
@@ -27,7 +24,6 @@ use pumpkin_protocol::bedrock::client::available_commands::{
 };
 use pumpkin_protocol::java::client::play::SuggestionProviders;
 
-#[expect(clippy::too_many_lines)]
 pub async fn send_c_commands_packet(
     player: &Arc<Player>,
     server: &Arc<Server>,
@@ -83,7 +79,8 @@ pub async fn send_c_commands_packet(
         root_node_index
             .try_into()
             .expect("i32 limit reached for ids"),
-    ).await;
+    )
+    .await;
 
     if !root_node_children_second.is_empty() {
         let root_node = &mut proto_nodes[root_node_index];
@@ -106,12 +103,27 @@ async fn make_proto_nodes_for_dispatcher<'a>(
     let mut map: FxHashMap<NodeId, i32> = FxHashMap::default();
     map.insert(ROOT_NODE_ID, root_node_index);
 
+    let mut visiting: FxHashSet<NodeId> = FxHashSet::default();
+
     let mut children_indices: Vec<VarInt> = Vec::new();
     for child_id in tree.get_root_children() {
-        if tree[child_id].owned.requirements.evaluate(command_source).await {
+        if tree[child_id]
+            .owned
+            .requirements
+            .evaluate(command_source)
+            .await
+        {
             children_indices.push(
-                index_usable_nodes(&mut map, nodes, command_source, tree, child_id.into()).await
-                    .into()
+                index_usable_nodes(
+                    &mut map,
+                    &mut visiting,
+                    nodes,
+                    command_source,
+                    tree,
+                    child_id.into(),
+                )
+                .await
+                .into(),
             );
         }
     }
@@ -119,96 +131,131 @@ async fn make_proto_nodes_for_dispatcher<'a>(
     children_indices.into_boxed_slice()
 }
 
-fn index_usable_nodes<'a, 'b>(
+#[allow(clippy::too_many_lines)]
+async fn index_usable_nodes<'a, 'b>(
     map: &'b mut FxHashMap<NodeId, i32>,
+    visiting: &'b mut FxHashSet<NodeId>,
     nodes: &'b mut Vec<ProtoNode<'a>>,
     command_source: &'b CommandSource,
     tree: &'a Tree,
     node_id: NodeId,
-) -> Pin<Box<dyn Future<Output = i32> + Send + 'b>> {
-    Box::pin(async move {
-        if let Some(index) = map.get(&node_id) {
-            return *index;
-        }
+) -> i32 {
+    // A non-recursive approach.
+    enum Frame {
+        Enter(NodeId),
+        Exit {
+            node_id: NodeId,
+            redirect: Option<NodeId>,
+            children: Vec<NodeId>,
+        },
+    }
 
-        let node = &tree[node_id];
-
-        let redirect_target = {
-            if let Some(id) = node
-                .redirect()
-                .and_then(|redirection| tree.resolve(redirection))
-            {
-                Some(index_usable_nodes(map, nodes, command_source, tree, id).await)
-            } else {
-                None
-            }
-        };
-
-        let mut children = Vec::with_capacity(node.children_ref().len());
-        for child_id in node.children_ref().values() {
-            let child = &tree[*child_id];
-            if child.requirements().evaluate(command_source).await {
-                let index =
-                    index_usable_nodes(map, nodes, command_source, tree, *child_id).await;
-                children.push(index.into());
-            }
-        }
-        let children = children.into_boxed_slice();
-
-        let restricted = false;
-
-        let proto_node = match node {
-            AttachedNode::Root(_) => ProtoNode {
-                children,
-                node_type: ProtoNodeType::Root,
-            },
-            AttachedNode::Literal(literal_attached_node) => ProtoNode {
-                children,
-                node_type: ProtoNodeType::Literal {
-                    name: &literal_attached_node.meta.literal,
-                    is_executable: literal_attached_node.owned.command.is_some(),
-                    redirect_target,
-                    restricted,
-                },
-            },
-            AttachedNode::Command(command_attached_node) => ProtoNode {
-                children,
-                node_type: ProtoNodeType::Literal {
-                    name: &command_attached_node.meta.literal,
-                    is_executable: command_attached_node.owned.command.is_some(),
-                    redirect_target,
-                    restricted,
-                },
-            },
-            AttachedNode::Argument(argument_attached_node) => {
-                let arg_type = &argument_attached_node.meta.argument_type;
-                ProtoNode {
-                    children,
-                    node_type: ProtoNodeType::Argument {
-                        name: &argument_attached_node.meta.name,
-                        is_executable: argument_attached_node.owned.command.is_some(),
-                        parser: arg_type.client_side_parser(),
-                        override_suggestion_type: if argument_attached_node
-                            .meta
-                            .suggestion_provider
-                            .is_some()
-                        {
-                            Some(SuggestionProviders::AskServer)
-                        } else {
-                            arg_type.override_suggestion_providers()
-                        },
-                        redirect_target,
-                        restricted,
-                    },
+    let mut stack = vec![Frame::Enter(node_id)];
+    while let Some(frame) = stack.pop() {
+        match frame {
+            Frame::Enter(node_id) => {
+                if map.contains_key(&node_id) {
+                    continue;
+                }
+                if !visiting.insert(node_id) {
+                    continue;
+                }
+                let node = &tree[node_id];
+                let redirect = node
+                    .redirect()
+                    .and_then(|redirection| tree.resolve(redirection));
+                let mut children = Vec::new();
+                for child_id in node.children_ref().values() {
+                    let child = &tree[*child_id];
+                    if child.requirements().evaluate(command_source).await {
+                        children.push(*child_id);
+                    }
+                }
+                stack.push(Frame::Exit {
+                    node_id,
+                    redirect,
+                    children: children.clone(),
+                });
+                for child in children {
+                    stack.push(Frame::Enter(child));
+                }
+                if let Some(redirect_id) = redirect {
+                    stack.push(Frame::Enter(redirect_id));
                 }
             }
-        };
-
-        let i = nodes.len().try_into().expect("i32 limit reached for ids");
-        nodes.push(proto_node);
-        map.insert(node_id, i);
-        i
-    })
+            Frame::Exit {
+                node_id,
+                redirect,
+                children,
+            } => {
+                if map.contains_key(&node_id) {
+                    continue;
+                }
+                let redirect_target = redirect.as_ref().and_then(|id| map.get(id)).copied();
+                let mut children_indices = Vec::with_capacity(children.len());
+                for child in children {
+                    if let Some(id) = map.get(&child) {
+                        children_indices.push((*id).into());
+                    }
+                }
+                let children = children_indices.into_boxed_slice();
+                let restricted = false;
+                let node = &tree[node_id];
+                let proto_node = match node {
+                    AttachedNode::Root(_) => ProtoNode {
+                        children,
+                        node_type: ProtoNodeType::Root,
+                    },
+                    AttachedNode::Literal(literal_attached_node) => ProtoNode {
+                        children,
+                        node_type: ProtoNodeType::Literal {
+                            name: &literal_attached_node.meta.literal,
+                            is_executable: literal_attached_node.owned.command.is_some(),
+                            redirect_target,
+                            restricted,
+                        },
+                    },
+                    AttachedNode::Command(command_attached_node) => ProtoNode {
+                        children,
+                        node_type: ProtoNodeType::Literal {
+                            name: &command_attached_node.meta.literal,
+                            is_executable: command_attached_node.owned.command.is_some(),
+                            redirect_target,
+                            restricted,
+                        },
+                    },
+                    AttachedNode::Argument(argument_attached_node) => {
+                        let arg_type = &argument_attached_node.meta.argument_type;
+                        ProtoNode {
+                            children,
+                            node_type: ProtoNodeType::Argument {
+                                name: &argument_attached_node.meta.name,
+                                is_executable: argument_attached_node.owned.command.is_some(),
+                                parser: arg_type.client_side_parser(),
+                                override_suggestion_type: if argument_attached_node
+                                    .meta
+                                    .suggestion_provider
+                                    .is_some()
+                                {
+                                    Some(SuggestionProviders::AskServer)
+                                } else {
+                                    arg_type.override_suggestion_providers()
+                                },
+                                redirect_target,
+                                restricted,
+                            },
+                        }
+                    }
+                };
+                let i = nodes.len().try_into().expect("i32 limit reached for ids");
+                nodes.push(proto_node);
+                map.insert(node_id, i);
+                visiting.remove(&node_id);
+            }
+        }
+    }
+    *map.get(&node_id)
+        .expect("The node should have been put with an index at this point")
 }
 
 struct ProtoNodeBuilder<'a> {
