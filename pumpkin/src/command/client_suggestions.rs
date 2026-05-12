@@ -199,8 +199,8 @@ async fn index_usable_nodes<'a, 'b>(
                     }
                 }
                 let children = children_indices.into_boxed_slice();
-                let restricted = false;
                 let node = &tree[node_id];
+                let restricted = !node.requirements().0.is_empty();
                 let proto_node = match node {
                     AttachedNode::Root(_) => ProtoNode {
                         children,
