@@ -10,9 +10,7 @@ use crate::command::string_reader::StringReader;
 use crate::net::authentication::lookup_profile_by_name;
 use crate::net::{GameProfile, offline_uuid};
 use crate::server::Server;
-use arc_swap::ArcSwap;
 use pumpkin_data::translation;
-use std::sync::Arc;
 use uuid::Uuid;
 
 pub const UNKNOWN_PLAYER_ERROR_TYPE: CommandErrorType<0> = CommandErrorType::new(
@@ -54,7 +52,7 @@ impl GameProfileResult {
             Self::Name(name) => {
                 let server = source.server();
                 if let Some(player) = server.get_player_by_name(name) {
-                    return Ok(vec![player.gameprofile.clone()]);
+                    return Ok(vec![(**player.gameprofile.load()).clone()]);
                 }
 
                 let cached_entry = server.data.user_cache.write().await.get_by_name(name);
@@ -99,7 +97,7 @@ impl GameProfileResult {
                 let server = source.server();
 
                 if let Some(player) = server.get_player_by_uuid(*uuid) {
-                    return Ok(vec![player.gameprofile.clone()]);
+                    return Ok(vec![(**player.gameprofile.load()).clone()]);
                 }
 
                 let cached_entry = server.data.user_cache.write().await.get_by_uuid(*uuid);
@@ -115,7 +113,7 @@ impl GameProfileResult {
             }
         }?;
 
-        Ok(players.iter().map(|p| &p.gameprofile).cloned().collect())
+        Ok(players.iter().map(|p| (**p.gameprofile.load()).clone()).collect())
     }
 
     async fn resolve_known_profile_by_name(server: &Server, name: &str) -> Option<GameProfile> {
@@ -173,8 +171,7 @@ impl GameProfileResult {
         GameProfile {
             id: uuid,
             name,
-            properties: ArcSwap::new(Arc::new(vec![])),
-            profile_actions: None,
+            properties: vec![]
         }
     }
 }

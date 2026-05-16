@@ -397,7 +397,7 @@ pub struct Player {
     /// The underlying living entity object that represents the player.
     pub living_entity: LivingEntity,
     /// The player's game profile information, including their username and UUID.
-    pub gameprofile: GameProfile,
+    pub gameprofile: ArcSwap<GameProfile>,
     /// The client connection associated with the player.
     pub client: ClientPlatform,
     /// The player's inventory.
@@ -546,7 +546,7 @@ impl Player {
         Self {
             living_entity,
             config: ArcSwap::new(Arc::new(config)),
-            gameprofile,
+            gameprofile: ArcSwap::new(Arc::new(gameprofile)),
             client,
             awaiting_teleport: Mutex::new(None),
             breath_manager: BreathManager::default(),
@@ -691,7 +691,7 @@ impl Player {
         world.broadcast_packet_all(&CPlayerInfoUpdate::new(
             PlayerInfoFlags::UPDATE_DISPLAY_NAME.bits(),
             &[pumpkin_protocol::java::client::play::Player {
-                uuid: self.gameprofile.id,
+                uuid: self.gameprofile.load().id,
                 actions: &[PlayerAction::UpdateDisplayName(display_name.as_ref())],
             }],
         ));
@@ -707,7 +707,7 @@ impl Player {
         world.broadcast_packet_all(&CPlayerInfoUpdate::new(
             PlayerInfoFlags::UPDATE_DISPLAY_NAME.bits(),
             &[pumpkin_protocol::java::client::play::Player {
-                uuid: self.gameprofile.id,
+                uuid: self.gameprofile.load().id,
                 actions: &[PlayerAction::UpdateDisplayName(name.as_ref())],
             }],
         ));
@@ -719,7 +719,7 @@ impl Player {
         world.broadcast_packet_all(&CPlayerInfoUpdate::new(
             PlayerInfoFlags::UPDATE_LIST_PRIORITY.bits(),
             &[pumpkin_protocol::java::client::play::Player {
-                uuid: self.gameprofile.id,
+                uuid: self.gameprofile.load().id,
                 actions: &[PlayerAction::UpdateListOrder(VarInt(order))],
             }],
         ));
@@ -731,7 +731,7 @@ impl Player {
         world.broadcast_packet_all(&CPlayerInfoUpdate::new(
             PlayerInfoFlags::UPDATE_LATENCY.bits(),
             &[pumpkin_protocol::java::client::play::Player {
-                uuid: self.gameprofile.id,
+                uuid: self.gameprofile.load().id,
                 actions: &[PlayerAction::UpdateLatency(VarInt(latency))],
             }],
         ));
@@ -743,7 +743,7 @@ impl Player {
         world.broadcast_packet_all(&CPlayerInfoUpdate::new(
             PlayerInfoFlags::UPDATE_LISTED.bits(),
             &[pumpkin_protocol::java::client::play::Player {
-                uuid: self.gameprofile.id,
+                uuid: self.gameprofile.load().id,
                 actions: &[PlayerAction::UpdateListed(listed)],
             }],
         ));
@@ -784,7 +784,7 @@ impl Player {
 
         debug!(
             "Removing player {}, unwatching {} chunks",
-            self.gameprofile.name,
+            self.gameprofile.load().name,
             radial_chunks.len()
         );
 
@@ -802,7 +802,7 @@ impl Player {
 
         debug!(
             "Removed player id {} from world {} ({} chunks remain cached)",
-            self.gameprofile.name,
+            self.gameprofile.load().name,
             self.world().get_world_name(),
             level.loaded_chunk_count(),
         );
@@ -2447,17 +2447,19 @@ impl Player {
             pumpkin_util::text::TextComponent::get_text,
         );
 
+        let gameprofile = self.gameprofile.load();
+
         if banned_players
             .banned_players
             .iter()
-            .any(|entry| entry.uuid == self.gameprofile.id)
+            .any(|entry| entry.uuid == gameprofile.id)
         {
             return;
         }
 
         banned_players.banned_players.push(
             crate::data::banlist_serializer::BannedPlayerEntry::new(
-                &self.gameprofile,
+                &gameprofile,
                 "Plugin".to_string(),
                 None,
                 string_reason,
@@ -2613,7 +2615,7 @@ impl Player {
                     .broadcast_packet_all(&CPlayerInfoUpdate::new(
                         PlayerInfoFlags::UPDATE_GAME_MODE.bits(),
                         &[pumpkin_protocol::java::client::play::Player {
-                            uuid: self.gameprofile.id,
+                            uuid: self.gameprofile.load().id,
                             actions: &[PlayerAction::UpdateGameMode((gamemode as i32).into())],
                         }],
                     ));
@@ -3353,7 +3355,7 @@ impl Player {
         if !screen_handler.can_use(self.as_ref()) {
             warn!(
                 "Player {} interacted with invalid menu {:?}",
-                self.gameprofile.name,
+                self.gameprofile.load().name,
                 screen_handler.window_type()
             );
             return;
@@ -3364,7 +3366,7 @@ impl Player {
         if !screen_handler.is_slot_valid(i32::from(slot)).await {
             warn!(
                 "Player {} clicked invalid slot index: {}, available slots: {}",
-                self.gameprofile.name,
+                self.gameprofile.load().name,
                 slot,
                 screen_handler.get_behaviour().slots.len()
             );
@@ -3553,7 +3555,11 @@ impl Player {
     pub async fn has_permission(self: &Arc<Self>, server: &Server, node: &str) -> bool {
         let perm_manager = server.permission_manager.read().await;
         let result = perm_manager
-            .has_permission(&self.gameprofile.id, node, self.permission_lvl.load())
+            .has_permission(
+                &self.gameprofile.load().id,
+                node,
+                self.permission_lvl.load(),
+            )
             .await;
         drop(perm_manager);
 
@@ -3744,7 +3750,7 @@ impl Player {
 
 impl PartialEq for Player {
     fn eq(&self, other: &Self) -> bool {
-        self.gameprofile.id == other.gameprofile.id
+        self.gameprofile.load().id == other.gameprofile.load().id
     }
 }
 
@@ -4106,7 +4112,7 @@ impl EntityBase for Player {
 
     fn get_name(&self) -> TextComponent {
         //TODO: team color
-        TextComponent::text(self.gameprofile.name.clone())
+        TextComponent::text(self.gameprofile.load().name.clone())
     }
 
     fn get_display_name(&self) -> EntityBaseFuture<'_, TextComponent> {
@@ -4116,15 +4122,16 @@ impl EntityBase for Player {
             }
             let name = self.get_name();
             let name_clone = name.clone();
+            let gameprofile = self.gameprofile.load();
             let mut name = name.click_event(ClickEvent::SuggestCommand {
-                command: format!("/tell {} ", self.gameprofile.name.clone()).into(),
+                command: format!("/tell {} ", gameprofile.name.clone()).into(),
             });
             name = name.hover_event(HoverEvent::show_entity(
                 self.living_entity.entity.entity_uuid.to_string(),
                 self.living_entity.entity.entity_type.resource_name.into(),
                 Some(name_clone),
             ));
-            name.insertion(self.gameprofile.name.clone())
+            name.insertion(gameprofile.name.clone())
         })
     }
 
@@ -4545,7 +4552,7 @@ impl InventoryPlayer for Player {
             debug!("Player::award_experience called with amount={amount}");
             if amount > 0 {
                 debug!("Player: adding {amount} experience points");
-                if let Some(player) = self.world().get_player_by_uuid(self.gameprofile.id) {
+                if let Some(player) = self.world().get_player_by_uuid(self.gameprofile.load().id) {
                     player.add_experience_points(amount).await;
                 }
             }

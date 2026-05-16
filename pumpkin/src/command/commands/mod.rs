@@ -19,6 +19,7 @@ mod difficulty;
 mod effect;
 mod enchant;
 mod experience;
+mod fetchprofile;
 mod fill;
 mod gamemode;
 mod gamerule;
@@ -147,6 +148,7 @@ pub async fn default_dispatcher(
 
     banlist::register(&mut dispatcher, registry);
     difficulty::register(&mut dispatcher, registry);
+    fetchprofile::register(&mut dispatcher, registry);
     help::register(&mut dispatcher, registry);
     kill::register(&mut dispatcher, registry);
     op::register(&mut dispatcher, registry);

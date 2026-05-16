@@ -77,7 +77,7 @@ impl BedrockClient {
 
         debug!(
             "Player {} updated their render distance: {} -> {}.",
-            player.gameprofile.name, old_view_distance, view_distance
+            player.gameprofile.load().name, old_view_distance, view_distance
         );
         chunker::update_position(player).await;
     }
@@ -89,7 +89,7 @@ impl BedrockClient {
     ) {
         debug!(
             "Player {} initialized (Runtime ID: {})",
-            player.gameprofile.name, packet.runtime_entity_id.0
+            player.gameprofile.load().name, packet.runtime_entity_id.0
         );
         // This is sent when the client has finished loading and rendering the world.
         player.set_client_loaded(true);
@@ -241,7 +241,7 @@ impl BedrockClient {
     }
 
     pub async fn handle_chat_message(&self, server: &Server, player: &Arc<Player>, packet: SText) {
-        let gameprofile = &player.gameprofile;
+        let gameprofile = player.gameprofile.load();
 
         send_cancellable! {{
             server;
@@ -404,7 +404,7 @@ impl BedrockClient {
                 if server.advanced_config.commands.log_console {
                     info!(
                         "Player ({}): executed command /{}",
-                        player.gameprofile.name,
+                        player.gameprofile.load().name,
                         command
                     );
                 }

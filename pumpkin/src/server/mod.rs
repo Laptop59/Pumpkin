@@ -497,7 +497,7 @@ impl Server {
                     .add_player(&player)
                     .is_ok() {
                     let mut user_cache = self.data.user_cache.write().await;
-                    user_cache.upsert(player.gameprofile.id, player.gameprofile.name.clone());
+                    user_cache.upsert(player.gameprofile.load().id, player.gameprofile.load().name.clone());
 
                     // TODO: Config if we want increase online
                     if let Some(config) = config {

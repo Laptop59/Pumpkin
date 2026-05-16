@@ -147,12 +147,12 @@ impl pumpkin::plugin::player::HostPlayer for PluginHostState {
 
     async fn get_id(&mut self, player: Resource<Player>) -> wasmtime::Result<String> {
         let player = player_from_resource(self, &player)?;
-        Ok(player.gameprofile.id.to_string())
+        Ok(player.gameprofile.load().id.to_string())
     }
 
     async fn get_name(&mut self, player: Resource<Player>) -> wasmtime::Result<String> {
         let player = player_from_resource(self, &player)?;
-        Ok(player.gameprofile.name.clone())
+        Ok(player.gameprofile.load().name.clone())
     }
 
     async fn get_position(
@@ -243,7 +243,7 @@ impl pumpkin::plugin::player::HostPlayer for PluginHostState {
         let server = self.server.as_ref().expect("server not available");
 
         let mut perm_manager = server.permission_manager.write().await;
-        let attachment = perm_manager.get_attachment(player.gameprofile.id);
+        let attachment = perm_manager.get_attachment(player.gameprofile.load().id);
         drop(perm_manager);
 
         attachment.write().await.set_permission(&node, value);
@@ -260,7 +260,7 @@ impl pumpkin::plugin::player::HostPlayer for PluginHostState {
         let server = self.server.as_ref().expect("server not available");
 
         let mut perm_manager = server.permission_manager.write().await;
-        let attachment = perm_manager.get_attachment(player.gameprofile.id);
+        let attachment = perm_manager.get_attachment(player.gameprofile.load().id);
         drop(perm_manager);
 
         attachment.write().await.unset_permission(&node);
@@ -277,7 +277,7 @@ impl pumpkin::plugin::player::HostPlayer for PluginHostState {
         let server = self.server.as_ref().expect("server not available");
 
         let mut perm_manager = server.permission_manager.write().await;
-        let attachment = perm_manager.get_attachment(player.gameprofile.id);
+        let attachment = perm_manager.get_attachment(player.gameprofile.load().id);
         drop(perm_manager);
 
         Ok(attachment.read().await.has_permission_set(&node))
@@ -800,8 +800,8 @@ impl pumpkin::plugin::player::HostPlayer for PluginHostState {
         let player = player_from_resource(self, &player)?;
         Ok(player
             .gameprofile
-            .properties
             .load()
+            .properties
             .iter()
             .find(|p| p.name == "textures")
             .map(|p| PlayerSkin {
@@ -816,16 +816,16 @@ impl pumpkin::plugin::player::HostPlayer for PluginHostState {
         skin: PlayerSkin,
     ) -> wasmtime::Result<()> {
         let player = player_from_resource(self, &player)?;
-        let mut properties = (**player.gameprofile.properties.load()).clone();
+        let mut gameprofile = player.gameprofile.load().as_ref().clone();
 
-        properties.retain(|p| p.name != "textures");
-        properties.push(Property {
+        gameprofile.properties.retain(|p| p.name != "textures");
+        gameprofile.properties.push(Property {
             name: "textures".into(),
             value: skin.value,
             signature: skin.signature,
         });
 
-        player.gameprofile.properties.store(Arc::new(properties));
+        player.gameprofile.store(Arc::new(gameprofile));
 
         Ok(())
     }

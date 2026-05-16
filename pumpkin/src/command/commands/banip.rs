@@ -114,7 +114,7 @@ async fn ban_ip(
     let affected = server.get_players_by_ip(target_ip).await;
     let names = affected
         .iter()
-        .map(|p| p.gameprofile.name.clone())
+        .map(|p| p.gameprofile.load().name.clone())
         .collect::<Vec<_>>()
         .join(" ");
 

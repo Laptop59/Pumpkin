@@ -3,7 +3,6 @@ use crate::{
     net::{bedrock::BedrockClient, java::JavaClient},
     server::Server,
 };
-use arc_swap::ArcSwap;
 use bytes::Bytes;
 use std::{
     net::SocketAddr,
@@ -13,8 +12,8 @@ use std::{
 
 use pumpkin_data::translation;
 use pumpkin_protocol::{ClientPacket, Property};
-use pumpkin_util::{Hand, ProfileAction, text::TextComponent, version::MinecraftVersion};
-use serde::{Deserialize, Deserializer};
+use pumpkin_util::{Hand, text::TextComponent, version::MinecraftVersion};
+use serde::Deserialize;
 use sha1::Digest;
 use sha2::Sha256;
 use tokio::task::JoinHandle;
@@ -29,33 +28,11 @@ mod proxy;
 pub mod query;
 pub mod rcon;
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Clone, Debug)]
 pub struct GameProfile {
     pub id: Uuid,
     pub name: String,
-    #[serde(deserialize_with = "from_vec")]
-    pub properties: ArcSwap<Vec<Property>>,
-    #[serde(rename = "profileActions")]
-    pub profile_actions: Option<Vec<ProfileAction>>,
-}
-
-impl Clone for GameProfile {
-    fn clone(&self) -> Self {
-        Self {
-            id: self.id,
-            name: self.name.clone(),
-            properties: ArcSwap::new(self.properties.load().clone()),
-            profile_actions: self.profile_actions.clone(),
-        }
-    }
-}
-
-fn from_vec<'de, D>(deserializer: D) -> Result<ArcSwap<Vec<Property>>, D::Error>
-where
-    D: Deserializer<'de>,
-{
-    let v = Vec::<Property>::deserialize(deserializer)?;
-    Ok(ArcSwap::new(Arc::new(v)))
+    pub properties: Vec<Property>,
 }
 
 pub fn offline_uuid(username: &str) -> Result<Uuid, uuid::Error> {

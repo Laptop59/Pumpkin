@@ -96,8 +96,9 @@ impl SuggestionProvider for OpSuggestionProvider {
             // Suggest every non-opped player.
             let ops = context.server().data.operator_config.read().await;
             for player in context.source.server().get_all_players() {
-                if ops.ops.iter().all(|op| op.uuid != player.gameprofile.id) {
-                    builder = builder.suggest(player.gameprofile.name.clone());
+                let gameprofile = player.gameprofile.load();
+                if ops.ops.iter().all(|op| op.uuid != gameprofile.id) {
+                    builder = builder.suggest(gameprofile.name.clone());
                 }
             }
             builder.build()

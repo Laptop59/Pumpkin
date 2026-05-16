@@ -83,7 +83,7 @@ impl super::Phase for CirclingPhase {
                 if rand::random_bool(0.5) {
                     dragon.set_phase(EnderDragonPhase::FlyToPortal).await;
                 } else if let Some(player) = dragon.find_nearest_player() {
-                    *dragon.target_player.lock().await = Some(player.gameprofile.id);
+                    *dragon.target_player.lock().await = Some(player.gameprofile.load().id);
                     dragon.set_phase(EnderDragonPhase::Strafing).await;
                 }
             }

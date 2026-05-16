@@ -1,5 +1,3 @@
-use arc_swap::ArcSwap;
-use std::sync::Arc;
 use std::{net::IpAddr, net::SocketAddr};
 use thiserror::Error;
 use tokio::sync::Mutex;
@@ -66,8 +64,7 @@ pub async fn bungeecord_login(
         GameProfile {
             id,
             name,
-            properties: ArcSwap::new(Arc::new(properties)),
-            profile_actions: None,
+            properties
         },
     ))
 }

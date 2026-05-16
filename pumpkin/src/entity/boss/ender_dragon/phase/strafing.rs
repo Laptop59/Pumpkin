@@ -35,7 +35,7 @@ impl super::Phase for StrafingPhase {
                     .players
                     .load()
                     .iter()
-                    .find(|p| p.gameprofile.id == id)
+                    .find(|p| p.gameprofile.load().id == id)
                     .cloned()
             } else {
                 None

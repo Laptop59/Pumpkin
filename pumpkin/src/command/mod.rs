@@ -73,17 +73,13 @@ pub enum CommandSender {
 
 impl fmt::Display for CommandSender {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f,
-            "{}",
-            match self {
-                Self::Console => "Server",
-                Self::Rcon(_) => "Rcon",
-                Self::Player(p) => &p.gameprofile.name,
-                Self::CommandBlock(..) => "@",
-                Self::Dummy => "",
-            }
-        )
+        match self {
+            Self::Console => write!(f, "Server"),
+            Self::Rcon(_) => write!(f, "Rcon"),
+            Self::Player(p) => write!(f, "{}", p.gameprofile.load().name.as_str()),
+            Self::CommandBlock(..) => write!(f, "@"),
+            Self::Dummy => fmt::Result::Ok(()),
+        }
     }
 }
 

@@ -299,7 +299,7 @@ impl JavaClient {
         }
         // Sync position with all other players.
         world.broadcast_packet_except(
-            &[player.gameprofile.id],
+            &[player.gameprofile.load().id],
             &CEntityPositionSync::new(
                 entity_id.into(),
                 pos,
@@ -374,7 +374,7 @@ impl JavaClient {
                     // Send the new position to all other players.
                     world
                         .broadcast_packet_except(
-                            &[player.gameprofile.id],
+                            &[player.gameprofile.load().id],
                             &CUpdateEntityPos::new(
                                 player.entity_id().into(),
                                 Vector3::new(
@@ -499,7 +499,7 @@ impl JavaClient {
                     // Send the new position to all other players.
                     world
                         .broadcast_packet_except(
-                            &[player.gameprofile.id],
+                            &[player.gameprofile.load().id],
                             &CUpdateEntityPosRot::new(
                                 entity_id.into(),
                                 Vector3::new(
@@ -517,7 +517,7 @@ impl JavaClient {
 
                 world
                     .broadcast_packet_except(
-                        &[player.gameprofile.id],
+                        &[player.gameprofile.load().id],
                         &CHeadRot::new(entity_id.into(), yaw as u8),
                     )
                    ;
@@ -596,9 +596,9 @@ impl JavaClient {
         let world = entity.world.load_full();
         let packet =
             CUpdateEntityRot::new(entity_id.into(), yaw as u8, pitch as u8, rotation.ground);
-        world.broadcast_packet_except(&[player.gameprofile.id], &packet);
+        world.broadcast_packet_except(&[player.gameprofile.load().id], &packet);
         let packet = CHeadRot::new(entity_id.into(), yaw as u8);
-        world.broadcast_packet_except(&[player.gameprofile.id], &packet);
+        world.broadcast_packet_except(&[player.gameprofile.load().id], &packet);
     }
 
     pub async fn handle_chat_command(
@@ -634,7 +634,7 @@ impl JavaClient {
                 if server.advanced_config.commands.log_console {
                     info!(
                         "Player ({}): executed command /{}",
-                        player.gameprofile.name,
+                        player.gameprofile.load().name,
                         command
                     );
                 }
@@ -1259,7 +1259,7 @@ impl JavaClient {
         chat_message: SChatMessage,
     ) {
         player.update_last_action_time();
-        let gameprofile = &player.gameprofile;
+        let gameprofile = player.gameprofile.load();
 
         if let Err(err) = self
             .validate_chat_message(server, player, &chat_message)
@@ -1310,7 +1310,7 @@ impl JavaClient {
                         false,
                     );
                     let be_packet = SText::new(
-                        message, player.gameprofile.name.clone()
+                        message, player.gameprofile.load().name.clone()
                     );
 
                     world.broadcast_editioned(&je_packet, &be_packet).await;
@@ -1394,8 +1394,8 @@ impl JavaClient {
             log_at_level!(
                 err.severity(),
                 "{} (uuid {}) {}",
-                player.gameprofile.name,
-                player.gameprofile.id,
+                player.gameprofile.load().name,
+                player.gameprofile.load().id,
                 err
             );
             if err.is_kick()
@@ -1417,7 +1417,7 @@ impl JavaClient {
         server.broadcast_packet_all(&CPlayerInfoUpdate::new(
             0x02,
             &[pumpkin_protocol::java::client::play::Player {
-                uuid: player.gameprofile.id,
+                uuid: player.gameprofile.load().id,
                 actions: &[PlayerAction::InitializeChat(Some(InitChat {
                     session_id: session.session_id,
                     expires_at: session.expires_at,
@@ -1448,7 +1448,7 @@ impl JavaClient {
             .map_err(|_| ChatError::InvalidPublicKey)?;
 
         let mut signable = Vec::new();
-        signable.extend_from_slice(player.gameprofile.id.as_bytes());
+        signable.extend_from_slice(player.gameprofile.load().id.as_bytes());
         signable.extend_from_slice(&session.expires_at.to_be_bytes());
         signable.extend_from_slice(&session.public_key);
 
@@ -1502,7 +1502,7 @@ impl JavaClient {
                 } else {
                     debug!(
                         "Player {} ({}) updated their render distance: {} -> {}.",
-                        player.gameprofile.name, self.id, old_view_distance, new_view_distance_raw
+                        player.gameprofile.load().name, self.id, old_view_distance, new_view_distance_raw
                     );
                     true
                 };
@@ -1542,7 +1542,7 @@ impl JavaClient {
             if update_settings {
                 debug!(
                     "Player {} ({}) updated their skin.",
-                    player.gameprofile.name, self.id,
+                    player.gameprofile.load().name, self.id,
                 );
                 player.send_client_information();
             }
@@ -1765,7 +1765,7 @@ impl JavaClient {
                     if !player.can_interact_with_block_at(&player_action.position, 1.0) {
                         warn!(
                             "Player {0} tried to interact with block out of reach at {1}",
-                            player.gameprofile.name, player_action.position
+                            player.gameprofile.load().name, player_action.position
                         );
                         self.update_sequence(player, player_action.sequence.0);
                         return;
@@ -1851,7 +1851,7 @@ impl JavaClient {
                     if !player.can_interact_with_block_at(&player_action.position, 1.0) {
                         warn!(
                             "Player {0} tried to interact with block out of reach at {1}",
-                            player.gameprofile.name, player_action.position
+                            player.gameprofile.load().name, player_action.position
                         );
                         self.update_sequence(player, player_action.sequence.0);
                         return;
@@ -1871,7 +1871,7 @@ impl JavaClient {
                     if !player.can_interact_with_block_at(&location, 1.0) {
                         warn!(
                             "Player {0} tried to interact with block out of reach at {1}",
-                            player.gameprofile.name, player_action.position
+                            player.gameprofile.load().name, player_action.position
                         );
                         self.update_sequence(player, player_action.sequence.0);
                         return;
@@ -2395,7 +2395,7 @@ impl JavaClient {
         let slot = slot as u8;
         let previous_slot = player.inventory.get_selected_slot();
         if let Some(server) = player.world().server.upgrade() {
-            let Some(player_arc) = player.world().get_player_by_uuid(player.gameprofile.id) else {
+            let Some(player_arc) = player.world().get_player_by_uuid(player.gameprofile.load().id) else {
                 return;
             };
             let event = PlayerItemHeldEvent::new(player_arc, previous_slot, slot);

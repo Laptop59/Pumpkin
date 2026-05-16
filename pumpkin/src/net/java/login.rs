@@ -1,4 +1,3 @@
-use arc_swap::ArcSwap;
 use pumpkin_data::translation;
 use pumpkin_protocol::{
     ConnectionState, KnownPack, Label, Link, LinkType,
@@ -11,14 +10,13 @@ use pumpkin_protocol::{
     },
 };
 use pumpkin_util::{text::TextComponent, version::MinecraftVersion};
-use std::sync::Arc;
 use tracing::debug;
 use uuid::Uuid;
 
 use crate::{
     net::{
         GameProfile,
-        authentication::{self, AuthError},
+        authentication::{self, AuthError, GameProfileSuccess},
         is_valid_player_name,
         java::JavaClient,
         offline_uuid,
@@ -83,8 +81,7 @@ impl JavaClient {
             let profile = GameProfile {
                 id,
                 name: login_start.name,
-                properties: ArcSwap::new(Arc::new(vec![])),
-                profile_actions: None,
+                properties: vec![]
             };
 
             if server.advanced_config.networking.java_compression.enabled {
@@ -164,7 +161,7 @@ impl JavaClient {
                 &self.address.lock().await,
                 &profile.name,
                 &profile.id,
-                &online_player.gameprofile.name
+                &online_player.gameprofile.load().name
             );
             self.kick(TextComponent::translate_cross(
                 translation::java::MULTIPLAYER_DISCONNECT_DUPLICATE_LOGIN,
@@ -182,7 +179,7 @@ impl JavaClient {
                 &self.address.lock().await,
                 &profile.name,
                 &profile.id,
-                &online_player.gameprofile.name
+                &online_player.gameprofile.load().name
             );
             self.kick(TextComponent::translate_cross(
                 translation::java::MULTIPLAYER_DISCONNECT_DUPLICATE_LOGIN,
@@ -212,8 +209,7 @@ impl JavaClient {
     }
 
     async fn finish_login(&self, profile: &GameProfile) {
-        let props = profile.properties.load();
-        let packet = CLoginSuccess::new(&profile.id, &profile.name, &props, false);
+        let packet = CLoginSuccess::new(&profile.id, &profile.name, &profile.properties, false);
         self.send_packet_now(&packet).await;
     }
 
@@ -225,7 +221,7 @@ impl JavaClient {
     ) -> Result<GameProfile, AuthError> {
         let hash = server.digest_secret(shared_secret).await;
         let ip = self.address.lock().await.ip();
-        let profile = authentication::authenticate(
+        let GameProfileSuccess { profile, profile_actions } = authentication::authenticate(
             username,
             &hash,
             &ip,
@@ -233,7 +229,7 @@ impl JavaClient {
         )?;
 
         // Check if the player should join
-        if let Some(actions) = &profile.profile_actions {
+        if !profile_actions.is_empty() {
             if server
                 .advanced_config
                 .networking
@@ -248,19 +244,19 @@ impl JavaClient {
                     .player_profile
                     .allowed_actions
                 {
-                    if !actions.contains(allowed) {
+                    if !profile_actions.contains(allowed) {
                         return Err(AuthError::DisallowedAction);
                     }
                 }
-                if !actions.is_empty() {
+                if !profile_actions.is_empty() {
                     return Err(AuthError::Banned);
                 }
-            } else if !actions.is_empty() {
+            } else if !profile_actions.is_empty() {
                 return Err(AuthError::Banned);
             }
         }
         // Validate textures
-        for property in profile.properties.load().iter() {
+        for property in &profile.properties {
             authentication::validate_textures(
                 property,
                 &server.advanced_config.networking.authentication.textures,

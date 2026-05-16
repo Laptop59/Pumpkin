@@ -134,7 +134,7 @@ async fn handle_packet(
                                 .iter()
                                 .take(4 - players.len())
                                 .map(|player| {
-                                    CString::new(player.gameprofile.name.as_str()).unwrap()
+                                    CString::new(player.gameprofile.load().name.as_str()).unwrap()
                                 })
                                 .collect::<Vec<_>>();
 

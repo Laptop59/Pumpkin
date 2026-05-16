@@ -3,6 +3,7 @@ use std::{collections::HashMap, net::IpAddr};
 use base64::{Engine, engine::general_purpose};
 use pumpkin_config::{AuthenticationConfig, networking::auth::TextureConfig};
 use pumpkin_protocol::Property;
+use pumpkin_util::ProfileAction;
 use rsa::RsaPublicKey;
 use rsa::pkcs8::DecodePublicKey;
 use serde::Deserialize;
@@ -11,6 +12,21 @@ use ureq::http::{StatusCode, Uri};
 use uuid::Uuid;
 
 use super::GameProfile;
+
+#[derive(Deserialize, Debug)]
+struct AuthenticatedGameProfile {
+    pub id: Uuid,
+    pub name: String,
+    pub properties: Vec<Property>,
+    #[serde(rename = "profileActions")]
+    pub profile_actions: Option<Vec<ProfileAction>>,
+}
+
+/// Represents a successful attempt of fetching a game profile.
+pub struct GameProfileSuccess {
+    pub profile: GameProfile,
+    pub profile_actions: Vec<ProfileAction>,
+}
 
 #[derive(Deserialize, Clone, Debug)]
 #[expect(dead_code)]
@@ -67,7 +83,7 @@ pub fn authenticate(
     server_hash: &str,
     ip: &IpAddr,
     auth_config: &AuthenticationConfig,
-) -> Result<GameProfile, AuthError> {
+) -> Result<GameProfileSuccess, AuthError> {
     let address = if auth_config.prevent_proxy_connections {
         let auth_url = auth_config
             .prevent_proxy_connection_auth_url
@@ -97,11 +113,19 @@ pub fn authenticate(
         StatusCode::NO_CONTENT => Err(AuthError::UnverifiedUsername)?,
         other => Err(AuthError::UnknownStatusCode(other))?,
     }
-    let profile: GameProfile = response
+    let profile: AuthenticatedGameProfile = response
         .body_mut()
         .read_json()
         .map_err(|_| AuthError::FailedParse)?;
-    Ok(profile)
+
+    Ok(GameProfileSuccess {
+        profile: GameProfile {
+            id: profile.id,
+            name: profile.name,
+            properties: profile.properties,
+        },
+        profile_actions: profile.profile_actions.unwrap_or_default(),
+    })
 }
 
 pub fn validate_textures(property: &Property, config: &TextureConfig) -> Result<(), TextureError> {

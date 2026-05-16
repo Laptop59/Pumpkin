@@ -20,7 +20,7 @@ impl super::Phase for ChargingPhase {
             let pos = dragon.mob_entity.living_entity.entity.pos.load();
 
             let target_pos = if let Some(id) = target_id
-                && let Some(player) = world.players.load().iter().find(|p| p.gameprofile.id == id)
+                && let Some(player) = world.players.load().iter().find(|p| p.gameprofile.load().id == id)
             {
                 player.living_entity.entity.pos.load()
             } else {

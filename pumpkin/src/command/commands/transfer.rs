@@ -53,7 +53,7 @@ impl CommandExecutor for TargetSelfExecutor {
             };
 
             if let CommandSender::Player(player) = sender {
-                let name = &player.gameprofile.name;
+                let name = &player.gameprofile.load().name;
                 info!("[{name}: Transferring {name} to {hostname}:{port}]");
                 player
                     .client
@@ -110,7 +110,7 @@ impl CommandExecutor for TargetPlayerExecutor {
                     .await;
                 info!(
                     "[{sender}: Transferring {} to {hostname}:{port}]",
-                    p.gameprofile.name
+                    p.gameprofile.load().name
                 );
             }
 

@@ -419,7 +419,7 @@ impl CommandExecutor for SetExecutor {
 
                     let targets = PlayersArgumentConsumer.find_arg_default_name(args)?;
                     let players: Vec<Uuid> =
-                        targets.iter().map(|player| player.gameprofile.id).collect();
+                        targets.iter().map(|player| player.gameprofile.load().id).collect();
                     let count = players.len();
 
                     match server
@@ -435,11 +435,15 @@ impl CommandExecutor for SetExecutor {
                         }
                     }
 
-                    let player_names = targets
-                        .iter()
-                        .map(|p| p.gameprofile.name.as_str())
-                        .collect::<Vec<_>>()
-                        .join(", ");
+                    let mut player_names = String::new();
+                    let mut first = true;
+                    for target in targets {
+                        player_names += target.gameprofile.load().name.as_str();
+                        if !first {
+                            player_names += ", ";
+                        }
+                        first = false;
+                    }
 
                     sender
                         .send_message(TextComponent::translate_cross(

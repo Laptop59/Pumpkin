@@ -141,7 +141,7 @@ async fn set_spawnpoint(sender: &CommandSender, target: &Arc<Player>, pos: Block
                 TextComponent::text(format!("{yaw:.2}")),
                 TextComponent::text("0.00".to_string()),
                 TextComponent::text(dimension.minecraft_name),
-                TextComponent::text(target.gameprofile.name.clone()),
+                TextComponent::text(target.gameprofile.load().name.clone()),
             ],
         ))
         .await;

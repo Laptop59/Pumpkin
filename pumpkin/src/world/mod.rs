@@ -583,7 +583,7 @@ impl World {
             let messages_received: i32 = recipient.chat_session.lock().await.messages_received;
             let packet = &CPlayerChatMessage::new(
                 VarInt(messages_received),
-                sender.gameprofile.id,
+                sender.gameprofile.load().id,
                 VarInt(messages_sent),
                 chat_message.signature.clone(),
                 chat_message.message.clone(),
@@ -604,7 +604,7 @@ impl World {
                 .await
                 .add_seen_signature(&chat_message.signature.clone().unwrap()); // Unwrap is safe because we check for None in validate_chat_message
 
-            if recipient.gameprofile.id != sender.gameprofile.id {
+            if recipient.gameprofile.load().id != sender.gameprofile.load().id {
                 // Sender may update recipient on signatures recipient hasn't seen
                 recipient
                     .signature_cache
@@ -628,7 +628,7 @@ impl World {
         let recipients_by_version = Self::collect_java_recipients_by_version(
             players
                 .iter()
-                .filter(|candidate| !except.contains(&candidate.gameprofile.id)),
+                .filter(|candidate| !except.contains(&candidate.gameprofile.load().id)),
         );
         Self::broadcast_java_grouped(packet, recipients_by_version);
     }
@@ -735,7 +735,7 @@ impl World {
         let players = self.players.load();
         let recipients = players.iter().filter(|p| {
             // Skip the expected player
-            if p.gameprofile.id == player.gameprofile.id {
+            if p.gameprofile.load().id == player.gameprofile.load().id {
                 return false;
             }
 
@@ -1875,7 +1875,7 @@ impl World {
         let gamemode = player.gamemode.load();
         debug!(
             "spawning player {}, entity id {}",
-            player.gameprofile.name, entity_id
+            player.gameprofile.load().name, entity_id
         );
 
         let client = player.client.java();
@@ -1949,15 +1949,15 @@ impl World {
 
         let velocity = player.living_entity.entity.velocity.load();
 
-        debug!("Sending player teleport to {}", player.gameprofile.name);
+        debug!("Sending player teleport to {}", player.gameprofile.load().name);
         player.request_teleport(position, yaw, pitch).await;
 
         player.living_entity.entity.last_pos.store(position);
 
-        let gameprofile = &player.gameprofile;
+        let gameprofile = player.gameprofile.load();
         // Firstly, send an info update to our new player, so they can see their skin
         // and also send their info to everyone else.
-        debug!("Broadcasting player info for {}", player.gameprofile.name);
+        debug!("Broadcasting player info for {}", player.gameprofile.load().name);
         self.broadcast_packet_all(&CPlayerInfoUpdate::new(
             (PlayerInfoFlags::ADD_PLAYER
                 | PlayerInfoFlags::UPDATE_GAME_MODE
@@ -1970,7 +1970,7 @@ impl World {
                 actions: &[
                     PlayerAction::AddPlayer {
                         name: &gameprofile.name,
-                        properties: &gameprofile.properties.load(),
+                        properties: &gameprofile.properties,
                     },
                     PlayerAction::UpdateGameMode(VarInt(gamemode as i32)),
                     PlayerAction::UpdateListed(true),
@@ -1995,11 +1995,12 @@ impl World {
         {
             let players = self.players.load();
             let mut data_to_process = Vec::new();
+            let gameprofile = player.gameprofile.load();
             for p in players
                 .iter()
-                .filter(|p| p.gameprofile.id != player.gameprofile.id)
+                .filter(|p| p.gameprofile.load().id != gameprofile.id)
             {
-                let props_guard = p.gameprofile.properties.load();
+                let props_guard = &gameprofile.properties;
                 data_to_process.push((props_guard, p));
             }
 
@@ -2010,7 +2011,7 @@ impl World {
 
                 let mut player_actions = vec![
                     PlayerAction::AddPlayer {
-                        name: &player.gameprofile.name,
+                        name: &gameprofile.name,
                         properties,
                     },
                     PlayerAction::UpdateListed(player.tab_list_listed.load(Ordering::Relaxed)),
@@ -2032,11 +2033,11 @@ impl World {
                 }
                 drop(chat_session);
 
-                current_player_data.push((&player.gameprofile.id, player_actions));
+                current_player_data.push((&gameprofile.id, player_actions));
 
                 // Collect tab_list_names for sending later
                 if tab_list_name.is_some() {
-                    players_tab_list_names.push((player.gameprofile.id, tab_list_name));
+                    players_tab_list_names.push((player.gameprofile.load().id, tab_list_name));
                 }
             }
 
@@ -2056,7 +2057,7 @@ impl World {
                 })
                 .collect::<Vec<_>>();
 
-            debug!("Sending player info to {}", player.gameprofile.name);
+            debug!("Sending player info to {}", player.gameprofile.load().name);
             client
                 .enqueue_packet(&CPlayerInfoUpdate::new(action_flags.bits(), &entries))
                 .await;
@@ -2077,12 +2078,12 @@ impl World {
             }
         };
 
-        let gameprofile = &player.gameprofile;
+        let gameprofile = player.gameprofile.load();
 
-        debug!("Broadcasting player spawn for {}", player.gameprofile.name);
+        debug!("Broadcasting player spawn for {}", gameprofile.name);
         // Spawn the player for every client.
         self.broadcast_packet_except(
-            &[player.gameprofile.id],
+            &[gameprofile.id],
             &CSpawnEntity::new(
                 entity_id.into(),
                 gameprofile.id,
@@ -2097,17 +2098,16 @@ impl World {
         );
 
         // Spawn players for our client.
-        let id = player.gameprofile.id;
         for existing_player in self
             .players
             .load()
             .iter()
-            .filter(|c| c.gameprofile.id != id)
+            .filter(|c| c.gameprofile.load().id != gameprofile.id)
         {
             let entity = &existing_player.living_entity.entity;
             let pos = entity.pos.load();
-            let gameprofile = &existing_player.gameprofile;
-            debug!("Sending player entities to {}", player.gameprofile.name);
+            let gameprofile = existing_player.gameprofile.load();
+            debug!("Sending player entities to {}", player.gameprofile.load().name);
 
             client
                 .enqueue_packet(&CSpawnEntity::new(
@@ -2188,7 +2188,7 @@ impl World {
             .await;
 
         // Start waiting for level chunks. Sets the "Loading Terrain" screen
-        debug!("Sending waiting chunks to {}", player.gameprofile.name);
+        debug!("Sending waiting chunks to {}", player.gameprofile.load().name);
         client
             .send_packet_now(&CGameEvent::new(GameEvent::StartWaitingChunks, 0.0))
             .await;
@@ -2243,7 +2243,7 @@ impl World {
                 .await;
         }
 
-        // if let Some(bossbars) = self..lock().get_player_bars(&player.gameprofile.id) {
+        // if let Some(bossbars) = self..lock().get_player_bars(&player.gameprofile.load().id) {
         //     for bossbar in bossbars {
         //         player.send_bossbar(bossbar);
         //     }
@@ -2271,7 +2271,7 @@ impl World {
         let msg_comp = TextComponent::translate_cross(
             translation::java::MULTIPLAYER_PLAYER_JOINED,
             translation::bedrock::MULTIPLAYER_PLAYER_JOINED,
-            [TextComponent::text(player.gameprofile.name.clone())],
+            [TextComponent::text(player.gameprofile.load().name.clone())],
         )
         .color_named(NamedColor::Yellow);
         let event = PlayerJoinEvent::new(player.clone(), msg_comp);
@@ -2331,11 +2331,11 @@ impl World {
         let entity = &player.living_entity.entity;
 
         self.broadcast_packet_except(
-            &[player.gameprofile.id],
+            &[player.gameprofile.load().id],
             // TODO: add velo
             &CSpawnEntity::new(
                 entity.entity_id.into(),
-                player.gameprofile.id,
+                player.gameprofile.load().id,
                 i32::from(EntityType::PLAYER.id).into(),
                 position,
                 pitch,
@@ -2780,7 +2780,7 @@ impl World {
     /// Gets a `Player` by a username
     pub fn get_player_by_name(&self, name: &str) -> Option<Arc<Player>> {
         for player in self.players.load().iter() {
-            if player.gameprofile.name.eq_ignore_ascii_case(name) {
+            if player.gameprofile.load().name.eq_ignore_ascii_case(name) {
                 return Some(player.clone());
             }
         }
@@ -2840,7 +2840,7 @@ impl World {
         self.players
             .load()
             .iter()
-            .find(|p| p.gameprofile.id == id)
+            .find(|p| p.gameprofile.load().id == id)
             .cloned()
     }
 
@@ -3108,14 +3108,14 @@ impl World {
             // Find the player before we filter them out
             if let Some(pos) = new_list
                 .iter()
-                .position(|p| p.gameprofile.id == player.gameprofile.id)
+                .position(|p| p.gameprofile.load().id == player.gameprofile.load().id)
             {
                 removed_player = Some(new_list.remove(pos));
             }
             new_list
         });
         if let Some(ref player) = removed_player {
-            let uuid = player.gameprofile.id;
+            let uuid = player.gameprofile.load().id;
             self.broadcast_packet_all(&CRemovePlayerInfo::new(&[uuid]));
             self.broadcast_packet_all(&CRemoveEntities::new(&[player.entity_id().into()]));
 
@@ -3123,7 +3123,7 @@ impl World {
                 let msg_comp = TextComponent::translate_cross(
                     translation::java::MULTIPLAYER_PLAYER_LEFT,
                     translation::bedrock::MULTIPLAYER_PLAYER_LEFT,
-                    [TextComponent::text(player.gameprofile.name.clone())],
+                    [TextComponent::text(player.gameprofile.load().name.clone())],
                 )
                 .color_named(NamedColor::Yellow);
                 let event = PlayerLeaveEvent::new(player.clone(), msg_comp);

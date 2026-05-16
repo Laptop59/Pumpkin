@@ -313,7 +313,7 @@ impl boss_bar::HostBossBar for PluginHostState {
     ) -> wasmtime::Result<()> {
         let mut pbb = self.get_bossbar_res(&res)?.provider.lock().await;
         let player = player_from_resource(self, &player)?;
-        let uuid = player.gameprofile.id;
+        let uuid = player.gameprofile.load().id;
 
         if !pbb.players.contains(&uuid) {
             pbb.players.push(uuid);
@@ -331,7 +331,7 @@ impl boss_bar::HostBossBar for PluginHostState {
     ) -> wasmtime::Result<()> {
         let mut pbb = self.get_bossbar_res(&res)?.provider.lock().await;
         let player = player_from_resource(self, &player)?;
-        let uuid = player.gameprofile.id;
+        let uuid = player.gameprofile.load().id;
 
         if let Some(idx) = pbb.players.iter().position(|&x| x == uuid) {
             pbb.players.remove(idx);

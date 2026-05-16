@@ -76,7 +76,7 @@ fn get_player_names_and_ids(players: &[Arc<Player>]) -> TextComponent {
                 COMMANDS_LIST_NAMEANDID,
                 &[
                     p.get_name(),
-                    TextComponent::text(p.gameprofile.id.to_string()),
+                    TextComponent::text(p.gameprofile.load().id.to_string()),
                 ],
             )
         })

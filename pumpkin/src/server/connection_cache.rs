@@ -107,8 +107,8 @@ impl CachedStatus {
     }
 
     pub fn add_player(&mut self, player: &Player) {
-        let player_id = player.gameprofile.id;
-        let player_name = player.gameprofile.name.clone();
+        let player_id = player.gameprofile.load().id;
+        let player_name = player.gameprofile.load().name.clone();
 
         if !self.player_samples.iter().any(|(id, _)| *id == player_id) {
             self.player_samples.push((player_id, player_name));
@@ -122,7 +122,7 @@ impl CachedStatus {
     }
 
     pub fn remove_player(&mut self, player: &Player) {
-        let player_id = player.gameprofile.id;
+        let player_id = player.gameprofile.load().id;
 
         if self.player_samples.iter().any(|(id, _)| *id == player_id) {
             self.player_samples.retain(|(id, _)| *id != player_id);

@@ -633,7 +633,7 @@ impl DragonFight {
 
     async fn update_bossbar_health(&self, world: &Arc<World>, health: f32) {
         for player in world.players.load().iter() {
-            if self.bossbar_players.contains(&player.gameprofile.id) {
+            if self.bossbar_players.contains(&player.gameprofile.load().id) {
                 player
                     .update_bossbar_health(&self.bossbar_uuid, health)
                     .await;
@@ -643,7 +643,7 @@ impl DragonFight {
 
     async fn remove_all_bossbar(&mut self, world: &Arc<World>) {
         for player in world.players.load().iter() {
-            if self.bossbar_players.contains(&player.gameprofile.id) {
+            if self.bossbar_players.contains(&player.gameprofile.load().id) {
                 player.remove_bossbar(self.bossbar_uuid).await;
             }
         }
@@ -664,14 +664,14 @@ impl DragonFight {
                 let dz = pos.z;
                 dx * dx + dy * dy + dz * dz < ARENA_RADIUS * ARENA_RADIUS
             })
-            .map(|p| p.gameprofile.id)
+            .map(|p| p.gameprofile.load().id)
             .collect();
 
         // Add newly-in-range players.
         for &uid in &current {
             if !self.bossbar_players.contains(&uid) {
                 if !self.dragon_killed
-                    && let Some(p) = players.iter().find(|p| p.gameprofile.id == uid)
+                    && let Some(p) = players.iter().find(|p| p.gameprofile.load().id == uid)
                 {
                     p.send_bossbar(&self.make_bossbar()).await;
                 }
@@ -688,7 +688,7 @@ impl DragonFight {
             .collect();
 
         for uid in &to_remove {
-            if let Some(p) = players.iter().find(|p| &p.gameprofile.id == uid) {
+            if let Some(p) = players.iter().find(|p| p.gameprofile.load().id == *uid) {
                 p.remove_bossbar(self.bossbar_uuid).await;
             }
             self.bossbar_players.retain(|u| u != uid);

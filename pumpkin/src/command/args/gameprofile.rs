@@ -1,8 +1,6 @@
-use arc_swap::ArcSwap;
 use pumpkin_data::translation;
 use pumpkin_protocol::java::client::play::{ArgumentType, CommandSuggestion, SuggestionProviders};
 use pumpkin_util::text::TextComponent;
-use std::sync::Arc;
 use uuid::Uuid;
 
 use crate::command::errors::command_syntax_error::{CommandSyntaxError, CommandSyntaxErrorContext};
@@ -120,14 +118,15 @@ impl ArgumentConsumer for GameProfilesArgumentConsumer {
             match self.suggestion_mode {
                 GameProfileSuggestionMode::OnlinePlayers => {
                     for player in server.get_all_players() {
-                        push_name_if_missing(&mut names, player.gameprofile.name.clone());
+                        push_name_if_missing(&mut names, player.gameprofile.load().name.clone());
                     }
                 }
                 GameProfileSuggestionMode::NonOpOnlinePlayers => {
                     let ops = server.data.operator_config.read().await;
                     for player in server.get_all_players() {
-                        if ops.ops.iter().all(|op| op.uuid != player.gameprofile.id) {
-                            push_name_if_missing(&mut names, player.gameprofile.name.clone());
+                        let gameprofile = player.gameprofile.load();
+                        if ops.ops.iter().all(|op| op.uuid != gameprofile.id) {
+                            push_name_if_missing(&mut names, gameprofile.name.clone());
                         }
                     }
                 }
@@ -146,8 +145,9 @@ impl ArgumentConsumer for GameProfilesArgumentConsumer {
                 GameProfileSuggestionMode::NonWhitelistedOnlinePlayers => {
                     let whitelist = server.data.whitelist_config.read().await;
                     for player in server.get_all_players() {
-                        if !whitelist.is_whitelisted(&player.gameprofile) {
-                            push_name_if_missing(&mut names, player.gameprofile.name.clone());
+                        let gameprofile = player.gameprofile.load();
+                        if !whitelist.is_whitelisted(&gameprofile) {
+                            push_name_if_missing(&mut names, gameprofile.name.clone());
                         }
                     }
                 }
@@ -203,13 +203,13 @@ async fn resolve_profiles_from_token(
 
         return Ok(players
             .into_iter()
-            .map(|player| player.gameprofile.clone())
+            .map(|player| (**player.gameprofile.load()).clone())
             .collect());
     }
 
     if let Ok(uuid) = Uuid::parse_str(raw_arg.value) {
         if let Some(player) = server.get_player_by_uuid(uuid) {
-            return Ok(vec![player.gameprofile.clone()]);
+            return Ok(vec![(**player.gameprofile.load()).clone()]);
         }
 
         let cached_entry = server.data.user_cache.write().await.get_by_uuid(uuid);
@@ -225,7 +225,7 @@ async fn resolve_profiles_from_token(
     }
 
     if let Some(player) = server.get_player_by_name(raw_arg.value) {
-        return Ok(vec![player.gameprofile.clone()]);
+        return Ok(vec![(**player.gameprofile.load()).clone()]);
     }
 
     let cached_entry = server
@@ -341,8 +341,7 @@ fn profile_from_uuid_name(uuid: Uuid, name: String) -> GameProfile {
     GameProfile {
         id: uuid,
         name,
-        properties: ArcSwap::new(Arc::from(vec![])),
-        profile_actions: None,
+        properties: vec![],
     }
 }
 

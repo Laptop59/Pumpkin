@@ -57,7 +57,7 @@ impl ServerPlayerData {
         player.write_nbt(&mut nbt).await;
 
         let storage = self.storage.clone();
-        let uuid = player.gameprofile.id;
+        let uuid = player.gameprofile.load().id;
         // Save to disk
         tokio::task::spawn_blocking(move || storage.save_player_data(&uuid, nbt))
             .await
@@ -86,7 +86,7 @@ impl ServerPlayerData {
                     player.write_nbt(&mut nbt).await;
 
                     let storage = self.storage.clone();
-                    let uuid = player.gameprofile.id;
+                    let uuid = player.gameprofile.load().id;
                     // Save to disk periodically to prevent data loss on server crash
                     if let Err(e) =
                         tokio::task::spawn_blocking(move || storage.save_player_data(&uuid, nbt))
@@ -95,7 +95,7 @@ impl ServerPlayerData {
                     {
                         error!(
                             "Failed to save player data for {}: {e}",
-                            player.gameprofile.id,
+                            player.gameprofile.load().id,
                         );
                     }
                 }
@@ -189,7 +189,7 @@ impl ServerPlayerData {
             return Ok(());
         }
 
-        let uuid = player.gameprofile.id;
+        let uuid = player.gameprofile.load().id;
         let mut nbt = NbtCompound::new();
         player.write_nbt(&mut nbt).await;
 

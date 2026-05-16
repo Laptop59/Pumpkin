@@ -444,7 +444,7 @@ impl BlockBehaviour for SignBlock {
             let mut currently_editing = sign_entity.currently_editing_player.lock().await;
             if !try_claim_sign(
                 &mut currently_editing,
-                &args.player.gameprofile.id,
+                &args.player.gameprofile.load().id,
                 args.world,
                 args.position,
             ) {
@@ -486,7 +486,7 @@ impl BlockBehaviour for SignBlock {
             let mut currently_editing = sign_entity.currently_editing_player.lock().await;
             if !try_claim_sign(
                 &mut currently_editing,
-                &args.player.gameprofile.id,
+                &args.player.gameprofile.load().id,
                 args.world,
                 args.position,
             ) {
