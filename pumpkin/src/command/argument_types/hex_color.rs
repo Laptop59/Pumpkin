@@ -21,16 +21,16 @@ impl ArgumentType for HexColorArgumentType {
         let string = reader.read_unquoted_string();
         match string.len() {
             3 => Ok(RGBColor {
-                red: Self::parse_one_hex_digit(&string, 0)?,
-                green: Self::parse_one_hex_digit(&string, 1)?,
-                blue: Self::parse_one_hex_digit(&string, 2)?,
+                red: Self::parse_one_hex_digit(reader, &string, 0)?,
+                green: Self::parse_one_hex_digit(reader, &string, 1)?,
+                blue: Self::parse_one_hex_digit(reader, &string, 2)?,
             }),
             6 => Ok(RGBColor {
-                red: Self::parse_two_hex_digits(&string, 0)?,
-                green: Self::parse_two_hex_digits(&string, 2)?,
-                blue: Self::parse_two_hex_digits(&string, 4)?,
+                red: Self::parse_two_hex_digits(reader, &string, 0)?,
+                green: Self::parse_two_hex_digits(reader, &string, 2)?,
+                blue: Self::parse_two_hex_digits(reader, &string, 4)?,
             }),
-            _ => Err(INVALID_HEX_ERROR_TYPE.create_without_context(TextComponent::text(string))),
+            _ => Err(INVALID_HEX_ERROR_TYPE.create(reader, TextComponent::text(string))),
         }
     }
 
@@ -52,8 +52,8 @@ impl ArgumentType for HexColorArgumentType {
 }
 
 impl HexColorArgumentType {
-    fn parse_one_hex_digit(string: &str, index: usize) -> Result<u8, CommandSyntaxError> {
-        Self::parse_hex_digit(&string[index..=index], 0)
+    fn parse_one_hex_digit(reader: &StringReader, string: &str, index: usize) -> Result<u8, CommandSyntaxError> {
+        Self::parse_hex_digit(reader, &string[index..=index], 0)
             // We want to map:
             // 0x0 -> 0x00
             // 0x1 -> 0x11
@@ -61,15 +61,15 @@ impl HexColorArgumentType {
             .map(|x| x * 0x11)
     }
 
-    fn parse_two_hex_digits(string: &str, index_start: usize) -> Result<u8, CommandSyntaxError> {
+    fn parse_two_hex_digits(reader: &StringReader, string: &str, index_start: usize) -> Result<u8, CommandSyntaxError> {
         Ok(
-            Self::parse_hex_digit(&string[index_start..index_start + 2], 0)? << 4
-                | Self::parse_hex_digit(&string[index_start..index_start + 2], 1)?,
+            Self::parse_hex_digit(reader, &string[index_start..index_start + 2], 0)? << 4
+                | Self::parse_hex_digit(reader, &string[index_start..index_start + 2], 1)?,
         )
     }
 
     #[inline]
-    fn parse_hex_digit(slice: &str, index: usize) -> Result<u8, CommandSyntaxError> {
+    fn parse_hex_digit(reader: &StringReader, slice: &str, index: usize) -> Result<u8, CommandSyntaxError> {
         // This should be fine as `read_unquoted_string` parses only ASCII digits.
         let b = slice.as_bytes()[index];
         match b {
@@ -90,7 +90,7 @@ impl HexColorArgumentType {
             b'e' | b'E' => Ok(0xE),
             b'f' | b'F' => Ok(0xF),
             _ => Err(
-                DISPATCHER_PARSE_EXCEPTION.create_without_context(TextComponent::text(format!(
+                DISPATCHER_PARSE_EXCEPTION.create(reader, TextComponent::text(format!(
                     "Error at index {index} in: \"{slice}\""
                 ))),
             ),
