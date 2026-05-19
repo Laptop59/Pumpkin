@@ -52,7 +52,11 @@ impl ArgumentType for HexColorArgumentType {
 }
 
 impl HexColorArgumentType {
-    fn parse_one_hex_digit(reader: &StringReader, string: &str, index: usize) -> Result<u8, CommandSyntaxError> {
+    fn parse_one_hex_digit(
+        reader: &StringReader,
+        string: &str,
+        index: usize,
+    ) -> Result<u8, CommandSyntaxError> {
         Self::parse_hex_digit(reader, &string[index..=index], 0)
             // We want to map:
             // 0x0 -> 0x00
@@ -61,7 +65,11 @@ impl HexColorArgumentType {
             .map(|x| x * 0x11)
     }
 
-    fn parse_two_hex_digits(reader: &StringReader, string: &str, index_start: usize) -> Result<u8, CommandSyntaxError> {
+    fn parse_two_hex_digits(
+        reader: &StringReader,
+        string: &str,
+        index_start: usize,
+    ) -> Result<u8, CommandSyntaxError> {
         Ok(
             Self::parse_hex_digit(reader, &string[index_start..index_start + 2], 0)? << 4
                 | Self::parse_hex_digit(reader, &string[index_start..index_start + 2], 1)?,
@@ -69,7 +77,11 @@ impl HexColorArgumentType {
     }
 
     #[inline]
-    fn parse_hex_digit(reader: &StringReader, slice: &str, index: usize) -> Result<u8, CommandSyntaxError> {
+    fn parse_hex_digit(
+        reader: &StringReader,
+        slice: &str,
+        index: usize,
+    ) -> Result<u8, CommandSyntaxError> {
         // This should be fine as `read_unquoted_string` parses only ASCII digits.
         let b = slice.as_bytes()[index];
         match b {
@@ -89,11 +101,10 @@ impl HexColorArgumentType {
             b'd' | b'D' => Ok(0xD),
             b'e' | b'E' => Ok(0xE),
             b'f' | b'F' => Ok(0xF),
-            _ => Err(
-                DISPATCHER_PARSE_EXCEPTION.create(reader, TextComponent::text(format!(
-                    "Error at index {index} in: \"{slice}\""
-                ))),
-            ),
+            _ => Err(DISPATCHER_PARSE_EXCEPTION.create(
+                reader,
+                TextComponent::text(format!("Error at index {index} in: \"{slice}\"")),
+            )),
         }
     }
 }
