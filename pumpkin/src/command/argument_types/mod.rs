@@ -226,6 +226,7 @@ pub mod entity_selector;
 pub mod game_profile;
 pub mod hex_color;
 pub mod identifier;
+pub mod nbt;
 pub mod range;
 pub mod time;
 pub mod uuid;
