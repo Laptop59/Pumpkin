@@ -3,6 +3,12 @@ use crate::block_state::PistonBehavior;
 use crate::{Block, BlockState, blocks::Flammable};
 use phf;
 use pumpkin_util::loot_table::*;
+#[allow(
+    clippy::wildcard_imports,
+    clippy::enum_glob_use,
+    clippy::too_many_lines,
+    clippy::match_same_arms
+)]
 use pumpkin_util::math::boundingbox::BoundingBox;
 use pumpkin_util::math::experience::Experience;
 use pumpkin_util::math::int_provider::{IntProvider, NormalIntProvider, UniformIntProvider};
@@ -3311,11 +3317,13 @@ pub const BLOCK_ENTITY_TYPES: &[&str] = &[
     "copper_golem_statue",
 ];
 #[inline(always)]
-pub fn is_air(state_id: u16) -> bool {
+#[must_use]
+pub const fn is_air(state_id: u16) -> bool {
     matches!(state_id, 0 | 15292 | 15293)
 }
 #[inline(always)]
-pub fn is_liquid(state_id: u16) -> bool {
+#[must_use]
+pub const fn is_liquid(state_id: u16) -> bool {
     matches!(
         state_id,
         45 | 47
@@ -13872,9 +13880,11 @@ pub fn is_liquid(state_id: u16) -> bool {
     )
 }
 #[inline(always)]
+#[must_use]
 pub fn has_random_ticks(state_id: u16) -> bool {
     __random_ticks_bitset::random_ticks_contains(state_id)
 }
+#[must_use]
 pub fn blocks_movement(block_state: &BlockState, block: u16) -> bool {
     if block_state.is_solid() {
         return block != Block::COBWEB && block != Block::BAMBOO_SAPLING;
@@ -15917,22 +15927,25 @@ impl BlockState {
     #[doc = r" Get a block state from a state id."]
     #[doc = r" If you need access to the block use `BlockState::from_id_with_block` instead."]
     #[inline]
+    #[must_use]
     pub fn from_id(id: u16) -> &'static Self {
         unsafe { Block::STATE_FROM_STATE_ID.get_unchecked(id as usize) }
     }
     #[doc = r" Get a block state from a state id and the corresponding block."]
     #[inline]
+    #[must_use]
     pub fn from_id_with_block(id: u16) -> (&'static Block, &'static Self) {
         let block = Block::from_state_id(id);
         let state: &Self = Block::STATE_FROM_STATE_ID[id as usize];
         (block, state)
     }
-    pub fn to_be_network_id(id: u16) -> u16 {
+    #[must_use]
+    pub const fn to_be_network_id(id: u16) -> u16 {
         Self::STATE_ID_TO_BEDROCK[id as usize]
     }
 }
 impl Block {
-    pub const AIR: Block = Block {
+    pub const AIR: Self = Block {
         id: 0,
         name: "air",
         hardness: 0f32,
@@ -15972,7 +15985,7 @@ impl Block {
         loot_table: None,
         experience: None,
     };
-    pub const STONE: Block = Block {
+    pub const STONE: Self = Block {
         id: 1,
         name: "stone",
         hardness: 1.5f32,
@@ -16043,7 +16056,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const GRANITE: Block = Block {
+    pub const GRANITE: Self = Block {
         id: 2,
         name: "granite",
         hardness: 1.5f32,
@@ -16099,7 +16112,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POLISHED_GRANITE: Block = Block {
+    pub const POLISHED_GRANITE: Self = Block {
         id: 3,
         name: "polished_granite",
         hardness: 1.5f32,
@@ -16155,7 +16168,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DIORITE: Block = Block {
+    pub const DIORITE: Self = Block {
         id: 4,
         name: "diorite",
         hardness: 1.5f32,
@@ -16211,7 +16224,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POLISHED_DIORITE: Block = Block {
+    pub const POLISHED_DIORITE: Self = Block {
         id: 5,
         name: "polished_diorite",
         hardness: 1.5f32,
@@ -16267,7 +16280,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const ANDESITE: Block = Block {
+    pub const ANDESITE: Self = Block {
         id: 6,
         name: "andesite",
         hardness: 1.5f32,
@@ -16323,7 +16336,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POLISHED_ANDESITE: Block = Block {
+    pub const POLISHED_ANDESITE: Self = Block {
         id: 7,
         name: "polished_andesite",
         hardness: 1.5f32,
@@ -16379,7 +16392,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const GRASS_BLOCK: Block = Block {
+    pub const GRASS_BLOCK: Self = Block {
         id: 8,
         name: "grass_block",
         hardness: 0.6f32,
@@ -16465,7 +16478,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DIRT: Block = Block {
+    pub const DIRT: Self = Block {
         id: 9,
         name: "dirt",
         hardness: 0.5f32,
@@ -16521,7 +16534,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const COARSE_DIRT: Block = Block {
+    pub const COARSE_DIRT: Self = Block {
         id: 10,
         name: "coarse_dirt",
         hardness: 0.5f32,
@@ -16577,7 +16590,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PODZOL: Block = Block {
+    pub const PODZOL: Self = Block {
         id: 11,
         name: "podzol",
         hardness: 0.5f32,
@@ -16663,7 +16676,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const COBBLESTONE: Block = Block {
+    pub const COBBLESTONE: Self = Block {
         id: 12,
         name: "cobblestone",
         hardness: 2f32,
@@ -16719,7 +16732,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const OAK_PLANKS: Block = Block {
+    pub const OAK_PLANKS: Self = Block {
         id: 13,
         name: "oak_planks",
         hardness: 2f32,
@@ -16778,7 +16791,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SPRUCE_PLANKS: Block = Block {
+    pub const SPRUCE_PLANKS: Self = Block {
         id: 14,
         name: "spruce_planks",
         hardness: 2f32,
@@ -16837,7 +16850,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BIRCH_PLANKS: Block = Block {
+    pub const BIRCH_PLANKS: Self = Block {
         id: 15,
         name: "birch_planks",
         hardness: 2f32,
@@ -16896,7 +16909,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const JUNGLE_PLANKS: Block = Block {
+    pub const JUNGLE_PLANKS: Self = Block {
         id: 16,
         name: "jungle_planks",
         hardness: 2f32,
@@ -16955,7 +16968,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const ACACIA_PLANKS: Block = Block {
+    pub const ACACIA_PLANKS: Self = Block {
         id: 17,
         name: "acacia_planks",
         hardness: 2f32,
@@ -17014,7 +17027,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CHERRY_PLANKS: Block = Block {
+    pub const CHERRY_PLANKS: Self = Block {
         id: 18,
         name: "cherry_planks",
         hardness: 2f32,
@@ -17073,7 +17086,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DARK_OAK_PLANKS: Block = Block {
+    pub const DARK_OAK_PLANKS: Self = Block {
         id: 19,
         name: "dark_oak_planks",
         hardness: 2f32,
@@ -17132,7 +17145,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PALE_OAK_WOOD: Block = Block {
+    pub const PALE_OAK_WOOD: Self = Block {
         id: 20,
         name: "pale_oak_wood",
         hardness: 2f32,
@@ -17219,7 +17232,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PALE_OAK_PLANKS: Block = Block {
+    pub const PALE_OAK_PLANKS: Self = Block {
         id: 21,
         name: "pale_oak_planks",
         hardness: 2f32,
@@ -17278,7 +17291,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MANGROVE_PLANKS: Block = Block {
+    pub const MANGROVE_PLANKS: Self = Block {
         id: 22,
         name: "mangrove_planks",
         hardness: 2f32,
@@ -17337,7 +17350,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BAMBOO_PLANKS: Block = Block {
+    pub const BAMBOO_PLANKS: Self = Block {
         id: 23,
         name: "bamboo_planks",
         hardness: 2f32,
@@ -17396,7 +17409,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BAMBOO_MOSAIC: Block = Block {
+    pub const BAMBOO_MOSAIC: Self = Block {
         id: 24,
         name: "bamboo_mosaic",
         hardness: 2f32,
@@ -17455,7 +17468,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const OAK_SAPLING: Block = Block {
+    pub const OAK_SAPLING: Self = Block {
         id: 25,
         name: "oak_sapling",
         hardness: 0f32,
@@ -17526,7 +17539,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SPRUCE_SAPLING: Block = Block {
+    pub const SPRUCE_SAPLING: Self = Block {
         id: 26,
         name: "spruce_sapling",
         hardness: 0f32,
@@ -17597,7 +17610,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BIRCH_SAPLING: Block = Block {
+    pub const BIRCH_SAPLING: Self = Block {
         id: 27,
         name: "birch_sapling",
         hardness: 0f32,
@@ -17668,7 +17681,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const JUNGLE_SAPLING: Block = Block {
+    pub const JUNGLE_SAPLING: Self = Block {
         id: 28,
         name: "jungle_sapling",
         hardness: 0f32,
@@ -17739,7 +17752,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const ACACIA_SAPLING: Block = Block {
+    pub const ACACIA_SAPLING: Self = Block {
         id: 29,
         name: "acacia_sapling",
         hardness: 0f32,
@@ -17810,7 +17823,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CHERRY_SAPLING: Block = Block {
+    pub const CHERRY_SAPLING: Self = Block {
         id: 30,
         name: "cherry_sapling",
         hardness: 0f32,
@@ -17881,7 +17894,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DARK_OAK_SAPLING: Block = Block {
+    pub const DARK_OAK_SAPLING: Self = Block {
         id: 31,
         name: "dark_oak_sapling",
         hardness: 0f32,
@@ -17952,7 +17965,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PALE_OAK_SAPLING: Block = Block {
+    pub const PALE_OAK_SAPLING: Self = Block {
         id: 32,
         name: "pale_oak_sapling",
         hardness: 0f32,
@@ -18023,7 +18036,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MANGROVE_PROPAGULE: Block = Block {
+    pub const MANGROVE_PROPAGULE: Self = Block {
         id: 33,
         name: "mangrove_propagule",
         hardness: 0f32,
@@ -18591,7 +18604,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BEDROCK: Block = Block {
+    pub const BEDROCK: Self = Block {
         id: 34,
         name: "bedrock",
         hardness: -1f32,
@@ -18631,7 +18644,7 @@ impl Block {
         loot_table: None,
         experience: None,
     };
-    pub const WATER: Block = Block {
+    pub const WATER: Self = Block {
         id: 35,
         name: "water",
         hardness: 100f32,
@@ -18868,7 +18881,7 @@ impl Block {
         loot_table: None,
         experience: None,
     };
-    pub const LAVA: Block = Block {
+    pub const LAVA: Self = Block {
         id: 36,
         name: "lava",
         hardness: 100f32,
@@ -19105,7 +19118,7 @@ impl Block {
         loot_table: None,
         experience: None,
     };
-    pub const SAND: Block = Block {
+    pub const SAND: Self = Block {
         id: 37,
         name: "sand",
         hardness: 0.5f32,
@@ -19161,7 +19174,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SUSPICIOUS_SAND: Block = Block {
+    pub const SUSPICIOUS_SAND: Self = Block {
         id: 38,
         name: "suspicious_sand",
         hardness: 0.25f32,
@@ -19246,7 +19259,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const RED_SAND: Block = Block {
+    pub const RED_SAND: Self = Block {
         id: 39,
         name: "red_sand",
         hardness: 0.5f32,
@@ -19302,7 +19315,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const GRAVEL: Block = Block {
+    pub const GRAVEL: Self = Block {
         id: 40,
         name: "gravel",
         hardness: 0.6f32,
@@ -19388,7 +19401,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SUSPICIOUS_GRAVEL: Block = Block {
+    pub const SUSPICIOUS_GRAVEL: Self = Block {
         id: 41,
         name: "suspicious_gravel",
         hardness: 0.25f32,
@@ -19473,7 +19486,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const GOLD_ORE: Block = Block {
+    pub const GOLD_ORE: Self = Block {
         id: 42,
         name: "gold_ore",
         hardness: 3f32,
@@ -19559,7 +19572,7 @@ impl Block {
             experience: IntProvider::Constant(0i32),
         }),
     };
-    pub const DEEPSLATE_GOLD_ORE: Block = Block {
+    pub const DEEPSLATE_GOLD_ORE: Self = Block {
         id: 43,
         name: "deepslate_gold_ore",
         hardness: 4.5f32,
@@ -19645,7 +19658,7 @@ impl Block {
             experience: IntProvider::Constant(0i32),
         }),
     };
-    pub const IRON_ORE: Block = Block {
+    pub const IRON_ORE: Self = Block {
         id: 44,
         name: "iron_ore",
         hardness: 3f32,
@@ -19731,7 +19744,7 @@ impl Block {
             experience: IntProvider::Constant(0i32),
         }),
     };
-    pub const DEEPSLATE_IRON_ORE: Block = Block {
+    pub const DEEPSLATE_IRON_ORE: Self = Block {
         id: 45,
         name: "deepslate_iron_ore",
         hardness: 4.5f32,
@@ -19817,7 +19830,7 @@ impl Block {
             experience: IntProvider::Constant(0i32),
         }),
     };
-    pub const COAL_ORE: Block = Block {
+    pub const COAL_ORE: Self = Block {
         id: 46,
         name: "coal_ore",
         hardness: 3f32,
@@ -19906,7 +19919,7 @@ impl Block {
             })),
         }),
     };
-    pub const DEEPSLATE_COAL_ORE: Block = Block {
+    pub const DEEPSLATE_COAL_ORE: Self = Block {
         id: 47,
         name: "deepslate_coal_ore",
         hardness: 4.5f32,
@@ -19995,7 +20008,7 @@ impl Block {
             })),
         }),
     };
-    pub const NETHER_GOLD_ORE: Block = Block {
+    pub const NETHER_GOLD_ORE: Self = Block {
         id: 48,
         name: "nether_gold_ore",
         hardness: 3f32,
@@ -20094,7 +20107,7 @@ impl Block {
             })),
         }),
     };
-    pub const OAK_LOG: Block = Block {
+    pub const OAK_LOG: Self = Block {
         id: 49,
         name: "oak_log",
         hardness: 2f32,
@@ -20181,7 +20194,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SPRUCE_LOG: Block = Block {
+    pub const SPRUCE_LOG: Self = Block {
         id: 50,
         name: "spruce_log",
         hardness: 2f32,
@@ -20268,7 +20281,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BIRCH_LOG: Block = Block {
+    pub const BIRCH_LOG: Self = Block {
         id: 51,
         name: "birch_log",
         hardness: 2f32,
@@ -20355,7 +20368,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const JUNGLE_LOG: Block = Block {
+    pub const JUNGLE_LOG: Self = Block {
         id: 52,
         name: "jungle_log",
         hardness: 2f32,
@@ -20442,7 +20455,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const ACACIA_LOG: Block = Block {
+    pub const ACACIA_LOG: Self = Block {
         id: 53,
         name: "acacia_log",
         hardness: 2f32,
@@ -20529,7 +20542,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CHERRY_LOG: Block = Block {
+    pub const CHERRY_LOG: Self = Block {
         id: 54,
         name: "cherry_log",
         hardness: 2f32,
@@ -20616,7 +20629,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DARK_OAK_LOG: Block = Block {
+    pub const DARK_OAK_LOG: Self = Block {
         id: 55,
         name: "dark_oak_log",
         hardness: 2f32,
@@ -20703,7 +20716,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PALE_OAK_LOG: Block = Block {
+    pub const PALE_OAK_LOG: Self = Block {
         id: 56,
         name: "pale_oak_log",
         hardness: 2f32,
@@ -20790,7 +20803,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MANGROVE_LOG: Block = Block {
+    pub const MANGROVE_LOG: Self = Block {
         id: 57,
         name: "mangrove_log",
         hardness: 2f32,
@@ -20877,7 +20890,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MANGROVE_ROOTS: Block = Block {
+    pub const MANGROVE_ROOTS: Self = Block {
         id: 58,
         name: "mangrove_roots",
         hardness: 0.7f32,
@@ -20951,7 +20964,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MUDDY_MANGROVE_ROOTS: Block = Block {
+    pub const MUDDY_MANGROVE_ROOTS: Self = Block {
         id: 59,
         name: "muddy_mangrove_roots",
         hardness: 0.7f32,
@@ -21035,7 +21048,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BAMBOO_BLOCK: Block = Block {
+    pub const BAMBOO_BLOCK: Self = Block {
         id: 60,
         name: "bamboo_block",
         hardness: 2f32,
@@ -21122,7 +21135,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const STRIPPED_SPRUCE_LOG: Block = Block {
+    pub const STRIPPED_SPRUCE_LOG: Self = Block {
         id: 61,
         name: "stripped_spruce_log",
         hardness: 2f32,
@@ -21209,7 +21222,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const STRIPPED_BIRCH_LOG: Block = Block {
+    pub const STRIPPED_BIRCH_LOG: Self = Block {
         id: 62,
         name: "stripped_birch_log",
         hardness: 2f32,
@@ -21296,7 +21309,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const STRIPPED_JUNGLE_LOG: Block = Block {
+    pub const STRIPPED_JUNGLE_LOG: Self = Block {
         id: 63,
         name: "stripped_jungle_log",
         hardness: 2f32,
@@ -21383,7 +21396,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const STRIPPED_ACACIA_LOG: Block = Block {
+    pub const STRIPPED_ACACIA_LOG: Self = Block {
         id: 64,
         name: "stripped_acacia_log",
         hardness: 2f32,
@@ -21470,7 +21483,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const STRIPPED_CHERRY_LOG: Block = Block {
+    pub const STRIPPED_CHERRY_LOG: Self = Block {
         id: 65,
         name: "stripped_cherry_log",
         hardness: 2f32,
@@ -21557,7 +21570,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const STRIPPED_DARK_OAK_LOG: Block = Block {
+    pub const STRIPPED_DARK_OAK_LOG: Self = Block {
         id: 66,
         name: "stripped_dark_oak_log",
         hardness: 2f32,
@@ -21644,7 +21657,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const STRIPPED_PALE_OAK_LOG: Block = Block {
+    pub const STRIPPED_PALE_OAK_LOG: Self = Block {
         id: 67,
         name: "stripped_pale_oak_log",
         hardness: 2f32,
@@ -21731,7 +21744,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const STRIPPED_OAK_LOG: Block = Block {
+    pub const STRIPPED_OAK_LOG: Self = Block {
         id: 68,
         name: "stripped_oak_log",
         hardness: 2f32,
@@ -21818,7 +21831,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const STRIPPED_MANGROVE_LOG: Block = Block {
+    pub const STRIPPED_MANGROVE_LOG: Self = Block {
         id: 69,
         name: "stripped_mangrove_log",
         hardness: 2f32,
@@ -21905,7 +21918,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const STRIPPED_BAMBOO_BLOCK: Block = Block {
+    pub const STRIPPED_BAMBOO_BLOCK: Self = Block {
         id: 70,
         name: "stripped_bamboo_block",
         hardness: 2f32,
@@ -21992,7 +22005,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const OAK_WOOD: Block = Block {
+    pub const OAK_WOOD: Self = Block {
         id: 71,
         name: "oak_wood",
         hardness: 2f32,
@@ -22079,7 +22092,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SPRUCE_WOOD: Block = Block {
+    pub const SPRUCE_WOOD: Self = Block {
         id: 72,
         name: "spruce_wood",
         hardness: 2f32,
@@ -22166,7 +22179,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BIRCH_WOOD: Block = Block {
+    pub const BIRCH_WOOD: Self = Block {
         id: 73,
         name: "birch_wood",
         hardness: 2f32,
@@ -22253,7 +22266,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const JUNGLE_WOOD: Block = Block {
+    pub const JUNGLE_WOOD: Self = Block {
         id: 74,
         name: "jungle_wood",
         hardness: 2f32,
@@ -22340,7 +22353,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const ACACIA_WOOD: Block = Block {
+    pub const ACACIA_WOOD: Self = Block {
         id: 75,
         name: "acacia_wood",
         hardness: 2f32,
@@ -22427,7 +22440,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CHERRY_WOOD: Block = Block {
+    pub const CHERRY_WOOD: Self = Block {
         id: 76,
         name: "cherry_wood",
         hardness: 2f32,
@@ -22514,7 +22527,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DARK_OAK_WOOD: Block = Block {
+    pub const DARK_OAK_WOOD: Self = Block {
         id: 77,
         name: "dark_oak_wood",
         hardness: 2f32,
@@ -22601,7 +22614,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MANGROVE_WOOD: Block = Block {
+    pub const MANGROVE_WOOD: Self = Block {
         id: 78,
         name: "mangrove_wood",
         hardness: 2f32,
@@ -22688,7 +22701,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const STRIPPED_OAK_WOOD: Block = Block {
+    pub const STRIPPED_OAK_WOOD: Self = Block {
         id: 79,
         name: "stripped_oak_wood",
         hardness: 2f32,
@@ -22775,7 +22788,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const STRIPPED_SPRUCE_WOOD: Block = Block {
+    pub const STRIPPED_SPRUCE_WOOD: Self = Block {
         id: 80,
         name: "stripped_spruce_wood",
         hardness: 2f32,
@@ -22862,7 +22875,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const STRIPPED_BIRCH_WOOD: Block = Block {
+    pub const STRIPPED_BIRCH_WOOD: Self = Block {
         id: 81,
         name: "stripped_birch_wood",
         hardness: 2f32,
@@ -22949,7 +22962,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const STRIPPED_JUNGLE_WOOD: Block = Block {
+    pub const STRIPPED_JUNGLE_WOOD: Self = Block {
         id: 82,
         name: "stripped_jungle_wood",
         hardness: 2f32,
@@ -23036,7 +23049,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const STRIPPED_ACACIA_WOOD: Block = Block {
+    pub const STRIPPED_ACACIA_WOOD: Self = Block {
         id: 83,
         name: "stripped_acacia_wood",
         hardness: 2f32,
@@ -23123,7 +23136,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const STRIPPED_CHERRY_WOOD: Block = Block {
+    pub const STRIPPED_CHERRY_WOOD: Self = Block {
         id: 84,
         name: "stripped_cherry_wood",
         hardness: 2f32,
@@ -23210,7 +23223,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const STRIPPED_DARK_OAK_WOOD: Block = Block {
+    pub const STRIPPED_DARK_OAK_WOOD: Self = Block {
         id: 85,
         name: "stripped_dark_oak_wood",
         hardness: 2f32,
@@ -23297,7 +23310,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const STRIPPED_PALE_OAK_WOOD: Block = Block {
+    pub const STRIPPED_PALE_OAK_WOOD: Self = Block {
         id: 86,
         name: "stripped_pale_oak_wood",
         hardness: 2f32,
@@ -23384,7 +23397,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const STRIPPED_MANGROVE_WOOD: Block = Block {
+    pub const STRIPPED_MANGROVE_WOOD: Self = Block {
         id: 87,
         name: "stripped_mangrove_wood",
         hardness: 2f32,
@@ -23471,7 +23484,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const OAK_LEAVES: Block = Block {
+    pub const OAK_LEAVES: Self = Block {
         id: 88,
         name: "oak_leaves",
         hardness: 0.2f32,
@@ -23947,7 +23960,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SPRUCE_LEAVES: Block = Block {
+    pub const SPRUCE_LEAVES: Self = Block {
         id: 89,
         name: "spruce_leaves",
         hardness: 0.2f32,
@@ -24407,7 +24420,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BIRCH_LEAVES: Block = Block {
+    pub const BIRCH_LEAVES: Self = Block {
         id: 90,
         name: "birch_leaves",
         hardness: 0.2f32,
@@ -24867,7 +24880,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const JUNGLE_LEAVES: Block = Block {
+    pub const JUNGLE_LEAVES: Self = Block {
         id: 91,
         name: "jungle_leaves",
         hardness: 0.2f32,
@@ -25327,7 +25340,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const ACACIA_LEAVES: Block = Block {
+    pub const ACACIA_LEAVES: Self = Block {
         id: 92,
         name: "acacia_leaves",
         hardness: 0.2f32,
@@ -25787,7 +25800,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CHERRY_LEAVES: Block = Block {
+    pub const CHERRY_LEAVES: Self = Block {
         id: 93,
         name: "cherry_leaves",
         hardness: 0.2f32,
@@ -26247,7 +26260,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DARK_OAK_LEAVES: Block = Block {
+    pub const DARK_OAK_LEAVES: Self = Block {
         id: 94,
         name: "dark_oak_leaves",
         hardness: 0.2f32,
@@ -26723,7 +26736,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PALE_OAK_LEAVES: Block = Block {
+    pub const PALE_OAK_LEAVES: Self = Block {
         id: 95,
         name: "pale_oak_leaves",
         hardness: 0.2f32,
@@ -27183,7 +27196,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MANGROVE_LEAVES: Block = Block {
+    pub const MANGROVE_LEAVES: Self = Block {
         id: 96,
         name: "mangrove_leaves",
         hardness: 0.2f32,
@@ -27625,7 +27638,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const AZALEA_LEAVES: Block = Block {
+    pub const AZALEA_LEAVES: Self = Block {
         id: 97,
         name: "azalea_leaves",
         hardness: 0.2f32,
@@ -28085,7 +28098,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const FLOWERING_AZALEA_LEAVES: Block = Block {
+    pub const FLOWERING_AZALEA_LEAVES: Self = Block {
         id: 98,
         name: "flowering_azalea_leaves",
         hardness: 0.2f32,
@@ -28545,7 +28558,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SPONGE: Block = Block {
+    pub const SPONGE: Self = Block {
         id: 99,
         name: "sponge",
         hardness: 0.6f32,
@@ -28601,7 +28614,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WET_SPONGE: Block = Block {
+    pub const WET_SPONGE: Self = Block {
         id: 100,
         name: "wet_sponge",
         hardness: 0.6f32,
@@ -28657,7 +28670,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const GLASS: Block = Block {
+    pub const GLASS: Self = Block {
         id: 101,
         name: "glass",
         hardness: 0.3f32,
@@ -28713,7 +28726,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LAPIS_ORE: Block = Block {
+    pub const LAPIS_ORE: Self = Block {
         id: 102,
         name: "lapis_ore",
         hardness: 3f32,
@@ -28812,7 +28825,7 @@ impl Block {
             })),
         }),
     };
-    pub const DEEPSLATE_LAPIS_ORE: Block = Block {
+    pub const DEEPSLATE_LAPIS_ORE: Self = Block {
         id: 103,
         name: "deepslate_lapis_ore",
         hardness: 4.5f32,
@@ -28911,7 +28924,7 @@ impl Block {
             })),
         }),
     };
-    pub const LAPIS_BLOCK: Block = Block {
+    pub const LAPIS_BLOCK: Self = Block {
         id: 104,
         name: "lapis_block",
         hardness: 3f32,
@@ -28967,7 +28980,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DISPENSER: Block = Block {
+    pub const DISPENSER: Self = Block {
         id: 105,
         name: "dispenser",
         hardness: 3.5f32,
@@ -29174,7 +29187,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SANDSTONE: Block = Block {
+    pub const SANDSTONE: Self = Block {
         id: 106,
         name: "sandstone",
         hardness: 0.8f32,
@@ -29230,7 +29243,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CHISELED_SANDSTONE: Block = Block {
+    pub const CHISELED_SANDSTONE: Self = Block {
         id: 107,
         name: "chiseled_sandstone",
         hardness: 0.8f32,
@@ -29286,7 +29299,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CUT_SANDSTONE: Block = Block {
+    pub const CUT_SANDSTONE: Self = Block {
         id: 108,
         name: "cut_sandstone",
         hardness: 0.8f32,
@@ -29342,7 +29355,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const NOTE_BLOCK: Block = Block {
+    pub const NOTE_BLOCK: Self = Block {
         id: 109,
         name: "note_block",
         hardness: 0.8f32,
@@ -46937,7 +46950,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WHITE_BED: Block = Block {
+    pub const WHITE_BED: Self = Block {
         id: 110,
         name: "white_bed",
         hardness: 0.2f32,
@@ -47193,7 +47206,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const ORANGE_BED: Block = Block {
+    pub const ORANGE_BED: Self = Block {
         id: 111,
         name: "orange_bed",
         hardness: 0.2f32,
@@ -47449,7 +47462,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MAGENTA_BED: Block = Block {
+    pub const MAGENTA_BED: Self = Block {
         id: 112,
         name: "magenta_bed",
         hardness: 0.2f32,
@@ -47705,7 +47718,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LIGHT_BLUE_BED: Block = Block {
+    pub const LIGHT_BLUE_BED: Self = Block {
         id: 113,
         name: "light_blue_bed",
         hardness: 0.2f32,
@@ -47961,7 +47974,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const YELLOW_BED: Block = Block {
+    pub const YELLOW_BED: Self = Block {
         id: 114,
         name: "yellow_bed",
         hardness: 0.2f32,
@@ -48217,7 +48230,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LIME_BED: Block = Block {
+    pub const LIME_BED: Self = Block {
         id: 115,
         name: "lime_bed",
         hardness: 0.2f32,
@@ -48473,7 +48486,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PINK_BED: Block = Block {
+    pub const PINK_BED: Self = Block {
         id: 116,
         name: "pink_bed",
         hardness: 0.2f32,
@@ -48729,7 +48742,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const GRAY_BED: Block = Block {
+    pub const GRAY_BED: Self = Block {
         id: 117,
         name: "gray_bed",
         hardness: 0.2f32,
@@ -48985,7 +48998,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LIGHT_GRAY_BED: Block = Block {
+    pub const LIGHT_GRAY_BED: Self = Block {
         id: 118,
         name: "light_gray_bed",
         hardness: 0.2f32,
@@ -49241,7 +49254,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CYAN_BED: Block = Block {
+    pub const CYAN_BED: Self = Block {
         id: 119,
         name: "cyan_bed",
         hardness: 0.2f32,
@@ -49497,7 +49510,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PURPLE_BED: Block = Block {
+    pub const PURPLE_BED: Self = Block {
         id: 120,
         name: "purple_bed",
         hardness: 0.2f32,
@@ -49753,7 +49766,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BLUE_BED: Block = Block {
+    pub const BLUE_BED: Self = Block {
         id: 121,
         name: "blue_bed",
         hardness: 0.2f32,
@@ -50009,7 +50022,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BROWN_BED: Block = Block {
+    pub const BROWN_BED: Self = Block {
         id: 122,
         name: "brown_bed",
         hardness: 0.2f32,
@@ -50265,7 +50278,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const GREEN_BED: Block = Block {
+    pub const GREEN_BED: Self = Block {
         id: 123,
         name: "green_bed",
         hardness: 0.2f32,
@@ -50521,7 +50534,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const RED_BED: Block = Block {
+    pub const RED_BED: Self = Block {
         id: 124,
         name: "red_bed",
         hardness: 0.2f32,
@@ -50777,7 +50790,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BLACK_BED: Block = Block {
+    pub const BLACK_BED: Self = Block {
         id: 125,
         name: "black_bed",
         hardness: 0.2f32,
@@ -51033,7 +51046,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POWERED_RAIL: Block = Block {
+    pub const POWERED_RAIL: Self = Block {
         id: 126,
         name: "powered_rail",
         hardness: 0.7f32,
@@ -51390,7 +51403,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DETECTOR_RAIL: Block = Block {
+    pub const DETECTOR_RAIL: Self = Block {
         id: 127,
         name: "detector_rail",
         hardness: 0.7f32,
@@ -51747,7 +51760,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const STICKY_PISTON: Block = Block {
+    pub const STICKY_PISTON: Self = Block {
         id: 128,
         name: "sticky_piston",
         hardness: 1.5f32,
@@ -51948,7 +51961,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const COBWEB: Block = Block {
+    pub const COBWEB: Self = Block {
         id: 129,
         name: "cobweb",
         hardness: 4f32,
@@ -52019,7 +52032,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SHORT_GRASS: Block = Block {
+    pub const SHORT_GRASS: Self = Block {
         id: 130,
         name: "short_grass",
         hardness: 0f32,
@@ -52112,7 +52125,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const FERN: Block = Block {
+    pub const FERN: Self = Block {
         id: 131,
         name: "fern",
         hardness: 0f32,
@@ -52205,7 +52218,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DEAD_BUSH: Block = Block {
+    pub const DEAD_BUSH: Self = Block {
         id: 132,
         name: "dead_bush",
         hardness: 0f32,
@@ -52294,7 +52307,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BUSH: Block = Block {
+    pub const BUSH: Self = Block {
         id: 133,
         name: "bush",
         hardness: 0f32,
@@ -52353,7 +52366,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SHORT_DRY_GRASS: Block = Block {
+    pub const SHORT_DRY_GRASS: Self = Block {
         id: 134,
         name: "short_dry_grass",
         hardness: 0f32,
@@ -52412,7 +52425,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const TALL_DRY_GRASS: Block = Block {
+    pub const TALL_DRY_GRASS: Self = Block {
         id: 135,
         name: "tall_dry_grass",
         hardness: 0f32,
@@ -52471,7 +52484,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SEAGRASS: Block = Block {
+    pub const SEAGRASS: Self = Block {
         id: 136,
         name: "seagrass",
         hardness: 0f32,
@@ -52527,7 +52540,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const TALL_SEAGRASS: Block = Block {
+    pub const TALL_SEAGRASS: Self = Block {
         id: 137,
         name: "tall_seagrass",
         hardness: 0f32,
@@ -52604,7 +52617,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PISTON: Block = Block {
+    pub const PISTON: Self = Block {
         id: 138,
         name: "piston",
         hardness: 1.5f32,
@@ -52805,7 +52818,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PISTON_HEAD: Block = Block {
+    pub const PISTON_HEAD: Self = Block {
         id: 139,
         name: "piston_head",
         hardness: 1.5f32,
@@ -53146,7 +53159,7 @@ impl Block {
         loot_table: None,
         experience: None,
     };
-    pub const WHITE_WOOL: Block = Block {
+    pub const WHITE_WOOL: Self = Block {
         id: 140,
         name: "white_wool",
         hardness: 0.8f32,
@@ -53205,7 +53218,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const ORANGE_WOOL: Block = Block {
+    pub const ORANGE_WOOL: Self = Block {
         id: 141,
         name: "orange_wool",
         hardness: 0.8f32,
@@ -53264,7 +53277,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MAGENTA_WOOL: Block = Block {
+    pub const MAGENTA_WOOL: Self = Block {
         id: 142,
         name: "magenta_wool",
         hardness: 0.8f32,
@@ -53323,7 +53336,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LIGHT_BLUE_WOOL: Block = Block {
+    pub const LIGHT_BLUE_WOOL: Self = Block {
         id: 143,
         name: "light_blue_wool",
         hardness: 0.8f32,
@@ -53382,7 +53395,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const YELLOW_WOOL: Block = Block {
+    pub const YELLOW_WOOL: Self = Block {
         id: 144,
         name: "yellow_wool",
         hardness: 0.8f32,
@@ -53441,7 +53454,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LIME_WOOL: Block = Block {
+    pub const LIME_WOOL: Self = Block {
         id: 145,
         name: "lime_wool",
         hardness: 0.8f32,
@@ -53500,7 +53513,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PINK_WOOL: Block = Block {
+    pub const PINK_WOOL: Self = Block {
         id: 146,
         name: "pink_wool",
         hardness: 0.8f32,
@@ -53559,7 +53572,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const GRAY_WOOL: Block = Block {
+    pub const GRAY_WOOL: Self = Block {
         id: 147,
         name: "gray_wool",
         hardness: 0.8f32,
@@ -53618,7 +53631,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LIGHT_GRAY_WOOL: Block = Block {
+    pub const LIGHT_GRAY_WOOL: Self = Block {
         id: 148,
         name: "light_gray_wool",
         hardness: 0.8f32,
@@ -53677,7 +53690,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CYAN_WOOL: Block = Block {
+    pub const CYAN_WOOL: Self = Block {
         id: 149,
         name: "cyan_wool",
         hardness: 0.8f32,
@@ -53736,7 +53749,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PURPLE_WOOL: Block = Block {
+    pub const PURPLE_WOOL: Self = Block {
         id: 150,
         name: "purple_wool",
         hardness: 0.8f32,
@@ -53795,7 +53808,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BLUE_WOOL: Block = Block {
+    pub const BLUE_WOOL: Self = Block {
         id: 151,
         name: "blue_wool",
         hardness: 0.8f32,
@@ -53854,7 +53867,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BROWN_WOOL: Block = Block {
+    pub const BROWN_WOOL: Self = Block {
         id: 152,
         name: "brown_wool",
         hardness: 0.8f32,
@@ -53913,7 +53926,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const GREEN_WOOL: Block = Block {
+    pub const GREEN_WOOL: Self = Block {
         id: 153,
         name: "green_wool",
         hardness: 0.8f32,
@@ -53972,7 +53985,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const RED_WOOL: Block = Block {
+    pub const RED_WOOL: Self = Block {
         id: 154,
         name: "red_wool",
         hardness: 0.8f32,
@@ -54031,7 +54044,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BLACK_WOOL: Block = Block {
+    pub const BLACK_WOOL: Self = Block {
         id: 155,
         name: "black_wool",
         hardness: 0.8f32,
@@ -54090,7 +54103,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MOVING_PISTON: Block = Block {
+    pub const MOVING_PISTON: Self = Block {
         id: 156,
         name: "moving_piston",
         hardness: -1f32,
@@ -54275,7 +54288,7 @@ impl Block {
         loot_table: None,
         experience: None,
     };
-    pub const DANDELION: Block = Block {
+    pub const DANDELION: Self = Block {
         id: 157,
         name: "dandelion",
         hardness: 0f32,
@@ -54334,7 +54347,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const GOLDEN_DANDELION: Block = Block {
+    pub const GOLDEN_DANDELION: Self = Block {
         id: 158,
         name: "golden_dandelion",
         hardness: 0f32,
@@ -54393,7 +54406,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const TORCHFLOWER: Block = Block {
+    pub const TORCHFLOWER: Self = Block {
         id: 159,
         name: "torchflower",
         hardness: 0f32,
@@ -54452,7 +54465,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POPPY: Block = Block {
+    pub const POPPY: Self = Block {
         id: 160,
         name: "poppy",
         hardness: 0f32,
@@ -54511,7 +54524,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BLUE_ORCHID: Block = Block {
+    pub const BLUE_ORCHID: Self = Block {
         id: 161,
         name: "blue_orchid",
         hardness: 0f32,
@@ -54570,7 +54583,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const ALLIUM: Block = Block {
+    pub const ALLIUM: Self = Block {
         id: 162,
         name: "allium",
         hardness: 0f32,
@@ -54629,7 +54642,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const AZURE_BLUET: Block = Block {
+    pub const AZURE_BLUET: Self = Block {
         id: 163,
         name: "azure_bluet",
         hardness: 0f32,
@@ -54688,7 +54701,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const RED_TULIP: Block = Block {
+    pub const RED_TULIP: Self = Block {
         id: 164,
         name: "red_tulip",
         hardness: 0f32,
@@ -54747,7 +54760,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const ORANGE_TULIP: Block = Block {
+    pub const ORANGE_TULIP: Self = Block {
         id: 165,
         name: "orange_tulip",
         hardness: 0f32,
@@ -54806,7 +54819,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WHITE_TULIP: Block = Block {
+    pub const WHITE_TULIP: Self = Block {
         id: 166,
         name: "white_tulip",
         hardness: 0f32,
@@ -54865,7 +54878,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PINK_TULIP: Block = Block {
+    pub const PINK_TULIP: Self = Block {
         id: 167,
         name: "pink_tulip",
         hardness: 0f32,
@@ -54924,7 +54937,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const OXEYE_DAISY: Block = Block {
+    pub const OXEYE_DAISY: Self = Block {
         id: 168,
         name: "oxeye_daisy",
         hardness: 0f32,
@@ -54983,7 +54996,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CORNFLOWER: Block = Block {
+    pub const CORNFLOWER: Self = Block {
         id: 169,
         name: "cornflower",
         hardness: 0f32,
@@ -55042,7 +55055,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WITHER_ROSE: Block = Block {
+    pub const WITHER_ROSE: Self = Block {
         id: 170,
         name: "wither_rose",
         hardness: 0f32,
@@ -55101,7 +55114,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LILY_OF_THE_VALLEY: Block = Block {
+    pub const LILY_OF_THE_VALLEY: Self = Block {
         id: 171,
         name: "lily_of_the_valley",
         hardness: 0f32,
@@ -55160,7 +55173,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BROWN_MUSHROOM: Block = Block {
+    pub const BROWN_MUSHROOM: Self = Block {
         id: 172,
         name: "brown_mushroom",
         hardness: 0f32,
@@ -55216,7 +55229,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const RED_MUSHROOM: Block = Block {
+    pub const RED_MUSHROOM: Self = Block {
         id: 173,
         name: "red_mushroom",
         hardness: 0f32,
@@ -55272,7 +55285,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const GOLD_BLOCK: Block = Block {
+    pub const GOLD_BLOCK: Self = Block {
         id: 174,
         name: "gold_block",
         hardness: 3f32,
@@ -55328,7 +55341,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const IRON_BLOCK: Block = Block {
+    pub const IRON_BLOCK: Self = Block {
         id: 175,
         name: "iron_block",
         hardness: 5f32,
@@ -55384,7 +55397,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BRICKS: Block = Block {
+    pub const BRICKS: Self = Block {
         id: 176,
         name: "bricks",
         hardness: 2f32,
@@ -55440,7 +55453,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const TNT: Block = Block {
+    pub const TNT: Self = Block {
         id: 177,
         name: "tnt",
         hardness: 0f32,
@@ -55517,7 +55530,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BOOKSHELF: Block = Block {
+    pub const BOOKSHELF: Self = Block {
         id: 178,
         name: "bookshelf",
         hardness: 1.5f32,
@@ -55605,7 +55618,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CHISELED_BOOKSHELF: Block = Block {
+    pub const CHISELED_BOOKSHELF: Self = Block {
         id: 179,
         name: "chiseled_bookshelf",
         hardness: 1.5f32,
@@ -58978,7 +58991,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const ACACIA_SHELF: Block = Block {
+    pub const ACACIA_SHELF: Self = Block {
         id: 180,
         name: "acacia_shelf",
         hardness: 2f32,
@@ -59858,7 +59871,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BAMBOO_SHELF: Block = Block {
+    pub const BAMBOO_SHELF: Self = Block {
         id: 181,
         name: "bamboo_shelf",
         hardness: 2f32,
@@ -60738,7 +60751,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BIRCH_SHELF: Block = Block {
+    pub const BIRCH_SHELF: Self = Block {
         id: 182,
         name: "birch_shelf",
         hardness: 2f32,
@@ -61618,7 +61631,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CHERRY_SHELF: Block = Block {
+    pub const CHERRY_SHELF: Self = Block {
         id: 183,
         name: "cherry_shelf",
         hardness: 2f32,
@@ -62498,7 +62511,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CRIMSON_SHELF: Block = Block {
+    pub const CRIMSON_SHELF: Self = Block {
         id: 184,
         name: "crimson_shelf",
         hardness: 2f32,
@@ -63375,7 +63388,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DARK_OAK_SHELF: Block = Block {
+    pub const DARK_OAK_SHELF: Self = Block {
         id: 185,
         name: "dark_oak_shelf",
         hardness: 2f32,
@@ -64255,7 +64268,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const JUNGLE_SHELF: Block = Block {
+    pub const JUNGLE_SHELF: Self = Block {
         id: 186,
         name: "jungle_shelf",
         hardness: 2f32,
@@ -65135,7 +65148,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MANGROVE_SHELF: Block = Block {
+    pub const MANGROVE_SHELF: Self = Block {
         id: 187,
         name: "mangrove_shelf",
         hardness: 2f32,
@@ -66015,7 +66028,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const OAK_SHELF: Block = Block {
+    pub const OAK_SHELF: Self = Block {
         id: 188,
         name: "oak_shelf",
         hardness: 2f32,
@@ -66895,7 +66908,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PALE_OAK_SHELF: Block = Block {
+    pub const PALE_OAK_SHELF: Self = Block {
         id: 189,
         name: "pale_oak_shelf",
         hardness: 2f32,
@@ -67775,7 +67788,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SPRUCE_SHELF: Block = Block {
+    pub const SPRUCE_SHELF: Self = Block {
         id: 190,
         name: "spruce_shelf",
         hardness: 2f32,
@@ -68655,7 +68668,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WARPED_SHELF: Block = Block {
+    pub const WARPED_SHELF: Self = Block {
         id: 191,
         name: "warped_shelf",
         hardness: 2f32,
@@ -69532,7 +69545,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MOSSY_COBBLESTONE: Block = Block {
+    pub const MOSSY_COBBLESTONE: Self = Block {
         id: 192,
         name: "mossy_cobblestone",
         hardness: 2f32,
@@ -69588,7 +69601,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const OBSIDIAN: Block = Block {
+    pub const OBSIDIAN: Self = Block {
         id: 193,
         name: "obsidian",
         hardness: 50f32,
@@ -69644,7 +69657,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const TORCH: Block = Block {
+    pub const TORCH: Self = Block {
         id: 194,
         name: "torch",
         hardness: 0f32,
@@ -69700,7 +69713,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WALL_TORCH: Block = Block {
+    pub const WALL_TORCH: Self = Block {
         id: 195,
         name: "wall_torch",
         hardness: 0f32,
@@ -69797,7 +69810,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const FIRE: Block = Block {
+    pub const FIRE: Self = Block {
         id: 196,
         name: "fire",
         hardness: 0f32,
@@ -76486,7 +76499,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SOUL_FIRE: Block = Block {
+    pub const SOUL_FIRE: Self = Block {
         id: 197,
         name: "soul_fire",
         hardness: 0f32,
@@ -76530,7 +76543,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SPAWNER: Block = Block {
+    pub const SPAWNER: Self = Block {
         id: 198,
         name: "spawner",
         hardness: 5f32,
@@ -76574,7 +76587,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CREAKING_HEART: Block = Block {
+    pub const CREAKING_HEART: Self = Block {
         id: 199,
         name: "creaking_heart",
         hardness: 10f32,
@@ -76902,7 +76915,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const OAK_STAIRS: Block = Block {
+    pub const OAK_STAIRS: Self = Block {
         id: 200,
         name: "oak_stairs",
         hardness: 2f32,
@@ -77990,7 +78003,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CHEST: Block = Block {
+    pub const CHEST: Self = Block {
         id: 201,
         name: "chest",
         hardness: 2.5f32,
@@ -78353,7 +78366,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const REDSTONE_WIRE: Block = Block {
+    pub const REDSTONE_WIRE: Self = Block {
         id: 202,
         name: "redstone_wire",
         hardness: 0f32,
@@ -95246,7 +95259,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DIAMOND_ORE: Block = Block {
+    pub const DIAMOND_ORE: Self = Block {
         id: 203,
         name: "diamond_ore",
         hardness: 3f32,
@@ -95335,7 +95348,7 @@ impl Block {
             })),
         }),
     };
-    pub const DEEPSLATE_DIAMOND_ORE: Block = Block {
+    pub const DEEPSLATE_DIAMOND_ORE: Self = Block {
         id: 204,
         name: "deepslate_diamond_ore",
         hardness: 4.5f32,
@@ -95424,7 +95437,7 @@ impl Block {
             })),
         }),
     };
-    pub const DIAMOND_BLOCK: Block = Block {
+    pub const DIAMOND_BLOCK: Self = Block {
         id: 205,
         name: "diamond_block",
         hardness: 5f32,
@@ -95480,7 +95493,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CRAFTING_TABLE: Block = Block {
+    pub const CRAFTING_TABLE: Self = Block {
         id: 206,
         name: "crafting_table",
         hardness: 2.5f32,
@@ -95536,7 +95549,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WHEAT: Block = Block {
+    pub const WHEAT: Self = Block {
         id: 207,
         name: "wheat",
         hardness: 0f32,
@@ -95731,7 +95744,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const FARMLAND: Block = Block {
+    pub const FARMLAND: Self = Block {
         id: 208,
         name: "farmland",
         hardness: 0.6f32,
@@ -95880,7 +95893,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const FURNACE: Block = Block {
+    pub const FURNACE: Self = Block {
         id: 209,
         name: "furnace",
         hardness: 3.5f32,
@@ -96035,7 +96048,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const OAK_SIGN: Block = Block {
+    pub const OAK_SIGN: Self = Block {
         id: 210,
         name: "oak_sign",
         hardness: 1f32,
@@ -96496,7 +96509,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SPRUCE_SIGN: Block = Block {
+    pub const SPRUCE_SIGN: Self = Block {
         id: 211,
         name: "spruce_sign",
         hardness: 1f32,
@@ -96957,7 +96970,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BIRCH_SIGN: Block = Block {
+    pub const BIRCH_SIGN: Self = Block {
         id: 212,
         name: "birch_sign",
         hardness: 1f32,
@@ -97418,7 +97431,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const ACACIA_SIGN: Block = Block {
+    pub const ACACIA_SIGN: Self = Block {
         id: 213,
         name: "acacia_sign",
         hardness: 1f32,
@@ -97879,7 +97892,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CHERRY_SIGN: Block = Block {
+    pub const CHERRY_SIGN: Self = Block {
         id: 214,
         name: "cherry_sign",
         hardness: 1f32,
@@ -98340,7 +98353,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const JUNGLE_SIGN: Block = Block {
+    pub const JUNGLE_SIGN: Self = Block {
         id: 215,
         name: "jungle_sign",
         hardness: 1f32,
@@ -98801,7 +98814,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DARK_OAK_SIGN: Block = Block {
+    pub const DARK_OAK_SIGN: Self = Block {
         id: 216,
         name: "dark_oak_sign",
         hardness: 1f32,
@@ -99262,7 +99275,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PALE_OAK_SIGN: Block = Block {
+    pub const PALE_OAK_SIGN: Self = Block {
         id: 217,
         name: "pale_oak_sign",
         hardness: 1f32,
@@ -99723,7 +99736,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MANGROVE_SIGN: Block = Block {
+    pub const MANGROVE_SIGN: Self = Block {
         id: 218,
         name: "mangrove_sign",
         hardness: 1f32,
@@ -100184,7 +100197,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BAMBOO_SIGN: Block = Block {
+    pub const BAMBOO_SIGN: Self = Block {
         id: 219,
         name: "bamboo_sign",
         hardness: 1f32,
@@ -100645,7 +100658,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const OAK_DOOR: Block = Block {
+    pub const OAK_DOOR: Self = Block {
         id: 220,
         name: "oak_door",
         hardness: 3f32,
@@ -101525,7 +101538,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LADDER: Block = Block {
+    pub const LADDER: Self = Block {
         id: 221,
         name: "ladder",
         hardness: 0.4f32,
@@ -101674,7 +101687,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const RAIL: Block = Block {
+    pub const RAIL: Self = Block {
         id: 222,
         name: "rail",
         hardness: 0.7f32,
@@ -101979,7 +101992,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const COBBLESTONE_STAIRS: Block = Block {
+    pub const COBBLESTONE_STAIRS: Self = Block {
         id: 223,
         name: "cobblestone_stairs",
         hardness: 2f32,
@@ -103064,7 +103077,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const OAK_WALL_SIGN: Block = Block {
+    pub const OAK_WALL_SIGN: Self = Block {
         id: 224,
         name: "oak_wall_sign",
         hardness: 1f32,
@@ -103213,7 +103226,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SPRUCE_WALL_SIGN: Block = Block {
+    pub const SPRUCE_WALL_SIGN: Self = Block {
         id: 225,
         name: "spruce_wall_sign",
         hardness: 1f32,
@@ -103362,7 +103375,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BIRCH_WALL_SIGN: Block = Block {
+    pub const BIRCH_WALL_SIGN: Self = Block {
         id: 226,
         name: "birch_wall_sign",
         hardness: 1f32,
@@ -103511,7 +103524,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const ACACIA_WALL_SIGN: Block = Block {
+    pub const ACACIA_WALL_SIGN: Self = Block {
         id: 227,
         name: "acacia_wall_sign",
         hardness: 1f32,
@@ -103660,7 +103673,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CHERRY_WALL_SIGN: Block = Block {
+    pub const CHERRY_WALL_SIGN: Self = Block {
         id: 228,
         name: "cherry_wall_sign",
         hardness: 1f32,
@@ -103809,7 +103822,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const JUNGLE_WALL_SIGN: Block = Block {
+    pub const JUNGLE_WALL_SIGN: Self = Block {
         id: 229,
         name: "jungle_wall_sign",
         hardness: 1f32,
@@ -103958,7 +103971,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DARK_OAK_WALL_SIGN: Block = Block {
+    pub const DARK_OAK_WALL_SIGN: Self = Block {
         id: 230,
         name: "dark_oak_wall_sign",
         hardness: 1f32,
@@ -104107,7 +104120,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PALE_OAK_WALL_SIGN: Block = Block {
+    pub const PALE_OAK_WALL_SIGN: Self = Block {
         id: 231,
         name: "pale_oak_wall_sign",
         hardness: 1f32,
@@ -104256,7 +104269,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MANGROVE_WALL_SIGN: Block = Block {
+    pub const MANGROVE_WALL_SIGN: Self = Block {
         id: 232,
         name: "mangrove_wall_sign",
         hardness: 1f32,
@@ -104405,7 +104418,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BAMBOO_WALL_SIGN: Block = Block {
+    pub const BAMBOO_WALL_SIGN: Self = Block {
         id: 233,
         name: "bamboo_wall_sign",
         hardness: 1f32,
@@ -104554,7 +104567,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const OAK_HANGING_SIGN: Block = Block {
+    pub const OAK_HANGING_SIGN: Self = Block {
         id: 234,
         name: "oak_hanging_sign",
         hardness: 1f32,
@@ -105431,7 +105444,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SPRUCE_HANGING_SIGN: Block = Block {
+    pub const SPRUCE_HANGING_SIGN: Self = Block {
         id: 235,
         name: "spruce_hanging_sign",
         hardness: 1f32,
@@ -106308,7 +106321,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BIRCH_HANGING_SIGN: Block = Block {
+    pub const BIRCH_HANGING_SIGN: Self = Block {
         id: 236,
         name: "birch_hanging_sign",
         hardness: 1f32,
@@ -107185,7 +107198,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const ACACIA_HANGING_SIGN: Block = Block {
+    pub const ACACIA_HANGING_SIGN: Self = Block {
         id: 237,
         name: "acacia_hanging_sign",
         hardness: 1f32,
@@ -108062,7 +108075,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CHERRY_HANGING_SIGN: Block = Block {
+    pub const CHERRY_HANGING_SIGN: Self = Block {
         id: 238,
         name: "cherry_hanging_sign",
         hardness: 1f32,
@@ -108939,7 +108952,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const JUNGLE_HANGING_SIGN: Block = Block {
+    pub const JUNGLE_HANGING_SIGN: Self = Block {
         id: 239,
         name: "jungle_hanging_sign",
         hardness: 1f32,
@@ -109816,7 +109829,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DARK_OAK_HANGING_SIGN: Block = Block {
+    pub const DARK_OAK_HANGING_SIGN: Self = Block {
         id: 240,
         name: "dark_oak_hanging_sign",
         hardness: 1f32,
@@ -110693,7 +110706,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PALE_OAK_HANGING_SIGN: Block = Block {
+    pub const PALE_OAK_HANGING_SIGN: Self = Block {
         id: 241,
         name: "pale_oak_hanging_sign",
         hardness: 1f32,
@@ -111570,7 +111583,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CRIMSON_HANGING_SIGN: Block = Block {
+    pub const CRIMSON_HANGING_SIGN: Self = Block {
         id: 242,
         name: "crimson_hanging_sign",
         hardness: 1f32,
@@ -112447,7 +112460,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WARPED_HANGING_SIGN: Block = Block {
+    pub const WARPED_HANGING_SIGN: Self = Block {
         id: 243,
         name: "warped_hanging_sign",
         hardness: 1f32,
@@ -113324,7 +113337,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MANGROVE_HANGING_SIGN: Block = Block {
+    pub const MANGROVE_HANGING_SIGN: Self = Block {
         id: 244,
         name: "mangrove_hanging_sign",
         hardness: 1f32,
@@ -114201,7 +114214,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BAMBOO_HANGING_SIGN: Block = Block {
+    pub const BAMBOO_HANGING_SIGN: Self = Block {
         id: 245,
         name: "bamboo_hanging_sign",
         hardness: 1f32,
@@ -115078,7 +115091,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const OAK_WALL_HANGING_SIGN: Block = Block {
+    pub const OAK_WALL_HANGING_SIGN: Self = Block {
         id: 246,
         name: "oak_wall_hanging_sign",
         hardness: 1f32,
@@ -115227,7 +115240,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SPRUCE_WALL_HANGING_SIGN: Block = Block {
+    pub const SPRUCE_WALL_HANGING_SIGN: Self = Block {
         id: 247,
         name: "spruce_wall_hanging_sign",
         hardness: 1f32,
@@ -115376,7 +115389,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BIRCH_WALL_HANGING_SIGN: Block = Block {
+    pub const BIRCH_WALL_HANGING_SIGN: Self = Block {
         id: 248,
         name: "birch_wall_hanging_sign",
         hardness: 1f32,
@@ -115525,7 +115538,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const ACACIA_WALL_HANGING_SIGN: Block = Block {
+    pub const ACACIA_WALL_HANGING_SIGN: Self = Block {
         id: 249,
         name: "acacia_wall_hanging_sign",
         hardness: 1f32,
@@ -115674,7 +115687,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CHERRY_WALL_HANGING_SIGN: Block = Block {
+    pub const CHERRY_WALL_HANGING_SIGN: Self = Block {
         id: 250,
         name: "cherry_wall_hanging_sign",
         hardness: 1f32,
@@ -115823,7 +115836,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const JUNGLE_WALL_HANGING_SIGN: Block = Block {
+    pub const JUNGLE_WALL_HANGING_SIGN: Self = Block {
         id: 251,
         name: "jungle_wall_hanging_sign",
         hardness: 1f32,
@@ -115972,7 +115985,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DARK_OAK_WALL_HANGING_SIGN: Block = Block {
+    pub const DARK_OAK_WALL_HANGING_SIGN: Self = Block {
         id: 252,
         name: "dark_oak_wall_hanging_sign",
         hardness: 1f32,
@@ -116121,7 +116134,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PALE_OAK_WALL_HANGING_SIGN: Block = Block {
+    pub const PALE_OAK_WALL_HANGING_SIGN: Self = Block {
         id: 253,
         name: "pale_oak_wall_hanging_sign",
         hardness: 1f32,
@@ -116270,7 +116283,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MANGROVE_WALL_HANGING_SIGN: Block = Block {
+    pub const MANGROVE_WALL_HANGING_SIGN: Self = Block {
         id: 254,
         name: "mangrove_wall_hanging_sign",
         hardness: 1f32,
@@ -116419,7 +116432,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CRIMSON_WALL_HANGING_SIGN: Block = Block {
+    pub const CRIMSON_WALL_HANGING_SIGN: Self = Block {
         id: 255,
         name: "crimson_wall_hanging_sign",
         hardness: 1f32,
@@ -116568,7 +116581,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WARPED_WALL_HANGING_SIGN: Block = Block {
+    pub const WARPED_WALL_HANGING_SIGN: Self = Block {
         id: 256,
         name: "warped_wall_hanging_sign",
         hardness: 1f32,
@@ -116717,7 +116730,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BAMBOO_WALL_HANGING_SIGN: Block = Block {
+    pub const BAMBOO_WALL_HANGING_SIGN: Self = Block {
         id: 257,
         name: "bamboo_wall_hanging_sign",
         hardness: 1f32,
@@ -116866,7 +116879,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LEVER: Block = Block {
+    pub const LEVER: Self = Block {
         id: 258,
         name: "lever",
         hardness: 0.5f32,
@@ -117223,7 +117236,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const STONE_PRESSURE_PLATE: Block = Block {
+    pub const STONE_PRESSURE_PLATE: Self = Block {
         id: 259,
         name: "stone_pressure_plate",
         hardness: 0.5f32,
@@ -117294,7 +117307,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const IRON_DOOR: Block = Block {
+    pub const IRON_DOOR: Self = Block {
         id: 260,
         name: "iron_door",
         hardness: 5f32,
@@ -118174,7 +118187,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const OAK_PRESSURE_PLATE: Block = Block {
+    pub const OAK_PRESSURE_PLATE: Self = Block {
         id: 261,
         name: "oak_pressure_plate",
         hardness: 0.5f32,
@@ -118245,7 +118258,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SPRUCE_PRESSURE_PLATE: Block = Block {
+    pub const SPRUCE_PRESSURE_PLATE: Self = Block {
         id: 262,
         name: "spruce_pressure_plate",
         hardness: 0.5f32,
@@ -118316,7 +118329,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BIRCH_PRESSURE_PLATE: Block = Block {
+    pub const BIRCH_PRESSURE_PLATE: Self = Block {
         id: 263,
         name: "birch_pressure_plate",
         hardness: 0.5f32,
@@ -118387,7 +118400,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const JUNGLE_PRESSURE_PLATE: Block = Block {
+    pub const JUNGLE_PRESSURE_PLATE: Self = Block {
         id: 264,
         name: "jungle_pressure_plate",
         hardness: 0.5f32,
@@ -118458,7 +118471,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const ACACIA_PRESSURE_PLATE: Block = Block {
+    pub const ACACIA_PRESSURE_PLATE: Self = Block {
         id: 265,
         name: "acacia_pressure_plate",
         hardness: 0.5f32,
@@ -118529,7 +118542,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CHERRY_PRESSURE_PLATE: Block = Block {
+    pub const CHERRY_PRESSURE_PLATE: Self = Block {
         id: 266,
         name: "cherry_pressure_plate",
         hardness: 0.5f32,
@@ -118600,7 +118613,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DARK_OAK_PRESSURE_PLATE: Block = Block {
+    pub const DARK_OAK_PRESSURE_PLATE: Self = Block {
         id: 267,
         name: "dark_oak_pressure_plate",
         hardness: 0.5f32,
@@ -118671,7 +118684,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PALE_OAK_PRESSURE_PLATE: Block = Block {
+    pub const PALE_OAK_PRESSURE_PLATE: Self = Block {
         id: 268,
         name: "pale_oak_pressure_plate",
         hardness: 0.5f32,
@@ -118742,7 +118755,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MANGROVE_PRESSURE_PLATE: Block = Block {
+    pub const MANGROVE_PRESSURE_PLATE: Self = Block {
         id: 269,
         name: "mangrove_pressure_plate",
         hardness: 0.5f32,
@@ -118813,7 +118826,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BAMBOO_PRESSURE_PLATE: Block = Block {
+    pub const BAMBOO_PRESSURE_PLATE: Self = Block {
         id: 270,
         name: "bamboo_pressure_plate",
         hardness: 0.5f32,
@@ -118884,7 +118897,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const REDSTONE_ORE: Block = Block {
+    pub const REDSTONE_ORE: Self = Block {
         id: 271,
         name: "redstone_ore",
         hardness: 3f32,
@@ -118997,7 +119010,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DEEPSLATE_REDSTONE_ORE: Block = Block {
+    pub const DEEPSLATE_REDSTONE_ORE: Self = Block {
         id: 272,
         name: "deepslate_redstone_ore",
         hardness: 4.5f32,
@@ -119110,7 +119123,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const REDSTONE_TORCH: Block = Block {
+    pub const REDSTONE_TORCH: Self = Block {
         id: 273,
         name: "redstone_torch",
         hardness: 0f32,
@@ -119181,7 +119194,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const REDSTONE_WALL_TORCH: Block = Block {
+    pub const REDSTONE_WALL_TORCH: Self = Block {
         id: 274,
         name: "redstone_wall_torch",
         hardness: 0f32,
@@ -119330,7 +119343,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const STONE_BUTTON: Block = Block {
+    pub const STONE_BUTTON: Self = Block {
         id: 275,
         name: "stone_button",
         hardness: 0.5f32,
@@ -119687,7 +119700,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SNOW: Block = Block {
+    pub const SNOW: Self = Block {
         id: 276,
         name: "snow",
         hardness: 0.1f32,
@@ -120160,7 +120173,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const ICE: Block = Block {
+    pub const ICE: Self = Block {
         id: 277,
         name: "ice",
         hardness: 0.5f32,
@@ -120216,7 +120229,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SNOW_BLOCK: Block = Block {
+    pub const SNOW_BLOCK: Self = Block {
         id: 278,
         name: "snow_block",
         hardness: 0.2f32,
@@ -120301,7 +120314,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CACTUS: Block = Block {
+    pub const CACTUS: Self = Block {
         id: 279,
         name: "cactus",
         hardness: 0.4f32,
@@ -120554,7 +120567,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CACTUS_FLOWER: Block = Block {
+    pub const CACTUS_FLOWER: Self = Block {
         id: 280,
         name: "cactus_flower",
         hardness: 0f32,
@@ -120613,7 +120626,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CLAY: Block = Block {
+    pub const CLAY: Self = Block {
         id: 281,
         name: "clay",
         hardness: 0.6f32,
@@ -120698,7 +120711,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SUGAR_CANE: Block = Block {
+    pub const SUGAR_CANE: Self = Block {
         id: 282,
         name: "sugar_cane",
         hardness: 0f32,
@@ -120951,7 +120964,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const JUKEBOX: Block = Block {
+    pub const JUKEBOX: Self = Block {
         id: 283,
         name: "jukebox",
         hardness: 2f32,
@@ -121022,7 +121035,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const OAK_FENCE: Block = Block {
+    pub const OAK_FENCE: Self = Block {
         id: 284,
         name: "oak_fence",
         hardness: 2f32,
@@ -121486,7 +121499,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const NETHERRACK: Block = Block {
+    pub const NETHERRACK: Self = Block {
         id: 285,
         name: "netherrack",
         hardness: 0.4f32,
@@ -121542,7 +121555,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SOUL_SAND: Block = Block {
+    pub const SOUL_SAND: Self = Block {
         id: 286,
         name: "soul_sand",
         hardness: 0.5f32,
@@ -121598,7 +121611,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SOUL_SOIL: Block = Block {
+    pub const SOUL_SOIL: Self = Block {
         id: 287,
         name: "soul_soil",
         hardness: 0.5f32,
@@ -121654,7 +121667,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BASALT: Block = Block {
+    pub const BASALT: Self = Block {
         id: 288,
         name: "basalt",
         hardness: 1.25f32,
@@ -121738,7 +121751,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POLISHED_BASALT: Block = Block {
+    pub const POLISHED_BASALT: Self = Block {
         id: 289,
         name: "polished_basalt",
         hardness: 1.25f32,
@@ -121822,7 +121835,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SOUL_TORCH: Block = Block {
+    pub const SOUL_TORCH: Self = Block {
         id: 290,
         name: "soul_torch",
         hardness: 0f32,
@@ -121878,7 +121891,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SOUL_WALL_TORCH: Block = Block {
+    pub const SOUL_WALL_TORCH: Self = Block {
         id: 291,
         name: "soul_wall_torch",
         hardness: 0f32,
@@ -121975,7 +121988,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const COPPER_TORCH: Block = Block {
+    pub const COPPER_TORCH: Self = Block {
         id: 292,
         name: "copper_torch",
         hardness: 0f32,
@@ -122031,7 +122044,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const COPPER_WALL_TORCH: Block = Block {
+    pub const COPPER_WALL_TORCH: Self = Block {
         id: 293,
         name: "copper_wall_torch",
         hardness: 0f32,
@@ -122128,7 +122141,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const GLOWSTONE: Block = Block {
+    pub const GLOWSTONE: Self = Block {
         id: 294,
         name: "glowstone",
         hardness: 0.3f32,
@@ -122233,7 +122246,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const NETHER_PORTAL: Block = Block {
+    pub const NETHER_PORTAL: Self = Block {
         id: 295,
         name: "nether_portal",
         hardness: -1f32,
@@ -122292,7 +122305,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CARVED_PUMPKIN: Block = Block {
+    pub const CARVED_PUMPKIN: Self = Block {
         id: 296,
         name: "carved_pumpkin",
         hardness: 1f32,
@@ -122389,7 +122402,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const JACK_O_LANTERN: Block = Block {
+    pub const JACK_O_LANTERN: Self = Block {
         id: 297,
         name: "jack_o_lantern",
         hardness: 1f32,
@@ -122486,7 +122499,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CAKE: Block = Block {
+    pub const CAKE: Self = Block {
         id: 298,
         name: "cake",
         hardness: 0.5f32,
@@ -122610,7 +122623,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const REPEATER: Block = Block {
+    pub const REPEATER: Self = Block {
         id: 299,
         name: "repeater",
         hardness: 0f32,
@@ -123487,7 +123500,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WHITE_STAINED_GLASS: Block = Block {
+    pub const WHITE_STAINED_GLASS: Self = Block {
         id: 300,
         name: "white_stained_glass",
         hardness: 0.3f32,
@@ -123543,7 +123556,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const ORANGE_STAINED_GLASS: Block = Block {
+    pub const ORANGE_STAINED_GLASS: Self = Block {
         id: 301,
         name: "orange_stained_glass",
         hardness: 0.3f32,
@@ -123599,7 +123612,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MAGENTA_STAINED_GLASS: Block = Block {
+    pub const MAGENTA_STAINED_GLASS: Self = Block {
         id: 302,
         name: "magenta_stained_glass",
         hardness: 0.3f32,
@@ -123655,7 +123668,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LIGHT_BLUE_STAINED_GLASS: Block = Block {
+    pub const LIGHT_BLUE_STAINED_GLASS: Self = Block {
         id: 303,
         name: "light_blue_stained_glass",
         hardness: 0.3f32,
@@ -123711,7 +123724,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const YELLOW_STAINED_GLASS: Block = Block {
+    pub const YELLOW_STAINED_GLASS: Self = Block {
         id: 304,
         name: "yellow_stained_glass",
         hardness: 0.3f32,
@@ -123767,7 +123780,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LIME_STAINED_GLASS: Block = Block {
+    pub const LIME_STAINED_GLASS: Self = Block {
         id: 305,
         name: "lime_stained_glass",
         hardness: 0.3f32,
@@ -123823,7 +123836,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PINK_STAINED_GLASS: Block = Block {
+    pub const PINK_STAINED_GLASS: Self = Block {
         id: 306,
         name: "pink_stained_glass",
         hardness: 0.3f32,
@@ -123879,7 +123892,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const GRAY_STAINED_GLASS: Block = Block {
+    pub const GRAY_STAINED_GLASS: Self = Block {
         id: 307,
         name: "gray_stained_glass",
         hardness: 0.3f32,
@@ -123935,7 +123948,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LIGHT_GRAY_STAINED_GLASS: Block = Block {
+    pub const LIGHT_GRAY_STAINED_GLASS: Self = Block {
         id: 308,
         name: "light_gray_stained_glass",
         hardness: 0.3f32,
@@ -123991,7 +124004,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CYAN_STAINED_GLASS: Block = Block {
+    pub const CYAN_STAINED_GLASS: Self = Block {
         id: 309,
         name: "cyan_stained_glass",
         hardness: 0.3f32,
@@ -124047,7 +124060,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PURPLE_STAINED_GLASS: Block = Block {
+    pub const PURPLE_STAINED_GLASS: Self = Block {
         id: 310,
         name: "purple_stained_glass",
         hardness: 0.3f32,
@@ -124103,7 +124116,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BLUE_STAINED_GLASS: Block = Block {
+    pub const BLUE_STAINED_GLASS: Self = Block {
         id: 311,
         name: "blue_stained_glass",
         hardness: 0.3f32,
@@ -124159,7 +124172,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BROWN_STAINED_GLASS: Block = Block {
+    pub const BROWN_STAINED_GLASS: Self = Block {
         id: 312,
         name: "brown_stained_glass",
         hardness: 0.3f32,
@@ -124215,7 +124228,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const GREEN_STAINED_GLASS: Block = Block {
+    pub const GREEN_STAINED_GLASS: Self = Block {
         id: 313,
         name: "green_stained_glass",
         hardness: 0.3f32,
@@ -124271,7 +124284,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const RED_STAINED_GLASS: Block = Block {
+    pub const RED_STAINED_GLASS: Self = Block {
         id: 314,
         name: "red_stained_glass",
         hardness: 0.3f32,
@@ -124327,7 +124340,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BLACK_STAINED_GLASS: Block = Block {
+    pub const BLACK_STAINED_GLASS: Self = Block {
         id: 315,
         name: "black_stained_glass",
         hardness: 0.3f32,
@@ -124383,7 +124396,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const OAK_TRAPDOOR: Block = Block {
+    pub const OAK_TRAPDOOR: Self = Block {
         id: 316,
         name: "oak_trapdoor",
         hardness: 3f32,
@@ -125260,7 +125273,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SPRUCE_TRAPDOOR: Block = Block {
+    pub const SPRUCE_TRAPDOOR: Self = Block {
         id: 317,
         name: "spruce_trapdoor",
         hardness: 3f32,
@@ -126137,7 +126150,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BIRCH_TRAPDOOR: Block = Block {
+    pub const BIRCH_TRAPDOOR: Self = Block {
         id: 318,
         name: "birch_trapdoor",
         hardness: 3f32,
@@ -127014,7 +127027,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const JUNGLE_TRAPDOOR: Block = Block {
+    pub const JUNGLE_TRAPDOOR: Self = Block {
         id: 319,
         name: "jungle_trapdoor",
         hardness: 3f32,
@@ -127891,7 +127904,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const ACACIA_TRAPDOOR: Block = Block {
+    pub const ACACIA_TRAPDOOR: Self = Block {
         id: 320,
         name: "acacia_trapdoor",
         hardness: 3f32,
@@ -128768,7 +128781,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CHERRY_TRAPDOOR: Block = Block {
+    pub const CHERRY_TRAPDOOR: Self = Block {
         id: 321,
         name: "cherry_trapdoor",
         hardness: 3f32,
@@ -129645,7 +129658,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DARK_OAK_TRAPDOOR: Block = Block {
+    pub const DARK_OAK_TRAPDOOR: Self = Block {
         id: 322,
         name: "dark_oak_trapdoor",
         hardness: 3f32,
@@ -130522,7 +130535,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PALE_OAK_TRAPDOOR: Block = Block {
+    pub const PALE_OAK_TRAPDOOR: Self = Block {
         id: 323,
         name: "pale_oak_trapdoor",
         hardness: 3f32,
@@ -131399,7 +131412,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MANGROVE_TRAPDOOR: Block = Block {
+    pub const MANGROVE_TRAPDOOR: Self = Block {
         id: 324,
         name: "mangrove_trapdoor",
         hardness: 3f32,
@@ -132276,7 +132289,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BAMBOO_TRAPDOOR: Block = Block {
+    pub const BAMBOO_TRAPDOOR: Self = Block {
         id: 325,
         name: "bamboo_trapdoor",
         hardness: 3f32,
@@ -133153,7 +133166,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const STONE_BRICKS: Block = Block {
+    pub const STONE_BRICKS: Self = Block {
         id: 326,
         name: "stone_bricks",
         hardness: 1.5f32,
@@ -133209,7 +133222,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MOSSY_STONE_BRICKS: Block = Block {
+    pub const MOSSY_STONE_BRICKS: Self = Block {
         id: 327,
         name: "mossy_stone_bricks",
         hardness: 1.5f32,
@@ -133265,7 +133278,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CRACKED_STONE_BRICKS: Block = Block {
+    pub const CRACKED_STONE_BRICKS: Self = Block {
         id: 328,
         name: "cracked_stone_bricks",
         hardness: 1.5f32,
@@ -133321,7 +133334,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CHISELED_STONE_BRICKS: Block = Block {
+    pub const CHISELED_STONE_BRICKS: Self = Block {
         id: 329,
         name: "chiseled_stone_bricks",
         hardness: 1.5f32,
@@ -133377,7 +133390,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PACKED_MUD: Block = Block {
+    pub const PACKED_MUD: Self = Block {
         id: 330,
         name: "packed_mud",
         hardness: 1f32,
@@ -133433,7 +133446,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MUD_BRICKS: Block = Block {
+    pub const MUD_BRICKS: Self = Block {
         id: 331,
         name: "mud_bricks",
         hardness: 1.5f32,
@@ -133489,7 +133502,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const INFESTED_STONE: Block = Block {
+    pub const INFESTED_STONE: Self = Block {
         id: 332,
         name: "infested_stone",
         hardness: 0.75f32,
@@ -133545,7 +133558,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const INFESTED_COBBLESTONE: Block = Block {
+    pub const INFESTED_COBBLESTONE: Self = Block {
         id: 333,
         name: "infested_cobblestone",
         hardness: 1f32,
@@ -133601,7 +133614,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const INFESTED_STONE_BRICKS: Block = Block {
+    pub const INFESTED_STONE_BRICKS: Self = Block {
         id: 334,
         name: "infested_stone_bricks",
         hardness: 0.75f32,
@@ -133657,7 +133670,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const INFESTED_MOSSY_STONE_BRICKS: Block = Block {
+    pub const INFESTED_MOSSY_STONE_BRICKS: Self = Block {
         id: 335,
         name: "infested_mossy_stone_bricks",
         hardness: 0.75f32,
@@ -133713,7 +133726,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const INFESTED_CRACKED_STONE_BRICKS: Block = Block {
+    pub const INFESTED_CRACKED_STONE_BRICKS: Self = Block {
         id: 336,
         name: "infested_cracked_stone_bricks",
         hardness: 0.75f32,
@@ -133769,7 +133782,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const INFESTED_CHISELED_STONE_BRICKS: Block = Block {
+    pub const INFESTED_CHISELED_STONE_BRICKS: Self = Block {
         id: 337,
         name: "infested_chiseled_stone_bricks",
         hardness: 0.75f32,
@@ -133825,7 +133838,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BROWN_MUSHROOM_BLOCK: Block = Block {
+    pub const BROWN_MUSHROOM_BLOCK: Self = Block {
         id: 338,
         name: "brown_mushroom_block",
         hardness: 0.2f32,
@@ -134739,7 +134752,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const RED_MUSHROOM_BLOCK: Block = Block {
+    pub const RED_MUSHROOM_BLOCK: Self = Block {
         id: 339,
         name: "red_mushroom_block",
         hardness: 0.2f32,
@@ -135653,7 +135666,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MUSHROOM_STEM: Block = Block {
+    pub const MUSHROOM_STEM: Self = Block {
         id: 340,
         name: "mushroom_stem",
         hardness: 0.2f32,
@@ -136530,7 +136543,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const IRON_BARS: Block = Block {
+    pub const IRON_BARS: Self = Block {
         id: 341,
         name: "iron_bars",
         hardness: 5f32,
@@ -136991,7 +137004,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const COPPER_BARS: Block = Block {
+    pub const COPPER_BARS: Self = Block {
         id: 342,
         name: "copper_bars",
         hardness: 5f32,
@@ -137452,7 +137465,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const EXPOSED_COPPER_BARS: Block = Block {
+    pub const EXPOSED_COPPER_BARS: Self = Block {
         id: 343,
         name: "exposed_copper_bars",
         hardness: 5f32,
@@ -137913,7 +137926,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WEATHERED_COPPER_BARS: Block = Block {
+    pub const WEATHERED_COPPER_BARS: Self = Block {
         id: 344,
         name: "weathered_copper_bars",
         hardness: 5f32,
@@ -138374,7 +138387,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const OXIDIZED_COPPER_BARS: Block = Block {
+    pub const OXIDIZED_COPPER_BARS: Self = Block {
         id: 345,
         name: "oxidized_copper_bars",
         hardness: 5f32,
@@ -138835,7 +138848,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_COPPER_BARS: Block = Block {
+    pub const WAXED_COPPER_BARS: Self = Block {
         id: 346,
         name: "waxed_copper_bars",
         hardness: 5f32,
@@ -139296,7 +139309,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_EXPOSED_COPPER_BARS: Block = Block {
+    pub const WAXED_EXPOSED_COPPER_BARS: Self = Block {
         id: 347,
         name: "waxed_exposed_copper_bars",
         hardness: 5f32,
@@ -139757,7 +139770,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_WEATHERED_COPPER_BARS: Block = Block {
+    pub const WAXED_WEATHERED_COPPER_BARS: Self = Block {
         id: 348,
         name: "waxed_weathered_copper_bars",
         hardness: 5f32,
@@ -140218,7 +140231,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_OXIDIZED_COPPER_BARS: Block = Block {
+    pub const WAXED_OXIDIZED_COPPER_BARS: Self = Block {
         id: 349,
         name: "waxed_oxidized_copper_bars",
         hardness: 5f32,
@@ -140679,7 +140692,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const IRON_CHAIN: Block = Block {
+    pub const IRON_CHAIN: Self = Block {
         id: 350,
         name: "iron_chain",
         hardness: 5f32,
@@ -140802,7 +140815,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const COPPER_CHAIN: Block = Block {
+    pub const COPPER_CHAIN: Self = Block {
         id: 351,
         name: "copper_chain",
         hardness: 5f32,
@@ -140925,7 +140938,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const EXPOSED_COPPER_CHAIN: Block = Block {
+    pub const EXPOSED_COPPER_CHAIN: Self = Block {
         id: 352,
         name: "exposed_copper_chain",
         hardness: 5f32,
@@ -141048,7 +141061,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WEATHERED_COPPER_CHAIN: Block = Block {
+    pub const WEATHERED_COPPER_CHAIN: Self = Block {
         id: 353,
         name: "weathered_copper_chain",
         hardness: 5f32,
@@ -141171,7 +141184,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const OXIDIZED_COPPER_CHAIN: Block = Block {
+    pub const OXIDIZED_COPPER_CHAIN: Self = Block {
         id: 354,
         name: "oxidized_copper_chain",
         hardness: 5f32,
@@ -141294,7 +141307,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_COPPER_CHAIN: Block = Block {
+    pub const WAXED_COPPER_CHAIN: Self = Block {
         id: 355,
         name: "waxed_copper_chain",
         hardness: 5f32,
@@ -141417,7 +141430,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_EXPOSED_COPPER_CHAIN: Block = Block {
+    pub const WAXED_EXPOSED_COPPER_CHAIN: Self = Block {
         id: 356,
         name: "waxed_exposed_copper_chain",
         hardness: 5f32,
@@ -141540,7 +141553,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_WEATHERED_COPPER_CHAIN: Block = Block {
+    pub const WAXED_WEATHERED_COPPER_CHAIN: Self = Block {
         id: 357,
         name: "waxed_weathered_copper_chain",
         hardness: 5f32,
@@ -141663,7 +141676,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_OXIDIZED_COPPER_CHAIN: Block = Block {
+    pub const WAXED_OXIDIZED_COPPER_CHAIN: Self = Block {
         id: 358,
         name: "waxed_oxidized_copper_chain",
         hardness: 5f32,
@@ -141786,7 +141799,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const GLASS_PANE: Block = Block {
+    pub const GLASS_PANE: Self = Block {
         id: 359,
         name: "glass_pane",
         hardness: 0.3f32,
@@ -142247,7 +142260,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PUMPKIN: Block = Block {
+    pub const PUMPKIN: Self = Block {
         id: 360,
         name: "pumpkin",
         hardness: 1f32,
@@ -142303,7 +142316,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MELON: Block = Block {
+    pub const MELON: Self = Block {
         id: 361,
         name: "melon",
         hardness: 1f32,
@@ -142408,7 +142421,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const ATTACHED_PUMPKIN_STEM: Block = Block {
+    pub const ATTACHED_PUMPKIN_STEM: Self = Block {
         id: 362,
         name: "attached_pumpkin_stem",
         hardness: 0f32,
@@ -142517,7 +142530,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const ATTACHED_MELON_STEM: Block = Block {
+    pub const ATTACHED_MELON_STEM: Self = Block {
         id: 363,
         name: "attached_melon_stem",
         hardness: 0f32,
@@ -142626,7 +142639,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PUMPKIN_STEM: Block = Block {
+    pub const PUMPKIN_STEM: Self = Block {
         id: 364,
         name: "pumpkin_stem",
         hardness: 0f32,
@@ -142877,7 +142890,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MELON_STEM: Block = Block {
+    pub const MELON_STEM: Self = Block {
         id: 365,
         name: "melon_stem",
         hardness: 0f32,
@@ -143128,7 +143141,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const VINE: Block = Block {
+    pub const VINE: Self = Block {
         id: 366,
         name: "vine",
         hardness: 0.2f32,
@@ -143592,7 +143605,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const GLOW_LICHEN: Block = Block {
+    pub const GLOW_LICHEN: Self = Block {
         id: 367,
         name: "glow_lichen",
         hardness: 0.2f32,
@@ -145376,7 +145389,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const RESIN_CLUMP: Block = Block {
+    pub const RESIN_CLUMP: Self = Block {
         id: 368,
         name: "resin_clump",
         hardness: 0f32,
@@ -147157,7 +147170,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const OAK_FENCE_GATE: Block = Block {
+    pub const OAK_FENCE_GATE: Self = Block {
         id: 369,
         name: "oak_fence_gate",
         hardness: 2f32,
@@ -147621,7 +147634,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BRICK_STAIRS: Block = Block {
+    pub const BRICK_STAIRS: Self = Block {
         id: 370,
         name: "brick_stairs",
         hardness: 2f32,
@@ -148706,7 +148719,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const STONE_BRICK_STAIRS: Block = Block {
+    pub const STONE_BRICK_STAIRS: Self = Block {
         id: 371,
         name: "stone_brick_stairs",
         hardness: 1.5f32,
@@ -149791,7 +149804,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MUD_BRICK_STAIRS: Block = Block {
+    pub const MUD_BRICK_STAIRS: Self = Block {
         id: 372,
         name: "mud_brick_stairs",
         hardness: 1.5f32,
@@ -150876,7 +150889,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MYCELIUM: Block = Block {
+    pub const MYCELIUM: Self = Block {
         id: 373,
         name: "mycelium",
         hardness: 0.6f32,
@@ -150962,7 +150975,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LILY_PAD: Block = Block {
+    pub const LILY_PAD: Self = Block {
         id: 374,
         name: "lily_pad",
         hardness: 0f32,
@@ -151018,7 +151031,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const RESIN_BLOCK: Block = Block {
+    pub const RESIN_BLOCK: Self = Block {
         id: 375,
         name: "resin_block",
         hardness: 0f32,
@@ -151074,7 +151087,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const RESIN_BRICKS: Block = Block {
+    pub const RESIN_BRICKS: Self = Block {
         id: 376,
         name: "resin_bricks",
         hardness: 1.5f32,
@@ -151130,7 +151143,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const RESIN_BRICK_STAIRS: Block = Block {
+    pub const RESIN_BRICK_STAIRS: Self = Block {
         id: 377,
         name: "resin_brick_stairs",
         hardness: 1.5f32,
@@ -152215,7 +152228,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const RESIN_BRICK_SLAB: Block = Block {
+    pub const RESIN_BRICK_SLAB: Self = Block {
         id: 378,
         name: "resin_brick_slab",
         hardness: 1.5f32,
@@ -152353,7 +152366,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const RESIN_BRICK_WALL: Block = Block {
+    pub const RESIN_BRICK_WALL: Self = Block {
         id: 379,
         name: "resin_brick_wall",
         hardness: 1.5f32,
@@ -156610,7 +156623,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CHISELED_RESIN_BRICKS: Block = Block {
+    pub const CHISELED_RESIN_BRICKS: Self = Block {
         id: 380,
         name: "chiseled_resin_bricks",
         hardness: 1.5f32,
@@ -156666,7 +156679,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const NETHER_BRICKS: Block = Block {
+    pub const NETHER_BRICKS: Self = Block {
         id: 381,
         name: "nether_bricks",
         hardness: 2f32,
@@ -156722,7 +156735,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const NETHER_BRICK_FENCE: Block = Block {
+    pub const NETHER_BRICK_FENCE: Self = Block {
         id: 382,
         name: "nether_brick_fence",
         hardness: 2f32,
@@ -157183,7 +157196,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const NETHER_BRICK_STAIRS: Block = Block {
+    pub const NETHER_BRICK_STAIRS: Self = Block {
         id: 383,
         name: "nether_brick_stairs",
         hardness: 2f32,
@@ -158268,7 +158281,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const NETHER_WART: Block = Block {
+    pub const NETHER_WART: Self = Block {
         id: 384,
         name: "nether_wart",
         hardness: 0f32,
@@ -158395,7 +158408,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const ENCHANTING_TABLE: Block = Block {
+    pub const ENCHANTING_TABLE: Self = Block {
         id: 385,
         name: "enchanting_table",
         hardness: 5f32,
@@ -158457,7 +158470,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BREWING_STAND: Block = Block {
+    pub const BREWING_STAND: Self = Block {
         id: 386,
         name: "brewing_stand",
         hardness: 0.5f32,
@@ -158612,7 +158625,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CAULDRON: Block = Block {
+    pub const CAULDRON: Self = Block {
         id: 387,
         name: "cauldron",
         hardness: 2f32,
@@ -158676,7 +158689,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WATER_CAULDRON: Block = Block {
+    pub const WATER_CAULDRON: Self = Block {
         id: 388,
         name: "water_cauldron",
         hardness: 2f32,
@@ -158776,7 +158789,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LAVA_CAULDRON: Block = Block {
+    pub const LAVA_CAULDRON: Self = Block {
         id: 389,
         name: "lava_cauldron",
         hardness: 2f32,
@@ -158840,7 +158853,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POWDER_SNOW_CAULDRON: Block = Block {
+    pub const POWDER_SNOW_CAULDRON: Self = Block {
         id: 390,
         name: "powder_snow_cauldron",
         hardness: 2f32,
@@ -158940,7 +158953,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const END_PORTAL: Block = Block {
+    pub const END_PORTAL: Self = Block {
         id: 391,
         name: "end_portal",
         hardness: -1f32,
@@ -158980,7 +158993,7 @@ impl Block {
         loot_table: None,
         experience: None,
     };
-    pub const END_PORTAL_FRAME: Block = Block {
+    pub const END_PORTAL_FRAME: Self = Block {
         id: 392,
         name: "end_portal_frame",
         hardness: -1f32,
@@ -159113,7 +159126,7 @@ impl Block {
         loot_table: None,
         experience: None,
     };
-    pub const END_STONE: Block = Block {
+    pub const END_STONE: Self = Block {
         id: 393,
         name: "end_stone",
         hardness: 3f32,
@@ -159169,7 +159182,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DRAGON_EGG: Block = Block {
+    pub const DRAGON_EGG: Self = Block {
         id: 394,
         name: "dragon_egg",
         hardness: 3f32,
@@ -159225,7 +159238,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const REDSTONE_LAMP: Block = Block {
+    pub const REDSTONE_LAMP: Self = Block {
         id: 395,
         name: "redstone_lamp",
         hardness: 0.3f32,
@@ -159296,7 +159309,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const COCOA: Block = Block {
+    pub const COCOA: Self = Block {
         id: 396,
         name: "cocoa",
         hardness: 0.2f32,
@@ -159512,7 +159525,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SANDSTONE_STAIRS: Block = Block {
+    pub const SANDSTONE_STAIRS: Self = Block {
         id: 397,
         name: "sandstone_stairs",
         hardness: 0.8f32,
@@ -160597,7 +160610,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const EMERALD_ORE: Block = Block {
+    pub const EMERALD_ORE: Self = Block {
         id: 398,
         name: "emerald_ore",
         hardness: 3f32,
@@ -160686,7 +160699,7 @@ impl Block {
             })),
         }),
     };
-    pub const DEEPSLATE_EMERALD_ORE: Block = Block {
+    pub const DEEPSLATE_EMERALD_ORE: Self = Block {
         id: 399,
         name: "deepslate_emerald_ore",
         hardness: 4.5f32,
@@ -160775,7 +160788,7 @@ impl Block {
             })),
         }),
     };
-    pub const ENDER_CHEST: Block = Block {
+    pub const ENDER_CHEST: Self = Block {
         id: 400,
         name: "ender_chest",
         hardness: 22.5f32,
@@ -160953,7 +160966,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const TRIPWIRE_HOOK: Block = Block {
+    pub const TRIPWIRE_HOOK: Self = Block {
         id: 401,
         name: "tripwire_hook",
         hardness: 0f32,
@@ -161206,7 +161219,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const TRIPWIRE: Block = Block {
+    pub const TRIPWIRE: Self = Block {
         id: 402,
         name: "tripwire",
         hardness: 0f32,
@@ -162915,7 +162928,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const EMERALD_BLOCK: Block = Block {
+    pub const EMERALD_BLOCK: Self = Block {
         id: 403,
         name: "emerald_block",
         hardness: 5f32,
@@ -162971,7 +162984,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SPRUCE_STAIRS: Block = Block {
+    pub const SPRUCE_STAIRS: Self = Block {
         id: 404,
         name: "spruce_stairs",
         hardness: 2f32,
@@ -164059,7 +164072,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BIRCH_STAIRS: Block = Block {
+    pub const BIRCH_STAIRS: Self = Block {
         id: 405,
         name: "birch_stairs",
         hardness: 2f32,
@@ -165147,7 +165160,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const JUNGLE_STAIRS: Block = Block {
+    pub const JUNGLE_STAIRS: Self = Block {
         id: 406,
         name: "jungle_stairs",
         hardness: 2f32,
@@ -166235,7 +166248,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const COMMAND_BLOCK: Block = Block {
+    pub const COMMAND_BLOCK: Self = Block {
         id: 407,
         name: "command_block",
         hardness: -1f32,
@@ -166420,7 +166433,7 @@ impl Block {
         loot_table: None,
         experience: None,
     };
-    pub const BEACON: Block = Block {
+    pub const BEACON: Self = Block {
         id: 408,
         name: "beacon",
         hardness: 3f32,
@@ -166482,7 +166495,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const COBBLESTONE_WALL: Block = Block {
+    pub const COBBLESTONE_WALL: Self = Block {
         id: 409,
         name: "cobblestone_wall",
         hardness: 2f32,
@@ -170739,7 +170752,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MOSSY_COBBLESTONE_WALL: Block = Block {
+    pub const MOSSY_COBBLESTONE_WALL: Self = Block {
         id: 410,
         name: "mossy_cobblestone_wall",
         hardness: 2f32,
@@ -174996,7 +175009,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const FLOWER_POT: Block = Block {
+    pub const FLOWER_POT: Self = Block {
         id: 411,
         name: "flower_pot",
         hardness: 0f32,
@@ -175052,7 +175065,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POTTED_TORCHFLOWER: Block = Block {
+    pub const POTTED_TORCHFLOWER: Self = Block {
         id: 412,
         name: "potted_torchflower",
         hardness: 0f32,
@@ -175123,7 +175136,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POTTED_OAK_SAPLING: Block = Block {
+    pub const POTTED_OAK_SAPLING: Self = Block {
         id: 413,
         name: "potted_oak_sapling",
         hardness: 0f32,
@@ -175194,7 +175207,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POTTED_SPRUCE_SAPLING: Block = Block {
+    pub const POTTED_SPRUCE_SAPLING: Self = Block {
         id: 414,
         name: "potted_spruce_sapling",
         hardness: 0f32,
@@ -175265,7 +175278,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POTTED_BIRCH_SAPLING: Block = Block {
+    pub const POTTED_BIRCH_SAPLING: Self = Block {
         id: 415,
         name: "potted_birch_sapling",
         hardness: 0f32,
@@ -175336,7 +175349,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POTTED_JUNGLE_SAPLING: Block = Block {
+    pub const POTTED_JUNGLE_SAPLING: Self = Block {
         id: 416,
         name: "potted_jungle_sapling",
         hardness: 0f32,
@@ -175407,7 +175420,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POTTED_ACACIA_SAPLING: Block = Block {
+    pub const POTTED_ACACIA_SAPLING: Self = Block {
         id: 417,
         name: "potted_acacia_sapling",
         hardness: 0f32,
@@ -175478,7 +175491,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POTTED_CHERRY_SAPLING: Block = Block {
+    pub const POTTED_CHERRY_SAPLING: Self = Block {
         id: 418,
         name: "potted_cherry_sapling",
         hardness: 0f32,
@@ -175549,7 +175562,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POTTED_DARK_OAK_SAPLING: Block = Block {
+    pub const POTTED_DARK_OAK_SAPLING: Self = Block {
         id: 419,
         name: "potted_dark_oak_sapling",
         hardness: 0f32,
@@ -175620,7 +175633,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POTTED_PALE_OAK_SAPLING: Block = Block {
+    pub const POTTED_PALE_OAK_SAPLING: Self = Block {
         id: 420,
         name: "potted_pale_oak_sapling",
         hardness: 0f32,
@@ -175691,7 +175704,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POTTED_MANGROVE_PROPAGULE: Block = Block {
+    pub const POTTED_MANGROVE_PROPAGULE: Self = Block {
         id: 421,
         name: "potted_mangrove_propagule",
         hardness: 0f32,
@@ -175762,7 +175775,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POTTED_FERN: Block = Block {
+    pub const POTTED_FERN: Self = Block {
         id: 422,
         name: "potted_fern",
         hardness: 0f32,
@@ -175833,7 +175846,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POTTED_DANDELION: Block = Block {
+    pub const POTTED_DANDELION: Self = Block {
         id: 423,
         name: "potted_dandelion",
         hardness: 0f32,
@@ -175904,7 +175917,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POTTED_GOLDEN_DANDELION: Block = Block {
+    pub const POTTED_GOLDEN_DANDELION: Self = Block {
         id: 424,
         name: "potted_golden_dandelion",
         hardness: 0f32,
@@ -175975,7 +175988,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POTTED_POPPY: Block = Block {
+    pub const POTTED_POPPY: Self = Block {
         id: 425,
         name: "potted_poppy",
         hardness: 0f32,
@@ -176046,7 +176059,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POTTED_BLUE_ORCHID: Block = Block {
+    pub const POTTED_BLUE_ORCHID: Self = Block {
         id: 426,
         name: "potted_blue_orchid",
         hardness: 0f32,
@@ -176117,7 +176130,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POTTED_ALLIUM: Block = Block {
+    pub const POTTED_ALLIUM: Self = Block {
         id: 427,
         name: "potted_allium",
         hardness: 0f32,
@@ -176188,7 +176201,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POTTED_AZURE_BLUET: Block = Block {
+    pub const POTTED_AZURE_BLUET: Self = Block {
         id: 428,
         name: "potted_azure_bluet",
         hardness: 0f32,
@@ -176259,7 +176272,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POTTED_RED_TULIP: Block = Block {
+    pub const POTTED_RED_TULIP: Self = Block {
         id: 429,
         name: "potted_red_tulip",
         hardness: 0f32,
@@ -176330,7 +176343,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POTTED_ORANGE_TULIP: Block = Block {
+    pub const POTTED_ORANGE_TULIP: Self = Block {
         id: 430,
         name: "potted_orange_tulip",
         hardness: 0f32,
@@ -176401,7 +176414,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POTTED_WHITE_TULIP: Block = Block {
+    pub const POTTED_WHITE_TULIP: Self = Block {
         id: 431,
         name: "potted_white_tulip",
         hardness: 0f32,
@@ -176472,7 +176485,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POTTED_PINK_TULIP: Block = Block {
+    pub const POTTED_PINK_TULIP: Self = Block {
         id: 432,
         name: "potted_pink_tulip",
         hardness: 0f32,
@@ -176543,7 +176556,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POTTED_OXEYE_DAISY: Block = Block {
+    pub const POTTED_OXEYE_DAISY: Self = Block {
         id: 433,
         name: "potted_oxeye_daisy",
         hardness: 0f32,
@@ -176614,7 +176627,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POTTED_CORNFLOWER: Block = Block {
+    pub const POTTED_CORNFLOWER: Self = Block {
         id: 434,
         name: "potted_cornflower",
         hardness: 0f32,
@@ -176685,7 +176698,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POTTED_LILY_OF_THE_VALLEY: Block = Block {
+    pub const POTTED_LILY_OF_THE_VALLEY: Self = Block {
         id: 435,
         name: "potted_lily_of_the_valley",
         hardness: 0f32,
@@ -176756,7 +176769,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POTTED_WITHER_ROSE: Block = Block {
+    pub const POTTED_WITHER_ROSE: Self = Block {
         id: 436,
         name: "potted_wither_rose",
         hardness: 0f32,
@@ -176827,7 +176840,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POTTED_RED_MUSHROOM: Block = Block {
+    pub const POTTED_RED_MUSHROOM: Self = Block {
         id: 437,
         name: "potted_red_mushroom",
         hardness: 0f32,
@@ -176898,7 +176911,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POTTED_BROWN_MUSHROOM: Block = Block {
+    pub const POTTED_BROWN_MUSHROOM: Self = Block {
         id: 438,
         name: "potted_brown_mushroom",
         hardness: 0f32,
@@ -176969,7 +176982,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POTTED_DEAD_BUSH: Block = Block {
+    pub const POTTED_DEAD_BUSH: Self = Block {
         id: 439,
         name: "potted_dead_bush",
         hardness: 0f32,
@@ -177040,7 +177053,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POTTED_CACTUS: Block = Block {
+    pub const POTTED_CACTUS: Self = Block {
         id: 440,
         name: "potted_cactus",
         hardness: 0f32,
@@ -177111,7 +177124,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CARROTS: Block = Block {
+    pub const CARROTS: Self = Block {
         id: 441,
         name: "carrots",
         hardness: 0f32,
@@ -177288,7 +177301,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POTATOES: Block = Block {
+    pub const POTATOES: Self = Block {
         id: 442,
         name: "potatoes",
         hardness: 0f32,
@@ -177481,7 +177494,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const OAK_BUTTON: Block = Block {
+    pub const OAK_BUTTON: Self = Block {
         id: 443,
         name: "oak_button",
         hardness: 0.5f32,
@@ -177838,7 +177851,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SPRUCE_BUTTON: Block = Block {
+    pub const SPRUCE_BUTTON: Self = Block {
         id: 444,
         name: "spruce_button",
         hardness: 0.5f32,
@@ -178195,7 +178208,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BIRCH_BUTTON: Block = Block {
+    pub const BIRCH_BUTTON: Self = Block {
         id: 445,
         name: "birch_button",
         hardness: 0.5f32,
@@ -178552,7 +178565,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const JUNGLE_BUTTON: Block = Block {
+    pub const JUNGLE_BUTTON: Self = Block {
         id: 446,
         name: "jungle_button",
         hardness: 0.5f32,
@@ -178909,7 +178922,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const ACACIA_BUTTON: Block = Block {
+    pub const ACACIA_BUTTON: Self = Block {
         id: 447,
         name: "acacia_button",
         hardness: 0.5f32,
@@ -179266,7 +179279,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CHERRY_BUTTON: Block = Block {
+    pub const CHERRY_BUTTON: Self = Block {
         id: 448,
         name: "cherry_button",
         hardness: 0.5f32,
@@ -179623,7 +179636,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DARK_OAK_BUTTON: Block = Block {
+    pub const DARK_OAK_BUTTON: Self = Block {
         id: 449,
         name: "dark_oak_button",
         hardness: 0.5f32,
@@ -179980,7 +179993,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PALE_OAK_BUTTON: Block = Block {
+    pub const PALE_OAK_BUTTON: Self = Block {
         id: 450,
         name: "pale_oak_button",
         hardness: 0.5f32,
@@ -180337,7 +180350,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MANGROVE_BUTTON: Block = Block {
+    pub const MANGROVE_BUTTON: Self = Block {
         id: 451,
         name: "mangrove_button",
         hardness: 0.5f32,
@@ -180694,7 +180707,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BAMBOO_BUTTON: Block = Block {
+    pub const BAMBOO_BUTTON: Self = Block {
         id: 452,
         name: "bamboo_button",
         hardness: 0.5f32,
@@ -181051,7 +181064,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SKELETON_SKULL: Block = Block {
+    pub const SKELETON_SKULL: Self = Block {
         id: 453,
         name: "skeleton_skull",
         hardness: 1f32,
@@ -181518,7 +181531,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SKELETON_WALL_SKULL: Block = Block {
+    pub const SKELETON_WALL_SKULL: Self = Block {
         id: 454,
         name: "skeleton_wall_skull",
         hardness: 1f32,
@@ -181673,7 +181686,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WITHER_SKELETON_SKULL: Block = Block {
+    pub const WITHER_SKELETON_SKULL: Self = Block {
         id: 455,
         name: "wither_skeleton_skull",
         hardness: 1f32,
@@ -182140,7 +182153,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WITHER_SKELETON_WALL_SKULL: Block = Block {
+    pub const WITHER_SKELETON_WALL_SKULL: Self = Block {
         id: 456,
         name: "wither_skeleton_wall_skull",
         hardness: 1f32,
@@ -182295,7 +182308,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const ZOMBIE_HEAD: Block = Block {
+    pub const ZOMBIE_HEAD: Self = Block {
         id: 457,
         name: "zombie_head",
         hardness: 1f32,
@@ -182762,7 +182775,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const ZOMBIE_WALL_HEAD: Block = Block {
+    pub const ZOMBIE_WALL_HEAD: Self = Block {
         id: 458,
         name: "zombie_wall_head",
         hardness: 1f32,
@@ -182917,7 +182930,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PLAYER_HEAD: Block = Block {
+    pub const PLAYER_HEAD: Self = Block {
         id: 459,
         name: "player_head",
         hardness: 1f32,
@@ -183388,7 +183401,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PLAYER_WALL_HEAD: Block = Block {
+    pub const PLAYER_WALL_HEAD: Self = Block {
         id: 460,
         name: "player_wall_head",
         hardness: 1f32,
@@ -183547,7 +183560,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CREEPER_HEAD: Block = Block {
+    pub const CREEPER_HEAD: Self = Block {
         id: 461,
         name: "creeper_head",
         hardness: 1f32,
@@ -184014,7 +184027,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CREEPER_WALL_HEAD: Block = Block {
+    pub const CREEPER_WALL_HEAD: Self = Block {
         id: 462,
         name: "creeper_wall_head",
         hardness: 1f32,
@@ -184169,7 +184182,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DRAGON_HEAD: Block = Block {
+    pub const DRAGON_HEAD: Self = Block {
         id: 463,
         name: "dragon_head",
         hardness: 1f32,
@@ -184636,7 +184649,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DRAGON_WALL_HEAD: Block = Block {
+    pub const DRAGON_WALL_HEAD: Self = Block {
         id: 464,
         name: "dragon_wall_head",
         hardness: 1f32,
@@ -184791,7 +184804,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PIGLIN_HEAD: Block = Block {
+    pub const PIGLIN_HEAD: Self = Block {
         id: 465,
         name: "piglin_head",
         hardness: 1f32,
@@ -185258,7 +185271,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PIGLIN_WALL_HEAD: Block = Block {
+    pub const PIGLIN_WALL_HEAD: Self = Block {
         id: 466,
         name: "piglin_wall_head",
         hardness: 1f32,
@@ -185413,7 +185426,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const ANVIL: Block = Block {
+    pub const ANVIL: Self = Block {
         id: 467,
         name: "anvil",
         hardness: 5f32,
@@ -185510,7 +185523,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CHIPPED_ANVIL: Block = Block {
+    pub const CHIPPED_ANVIL: Self = Block {
         id: 468,
         name: "chipped_anvil",
         hardness: 5f32,
@@ -185607,7 +185620,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DAMAGED_ANVIL: Block = Block {
+    pub const DAMAGED_ANVIL: Self = Block {
         id: 469,
         name: "damaged_anvil",
         hardness: 5f32,
@@ -185704,7 +185717,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const TRAPPED_CHEST: Block = Block {
+    pub const TRAPPED_CHEST: Self = Block {
         id: 470,
         name: "trapped_chest",
         hardness: 2.5f32,
@@ -186067,7 +186080,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LIGHT_WEIGHTED_PRESSURE_PLATE: Block = Block {
+    pub const LIGHT_WEIGHTED_PRESSURE_PLATE: Self = Block {
         id: 471,
         name: "light_weighted_pressure_plate",
         hardness: 0.5f32,
@@ -186320,7 +186333,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const HEAVY_WEIGHTED_PRESSURE_PLATE: Block = Block {
+    pub const HEAVY_WEIGHTED_PRESSURE_PLATE: Self = Block {
         id: 472,
         name: "heavy_weighted_pressure_plate",
         hardness: 0.5f32,
@@ -186573,7 +186586,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const COMPARATOR: Block = Block {
+    pub const COMPARATOR: Self = Block {
         id: 473,
         name: "comparator",
         hardness: 0f32,
@@ -186826,7 +186839,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DAYLIGHT_DETECTOR: Block = Block {
+    pub const DAYLIGHT_DETECTOR: Self = Block {
         id: 474,
         name: "daylight_detector",
         hardness: 0.2f32,
@@ -187287,7 +187300,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const REDSTONE_BLOCK: Block = Block {
+    pub const REDSTONE_BLOCK: Self = Block {
         id: 475,
         name: "redstone_block",
         hardness: 5f32,
@@ -187343,7 +187356,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const NETHER_QUARTZ_ORE: Block = Block {
+    pub const NETHER_QUARTZ_ORE: Self = Block {
         id: 476,
         name: "nether_quartz_ore",
         hardness: 3f32,
@@ -187432,7 +187445,7 @@ impl Block {
             })),
         }),
     };
-    pub const HOPPER: Block = Block {
+    pub const HOPPER: Self = Block {
         id: 477,
         name: "hopper",
         hardness: 3f32,
@@ -187625,7 +187638,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const QUARTZ_BLOCK: Block = Block {
+    pub const QUARTZ_BLOCK: Self = Block {
         id: 478,
         name: "quartz_block",
         hardness: 0.8f32,
@@ -187681,7 +187694,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CHISELED_QUARTZ_BLOCK: Block = Block {
+    pub const CHISELED_QUARTZ_BLOCK: Self = Block {
         id: 479,
         name: "chiseled_quartz_block",
         hardness: 0.8f32,
@@ -187737,7 +187750,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const QUARTZ_PILLAR: Block = Block {
+    pub const QUARTZ_PILLAR: Self = Block {
         id: 480,
         name: "quartz_pillar",
         hardness: 0.8f32,
@@ -187821,7 +187834,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const QUARTZ_STAIRS: Block = Block {
+    pub const QUARTZ_STAIRS: Self = Block {
         id: 481,
         name: "quartz_stairs",
         hardness: 0.8f32,
@@ -188906,7 +188919,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const ACTIVATOR_RAIL: Block = Block {
+    pub const ACTIVATOR_RAIL: Self = Block {
         id: 482,
         name: "activator_rail",
         hardness: 0.7f32,
@@ -189263,7 +189276,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DROPPER: Block = Block {
+    pub const DROPPER: Self = Block {
         id: 483,
         name: "dropper",
         hardness: 3.5f32,
@@ -189470,7 +189483,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WHITE_TERRACOTTA: Block = Block {
+    pub const WHITE_TERRACOTTA: Self = Block {
         id: 484,
         name: "white_terracotta",
         hardness: 1.25f32,
@@ -189526,7 +189539,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const ORANGE_TERRACOTTA: Block = Block {
+    pub const ORANGE_TERRACOTTA: Self = Block {
         id: 485,
         name: "orange_terracotta",
         hardness: 1.25f32,
@@ -189582,7 +189595,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MAGENTA_TERRACOTTA: Block = Block {
+    pub const MAGENTA_TERRACOTTA: Self = Block {
         id: 486,
         name: "magenta_terracotta",
         hardness: 1.25f32,
@@ -189638,7 +189651,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LIGHT_BLUE_TERRACOTTA: Block = Block {
+    pub const LIGHT_BLUE_TERRACOTTA: Self = Block {
         id: 487,
         name: "light_blue_terracotta",
         hardness: 1.25f32,
@@ -189694,7 +189707,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const YELLOW_TERRACOTTA: Block = Block {
+    pub const YELLOW_TERRACOTTA: Self = Block {
         id: 488,
         name: "yellow_terracotta",
         hardness: 1.25f32,
@@ -189750,7 +189763,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LIME_TERRACOTTA: Block = Block {
+    pub const LIME_TERRACOTTA: Self = Block {
         id: 489,
         name: "lime_terracotta",
         hardness: 1.25f32,
@@ -189806,7 +189819,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PINK_TERRACOTTA: Block = Block {
+    pub const PINK_TERRACOTTA: Self = Block {
         id: 490,
         name: "pink_terracotta",
         hardness: 1.25f32,
@@ -189862,7 +189875,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const GRAY_TERRACOTTA: Block = Block {
+    pub const GRAY_TERRACOTTA: Self = Block {
         id: 491,
         name: "gray_terracotta",
         hardness: 1.25f32,
@@ -189918,7 +189931,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LIGHT_GRAY_TERRACOTTA: Block = Block {
+    pub const LIGHT_GRAY_TERRACOTTA: Self = Block {
         id: 492,
         name: "light_gray_terracotta",
         hardness: 1.25f32,
@@ -189974,7 +189987,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CYAN_TERRACOTTA: Block = Block {
+    pub const CYAN_TERRACOTTA: Self = Block {
         id: 493,
         name: "cyan_terracotta",
         hardness: 1.25f32,
@@ -190030,7 +190043,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PURPLE_TERRACOTTA: Block = Block {
+    pub const PURPLE_TERRACOTTA: Self = Block {
         id: 494,
         name: "purple_terracotta",
         hardness: 1.25f32,
@@ -190086,7 +190099,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BLUE_TERRACOTTA: Block = Block {
+    pub const BLUE_TERRACOTTA: Self = Block {
         id: 495,
         name: "blue_terracotta",
         hardness: 1.25f32,
@@ -190142,7 +190155,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BROWN_TERRACOTTA: Block = Block {
+    pub const BROWN_TERRACOTTA: Self = Block {
         id: 496,
         name: "brown_terracotta",
         hardness: 1.25f32,
@@ -190198,7 +190211,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const GREEN_TERRACOTTA: Block = Block {
+    pub const GREEN_TERRACOTTA: Self = Block {
         id: 497,
         name: "green_terracotta",
         hardness: 1.25f32,
@@ -190254,7 +190267,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const RED_TERRACOTTA: Block = Block {
+    pub const RED_TERRACOTTA: Self = Block {
         id: 498,
         name: "red_terracotta",
         hardness: 1.25f32,
@@ -190310,7 +190323,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BLACK_TERRACOTTA: Block = Block {
+    pub const BLACK_TERRACOTTA: Self = Block {
         id: 499,
         name: "black_terracotta",
         hardness: 1.25f32,
@@ -190366,7 +190379,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WHITE_STAINED_GLASS_PANE: Block = Block {
+    pub const WHITE_STAINED_GLASS_PANE: Self = Block {
         id: 500,
         name: "white_stained_glass_pane",
         hardness: 0.3f32,
@@ -190827,7 +190840,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const ORANGE_STAINED_GLASS_PANE: Block = Block {
+    pub const ORANGE_STAINED_GLASS_PANE: Self = Block {
         id: 501,
         name: "orange_stained_glass_pane",
         hardness: 0.3f32,
@@ -191288,7 +191301,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MAGENTA_STAINED_GLASS_PANE: Block = Block {
+    pub const MAGENTA_STAINED_GLASS_PANE: Self = Block {
         id: 502,
         name: "magenta_stained_glass_pane",
         hardness: 0.3f32,
@@ -191749,7 +191762,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LIGHT_BLUE_STAINED_GLASS_PANE: Block = Block {
+    pub const LIGHT_BLUE_STAINED_GLASS_PANE: Self = Block {
         id: 503,
         name: "light_blue_stained_glass_pane",
         hardness: 0.3f32,
@@ -192210,7 +192223,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const YELLOW_STAINED_GLASS_PANE: Block = Block {
+    pub const YELLOW_STAINED_GLASS_PANE: Self = Block {
         id: 504,
         name: "yellow_stained_glass_pane",
         hardness: 0.3f32,
@@ -192671,7 +192684,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LIME_STAINED_GLASS_PANE: Block = Block {
+    pub const LIME_STAINED_GLASS_PANE: Self = Block {
         id: 505,
         name: "lime_stained_glass_pane",
         hardness: 0.3f32,
@@ -193132,7 +193145,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PINK_STAINED_GLASS_PANE: Block = Block {
+    pub const PINK_STAINED_GLASS_PANE: Self = Block {
         id: 506,
         name: "pink_stained_glass_pane",
         hardness: 0.3f32,
@@ -193593,7 +193606,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const GRAY_STAINED_GLASS_PANE: Block = Block {
+    pub const GRAY_STAINED_GLASS_PANE: Self = Block {
         id: 507,
         name: "gray_stained_glass_pane",
         hardness: 0.3f32,
@@ -194054,7 +194067,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LIGHT_GRAY_STAINED_GLASS_PANE: Block = Block {
+    pub const LIGHT_GRAY_STAINED_GLASS_PANE: Self = Block {
         id: 508,
         name: "light_gray_stained_glass_pane",
         hardness: 0.3f32,
@@ -194515,7 +194528,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CYAN_STAINED_GLASS_PANE: Block = Block {
+    pub const CYAN_STAINED_GLASS_PANE: Self = Block {
         id: 509,
         name: "cyan_stained_glass_pane",
         hardness: 0.3f32,
@@ -194976,7 +194989,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PURPLE_STAINED_GLASS_PANE: Block = Block {
+    pub const PURPLE_STAINED_GLASS_PANE: Self = Block {
         id: 510,
         name: "purple_stained_glass_pane",
         hardness: 0.3f32,
@@ -195437,7 +195450,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BLUE_STAINED_GLASS_PANE: Block = Block {
+    pub const BLUE_STAINED_GLASS_PANE: Self = Block {
         id: 511,
         name: "blue_stained_glass_pane",
         hardness: 0.3f32,
@@ -195898,7 +195911,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BROWN_STAINED_GLASS_PANE: Block = Block {
+    pub const BROWN_STAINED_GLASS_PANE: Self = Block {
         id: 512,
         name: "brown_stained_glass_pane",
         hardness: 0.3f32,
@@ -196359,7 +196372,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const GREEN_STAINED_GLASS_PANE: Block = Block {
+    pub const GREEN_STAINED_GLASS_PANE: Self = Block {
         id: 513,
         name: "green_stained_glass_pane",
         hardness: 0.3f32,
@@ -196820,7 +196833,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const RED_STAINED_GLASS_PANE: Block = Block {
+    pub const RED_STAINED_GLASS_PANE: Self = Block {
         id: 514,
         name: "red_stained_glass_pane",
         hardness: 0.3f32,
@@ -197281,7 +197294,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BLACK_STAINED_GLASS_PANE: Block = Block {
+    pub const BLACK_STAINED_GLASS_PANE: Self = Block {
         id: 515,
         name: "black_stained_glass_pane",
         hardness: 0.3f32,
@@ -197742,7 +197755,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const ACACIA_STAIRS: Block = Block {
+    pub const ACACIA_STAIRS: Self = Block {
         id: 516,
         name: "acacia_stairs",
         hardness: 2f32,
@@ -198830,7 +198843,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CHERRY_STAIRS: Block = Block {
+    pub const CHERRY_STAIRS: Self = Block {
         id: 517,
         name: "cherry_stairs",
         hardness: 2f32,
@@ -199918,7 +199931,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DARK_OAK_STAIRS: Block = Block {
+    pub const DARK_OAK_STAIRS: Self = Block {
         id: 518,
         name: "dark_oak_stairs",
         hardness: 2f32,
@@ -201006,7 +201019,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PALE_OAK_STAIRS: Block = Block {
+    pub const PALE_OAK_STAIRS: Self = Block {
         id: 519,
         name: "pale_oak_stairs",
         hardness: 2f32,
@@ -202094,7 +202107,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MANGROVE_STAIRS: Block = Block {
+    pub const MANGROVE_STAIRS: Self = Block {
         id: 520,
         name: "mangrove_stairs",
         hardness: 2f32,
@@ -203182,7 +203195,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BAMBOO_STAIRS: Block = Block {
+    pub const BAMBOO_STAIRS: Self = Block {
         id: 521,
         name: "bamboo_stairs",
         hardness: 2f32,
@@ -204270,7 +204283,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BAMBOO_MOSAIC_STAIRS: Block = Block {
+    pub const BAMBOO_MOSAIC_STAIRS: Self = Block {
         id: 522,
         name: "bamboo_mosaic_stairs",
         hardness: 2f32,
@@ -205358,7 +205371,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SLIME_BLOCK: Block = Block {
+    pub const SLIME_BLOCK: Self = Block {
         id: 523,
         name: "slime_block",
         hardness: 0f32,
@@ -205414,7 +205427,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BARRIER: Block = Block {
+    pub const BARRIER: Self = Block {
         id: 524,
         name: "barrier",
         hardness: -1f32,
@@ -205469,7 +205482,7 @@ impl Block {
         loot_table: None,
         experience: None,
     };
-    pub const LIGHT: Block = Block {
+    pub const LIGHT: Self = Block {
         id: 525,
         name: "light",
         hardness: -1f32,
@@ -205914,7 +205927,7 @@ impl Block {
         loot_table: None,
         experience: None,
     };
-    pub const IRON_TRAPDOOR: Block = Block {
+    pub const IRON_TRAPDOOR: Self = Block {
         id: 526,
         name: "iron_trapdoor",
         hardness: 5f32,
@@ -206791,7 +206804,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PRISMARINE: Block = Block {
+    pub const PRISMARINE: Self = Block {
         id: 527,
         name: "prismarine",
         hardness: 1.5f32,
@@ -206847,7 +206860,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PRISMARINE_BRICKS: Block = Block {
+    pub const PRISMARINE_BRICKS: Self = Block {
         id: 528,
         name: "prismarine_bricks",
         hardness: 1.5f32,
@@ -206903,7 +206916,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DARK_PRISMARINE: Block = Block {
+    pub const DARK_PRISMARINE: Self = Block {
         id: 529,
         name: "dark_prismarine",
         hardness: 1.5f32,
@@ -206959,7 +206972,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PRISMARINE_STAIRS: Block = Block {
+    pub const PRISMARINE_STAIRS: Self = Block {
         id: 530,
         name: "prismarine_stairs",
         hardness: 1.5f32,
@@ -208044,7 +208057,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PRISMARINE_BRICK_STAIRS: Block = Block {
+    pub const PRISMARINE_BRICK_STAIRS: Self = Block {
         id: 531,
         name: "prismarine_brick_stairs",
         hardness: 1.5f32,
@@ -209129,7 +209142,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DARK_PRISMARINE_STAIRS: Block = Block {
+    pub const DARK_PRISMARINE_STAIRS: Self = Block {
         id: 532,
         name: "dark_prismarine_stairs",
         hardness: 1.5f32,
@@ -210214,7 +210227,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PRISMARINE_SLAB: Block = Block {
+    pub const PRISMARINE_SLAB: Self = Block {
         id: 533,
         name: "prismarine_slab",
         hardness: 1.5f32,
@@ -210352,7 +210365,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PRISMARINE_BRICK_SLAB: Block = Block {
+    pub const PRISMARINE_BRICK_SLAB: Self = Block {
         id: 534,
         name: "prismarine_brick_slab",
         hardness: 1.5f32,
@@ -210490,7 +210503,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DARK_PRISMARINE_SLAB: Block = Block {
+    pub const DARK_PRISMARINE_SLAB: Self = Block {
         id: 535,
         name: "dark_prismarine_slab",
         hardness: 1.5f32,
@@ -210628,7 +210641,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SEA_LANTERN: Block = Block {
+    pub const SEA_LANTERN: Self = Block {
         id: 536,
         name: "sea_lantern",
         hardness: 0.3f32,
@@ -210733,7 +210746,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const HAY_BLOCK: Block = Block {
+    pub const HAY_BLOCK: Self = Block {
         id: 537,
         name: "hay_block",
         hardness: 0.5f32,
@@ -210820,7 +210833,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WHITE_CARPET: Block = Block {
+    pub const WHITE_CARPET: Self = Block {
         id: 538,
         name: "white_carpet",
         hardness: 0.1f32,
@@ -210879,7 +210892,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const ORANGE_CARPET: Block = Block {
+    pub const ORANGE_CARPET: Self = Block {
         id: 539,
         name: "orange_carpet",
         hardness: 0.1f32,
@@ -210938,7 +210951,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MAGENTA_CARPET: Block = Block {
+    pub const MAGENTA_CARPET: Self = Block {
         id: 540,
         name: "magenta_carpet",
         hardness: 0.1f32,
@@ -210997,7 +211010,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LIGHT_BLUE_CARPET: Block = Block {
+    pub const LIGHT_BLUE_CARPET: Self = Block {
         id: 541,
         name: "light_blue_carpet",
         hardness: 0.1f32,
@@ -211056,7 +211069,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const YELLOW_CARPET: Block = Block {
+    pub const YELLOW_CARPET: Self = Block {
         id: 542,
         name: "yellow_carpet",
         hardness: 0.1f32,
@@ -211115,7 +211128,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LIME_CARPET: Block = Block {
+    pub const LIME_CARPET: Self = Block {
         id: 543,
         name: "lime_carpet",
         hardness: 0.1f32,
@@ -211174,7 +211187,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PINK_CARPET: Block = Block {
+    pub const PINK_CARPET: Self = Block {
         id: 544,
         name: "pink_carpet",
         hardness: 0.1f32,
@@ -211233,7 +211246,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const GRAY_CARPET: Block = Block {
+    pub const GRAY_CARPET: Self = Block {
         id: 545,
         name: "gray_carpet",
         hardness: 0.1f32,
@@ -211292,7 +211305,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LIGHT_GRAY_CARPET: Block = Block {
+    pub const LIGHT_GRAY_CARPET: Self = Block {
         id: 546,
         name: "light_gray_carpet",
         hardness: 0.1f32,
@@ -211351,7 +211364,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CYAN_CARPET: Block = Block {
+    pub const CYAN_CARPET: Self = Block {
         id: 547,
         name: "cyan_carpet",
         hardness: 0.1f32,
@@ -211410,7 +211423,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PURPLE_CARPET: Block = Block {
+    pub const PURPLE_CARPET: Self = Block {
         id: 548,
         name: "purple_carpet",
         hardness: 0.1f32,
@@ -211469,7 +211482,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BLUE_CARPET: Block = Block {
+    pub const BLUE_CARPET: Self = Block {
         id: 549,
         name: "blue_carpet",
         hardness: 0.1f32,
@@ -211528,7 +211541,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BROWN_CARPET: Block = Block {
+    pub const BROWN_CARPET: Self = Block {
         id: 550,
         name: "brown_carpet",
         hardness: 0.1f32,
@@ -211587,7 +211600,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const GREEN_CARPET: Block = Block {
+    pub const GREEN_CARPET: Self = Block {
         id: 551,
         name: "green_carpet",
         hardness: 0.1f32,
@@ -211646,7 +211659,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const RED_CARPET: Block = Block {
+    pub const RED_CARPET: Self = Block {
         id: 552,
         name: "red_carpet",
         hardness: 0.1f32,
@@ -211705,7 +211718,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BLACK_CARPET: Block = Block {
+    pub const BLACK_CARPET: Self = Block {
         id: 553,
         name: "black_carpet",
         hardness: 0.1f32,
@@ -211764,7 +211777,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const TERRACOTTA: Block = Block {
+    pub const TERRACOTTA: Self = Block {
         id: 554,
         name: "terracotta",
         hardness: 1.25f32,
@@ -211820,7 +211833,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const COAL_BLOCK: Block = Block {
+    pub const COAL_BLOCK: Self = Block {
         id: 555,
         name: "coal_block",
         hardness: 5f32,
@@ -211879,7 +211892,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PACKED_ICE: Block = Block {
+    pub const PACKED_ICE: Self = Block {
         id: 556,
         name: "packed_ice",
         hardness: 0.5f32,
@@ -211935,7 +211948,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SUNFLOWER: Block = Block {
+    pub const SUNFLOWER: Self = Block {
         id: 557,
         name: "sunflower",
         hardness: 0f32,
@@ -212012,7 +212025,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LILAC: Block = Block {
+    pub const LILAC: Self = Block {
         id: 558,
         name: "lilac",
         hardness: 0f32,
@@ -212089,7 +212102,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const ROSE_BUSH: Block = Block {
+    pub const ROSE_BUSH: Self = Block {
         id: 559,
         name: "rose_bush",
         hardness: 0f32,
@@ -212166,7 +212179,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PEONY: Block = Block {
+    pub const PEONY: Self = Block {
         id: 560,
         name: "peony",
         hardness: 0f32,
@@ -212243,7 +212256,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const TALL_GRASS: Block = Block {
+    pub const TALL_GRASS: Self = Block {
         id: 561,
         name: "tall_grass",
         hardness: 0f32,
@@ -212396,7 +212409,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LARGE_FERN: Block = Block {
+    pub const LARGE_FERN: Self = Block {
         id: 562,
         name: "large_fern",
         hardness: 0f32,
@@ -212549,7 +212562,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WHITE_BANNER: Block = Block {
+    pub const WHITE_BANNER: Self = Block {
         id: 563,
         name: "white_banner",
         hardness: 1f32,
@@ -212814,7 +212827,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const ORANGE_BANNER: Block = Block {
+    pub const ORANGE_BANNER: Self = Block {
         id: 564,
         name: "orange_banner",
         hardness: 1f32,
@@ -213079,7 +213092,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MAGENTA_BANNER: Block = Block {
+    pub const MAGENTA_BANNER: Self = Block {
         id: 565,
         name: "magenta_banner",
         hardness: 1f32,
@@ -213344,7 +213357,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LIGHT_BLUE_BANNER: Block = Block {
+    pub const LIGHT_BLUE_BANNER: Self = Block {
         id: 566,
         name: "light_blue_banner",
         hardness: 1f32,
@@ -213609,7 +213622,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const YELLOW_BANNER: Block = Block {
+    pub const YELLOW_BANNER: Self = Block {
         id: 567,
         name: "yellow_banner",
         hardness: 1f32,
@@ -213874,7 +213887,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LIME_BANNER: Block = Block {
+    pub const LIME_BANNER: Self = Block {
         id: 568,
         name: "lime_banner",
         hardness: 1f32,
@@ -214139,7 +214152,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PINK_BANNER: Block = Block {
+    pub const PINK_BANNER: Self = Block {
         id: 569,
         name: "pink_banner",
         hardness: 1f32,
@@ -214404,7 +214417,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const GRAY_BANNER: Block = Block {
+    pub const GRAY_BANNER: Self = Block {
         id: 570,
         name: "gray_banner",
         hardness: 1f32,
@@ -214669,7 +214682,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LIGHT_GRAY_BANNER: Block = Block {
+    pub const LIGHT_GRAY_BANNER: Self = Block {
         id: 571,
         name: "light_gray_banner",
         hardness: 1f32,
@@ -214934,7 +214947,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CYAN_BANNER: Block = Block {
+    pub const CYAN_BANNER: Self = Block {
         id: 572,
         name: "cyan_banner",
         hardness: 1f32,
@@ -215199,7 +215212,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PURPLE_BANNER: Block = Block {
+    pub const PURPLE_BANNER: Self = Block {
         id: 573,
         name: "purple_banner",
         hardness: 1f32,
@@ -215464,7 +215477,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BLUE_BANNER: Block = Block {
+    pub const BLUE_BANNER: Self = Block {
         id: 574,
         name: "blue_banner",
         hardness: 1f32,
@@ -215729,7 +215742,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BROWN_BANNER: Block = Block {
+    pub const BROWN_BANNER: Self = Block {
         id: 575,
         name: "brown_banner",
         hardness: 1f32,
@@ -215994,7 +216007,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const GREEN_BANNER: Block = Block {
+    pub const GREEN_BANNER: Self = Block {
         id: 576,
         name: "green_banner",
         hardness: 1f32,
@@ -216259,7 +216272,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const RED_BANNER: Block = Block {
+    pub const RED_BANNER: Self = Block {
         id: 577,
         name: "red_banner",
         hardness: 1f32,
@@ -216524,7 +216537,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BLACK_BANNER: Block = Block {
+    pub const BLACK_BANNER: Self = Block {
         id: 578,
         name: "black_banner",
         hardness: 1f32,
@@ -216789,7 +216802,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WHITE_WALL_BANNER: Block = Block {
+    pub const WHITE_WALL_BANNER: Self = Block {
         id: 579,
         name: "white_wall_banner",
         hardness: 1f32,
@@ -216898,7 +216911,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const ORANGE_WALL_BANNER: Block = Block {
+    pub const ORANGE_WALL_BANNER: Self = Block {
         id: 580,
         name: "orange_wall_banner",
         hardness: 1f32,
@@ -217007,7 +217020,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MAGENTA_WALL_BANNER: Block = Block {
+    pub const MAGENTA_WALL_BANNER: Self = Block {
         id: 581,
         name: "magenta_wall_banner",
         hardness: 1f32,
@@ -217116,7 +217129,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LIGHT_BLUE_WALL_BANNER: Block = Block {
+    pub const LIGHT_BLUE_WALL_BANNER: Self = Block {
         id: 582,
         name: "light_blue_wall_banner",
         hardness: 1f32,
@@ -217225,7 +217238,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const YELLOW_WALL_BANNER: Block = Block {
+    pub const YELLOW_WALL_BANNER: Self = Block {
         id: 583,
         name: "yellow_wall_banner",
         hardness: 1f32,
@@ -217334,7 +217347,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LIME_WALL_BANNER: Block = Block {
+    pub const LIME_WALL_BANNER: Self = Block {
         id: 584,
         name: "lime_wall_banner",
         hardness: 1f32,
@@ -217443,7 +217456,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PINK_WALL_BANNER: Block = Block {
+    pub const PINK_WALL_BANNER: Self = Block {
         id: 585,
         name: "pink_wall_banner",
         hardness: 1f32,
@@ -217552,7 +217565,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const GRAY_WALL_BANNER: Block = Block {
+    pub const GRAY_WALL_BANNER: Self = Block {
         id: 586,
         name: "gray_wall_banner",
         hardness: 1f32,
@@ -217661,7 +217674,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LIGHT_GRAY_WALL_BANNER: Block = Block {
+    pub const LIGHT_GRAY_WALL_BANNER: Self = Block {
         id: 587,
         name: "light_gray_wall_banner",
         hardness: 1f32,
@@ -217770,7 +217783,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CYAN_WALL_BANNER: Block = Block {
+    pub const CYAN_WALL_BANNER: Self = Block {
         id: 588,
         name: "cyan_wall_banner",
         hardness: 1f32,
@@ -217879,7 +217892,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PURPLE_WALL_BANNER: Block = Block {
+    pub const PURPLE_WALL_BANNER: Self = Block {
         id: 589,
         name: "purple_wall_banner",
         hardness: 1f32,
@@ -217988,7 +218001,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BLUE_WALL_BANNER: Block = Block {
+    pub const BLUE_WALL_BANNER: Self = Block {
         id: 590,
         name: "blue_wall_banner",
         hardness: 1f32,
@@ -218097,7 +218110,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BROWN_WALL_BANNER: Block = Block {
+    pub const BROWN_WALL_BANNER: Self = Block {
         id: 591,
         name: "brown_wall_banner",
         hardness: 1f32,
@@ -218206,7 +218219,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const GREEN_WALL_BANNER: Block = Block {
+    pub const GREEN_WALL_BANNER: Self = Block {
         id: 592,
         name: "green_wall_banner",
         hardness: 1f32,
@@ -218315,7 +218328,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const RED_WALL_BANNER: Block = Block {
+    pub const RED_WALL_BANNER: Self = Block {
         id: 593,
         name: "red_wall_banner",
         hardness: 1f32,
@@ -218424,7 +218437,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BLACK_WALL_BANNER: Block = Block {
+    pub const BLACK_WALL_BANNER: Self = Block {
         id: 594,
         name: "black_wall_banner",
         hardness: 1f32,
@@ -218533,7 +218546,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const RED_SANDSTONE: Block = Block {
+    pub const RED_SANDSTONE: Self = Block {
         id: 595,
         name: "red_sandstone",
         hardness: 0.8f32,
@@ -218589,7 +218602,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CHISELED_RED_SANDSTONE: Block = Block {
+    pub const CHISELED_RED_SANDSTONE: Self = Block {
         id: 596,
         name: "chiseled_red_sandstone",
         hardness: 0.8f32,
@@ -218645,7 +218658,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CUT_RED_SANDSTONE: Block = Block {
+    pub const CUT_RED_SANDSTONE: Self = Block {
         id: 597,
         name: "cut_red_sandstone",
         hardness: 0.8f32,
@@ -218701,7 +218714,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const RED_SANDSTONE_STAIRS: Block = Block {
+    pub const RED_SANDSTONE_STAIRS: Self = Block {
         id: 598,
         name: "red_sandstone_stairs",
         hardness: 0.8f32,
@@ -219786,7 +219799,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const OAK_SLAB: Block = Block {
+    pub const OAK_SLAB: Self = Block {
         id: 599,
         name: "oak_slab",
         hardness: 2f32,
@@ -219927,7 +219940,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SPRUCE_SLAB: Block = Block {
+    pub const SPRUCE_SLAB: Self = Block {
         id: 600,
         name: "spruce_slab",
         hardness: 2f32,
@@ -220068,7 +220081,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BIRCH_SLAB: Block = Block {
+    pub const BIRCH_SLAB: Self = Block {
         id: 601,
         name: "birch_slab",
         hardness: 2f32,
@@ -220209,7 +220222,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const JUNGLE_SLAB: Block = Block {
+    pub const JUNGLE_SLAB: Self = Block {
         id: 602,
         name: "jungle_slab",
         hardness: 2f32,
@@ -220350,7 +220363,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const ACACIA_SLAB: Block = Block {
+    pub const ACACIA_SLAB: Self = Block {
         id: 603,
         name: "acacia_slab",
         hardness: 2f32,
@@ -220491,7 +220504,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CHERRY_SLAB: Block = Block {
+    pub const CHERRY_SLAB: Self = Block {
         id: 604,
         name: "cherry_slab",
         hardness: 2f32,
@@ -220632,7 +220645,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DARK_OAK_SLAB: Block = Block {
+    pub const DARK_OAK_SLAB: Self = Block {
         id: 605,
         name: "dark_oak_slab",
         hardness: 2f32,
@@ -220773,7 +220786,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PALE_OAK_SLAB: Block = Block {
+    pub const PALE_OAK_SLAB: Self = Block {
         id: 606,
         name: "pale_oak_slab",
         hardness: 2f32,
@@ -220914,7 +220927,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MANGROVE_SLAB: Block = Block {
+    pub const MANGROVE_SLAB: Self = Block {
         id: 607,
         name: "mangrove_slab",
         hardness: 2f32,
@@ -221055,7 +221068,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BAMBOO_SLAB: Block = Block {
+    pub const BAMBOO_SLAB: Self = Block {
         id: 608,
         name: "bamboo_slab",
         hardness: 2f32,
@@ -221196,7 +221209,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BAMBOO_MOSAIC_SLAB: Block = Block {
+    pub const BAMBOO_MOSAIC_SLAB: Self = Block {
         id: 609,
         name: "bamboo_mosaic_slab",
         hardness: 2f32,
@@ -221337,7 +221350,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const STONE_SLAB: Block = Block {
+    pub const STONE_SLAB: Self = Block {
         id: 610,
         name: "stone_slab",
         hardness: 2f32,
@@ -221475,7 +221488,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SMOOTH_STONE_SLAB: Block = Block {
+    pub const SMOOTH_STONE_SLAB: Self = Block {
         id: 611,
         name: "smooth_stone_slab",
         hardness: 2f32,
@@ -221613,7 +221626,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SANDSTONE_SLAB: Block = Block {
+    pub const SANDSTONE_SLAB: Self = Block {
         id: 612,
         name: "sandstone_slab",
         hardness: 2f32,
@@ -221751,7 +221764,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CUT_SANDSTONE_SLAB: Block = Block {
+    pub const CUT_SANDSTONE_SLAB: Self = Block {
         id: 613,
         name: "cut_sandstone_slab",
         hardness: 2f32,
@@ -221889,7 +221902,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PETRIFIED_OAK_SLAB: Block = Block {
+    pub const PETRIFIED_OAK_SLAB: Self = Block {
         id: 614,
         name: "petrified_oak_slab",
         hardness: 2f32,
@@ -222027,7 +222040,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const COBBLESTONE_SLAB: Block = Block {
+    pub const COBBLESTONE_SLAB: Self = Block {
         id: 615,
         name: "cobblestone_slab",
         hardness: 2f32,
@@ -222165,7 +222178,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BRICK_SLAB: Block = Block {
+    pub const BRICK_SLAB: Self = Block {
         id: 616,
         name: "brick_slab",
         hardness: 2f32,
@@ -222303,7 +222316,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const STONE_BRICK_SLAB: Block = Block {
+    pub const STONE_BRICK_SLAB: Self = Block {
         id: 617,
         name: "stone_brick_slab",
         hardness: 2f32,
@@ -222441,7 +222454,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MUD_BRICK_SLAB: Block = Block {
+    pub const MUD_BRICK_SLAB: Self = Block {
         id: 618,
         name: "mud_brick_slab",
         hardness: 1.5f32,
@@ -222579,7 +222592,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const NETHER_BRICK_SLAB: Block = Block {
+    pub const NETHER_BRICK_SLAB: Self = Block {
         id: 619,
         name: "nether_brick_slab",
         hardness: 2f32,
@@ -222717,7 +222730,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const QUARTZ_SLAB: Block = Block {
+    pub const QUARTZ_SLAB: Self = Block {
         id: 620,
         name: "quartz_slab",
         hardness: 2f32,
@@ -222855,7 +222868,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const RED_SANDSTONE_SLAB: Block = Block {
+    pub const RED_SANDSTONE_SLAB: Self = Block {
         id: 621,
         name: "red_sandstone_slab",
         hardness: 2f32,
@@ -222993,7 +223006,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CUT_RED_SANDSTONE_SLAB: Block = Block {
+    pub const CUT_RED_SANDSTONE_SLAB: Self = Block {
         id: 622,
         name: "cut_red_sandstone_slab",
         hardness: 2f32,
@@ -223131,7 +223144,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PURPUR_SLAB: Block = Block {
+    pub const PURPUR_SLAB: Self = Block {
         id: 623,
         name: "purpur_slab",
         hardness: 2f32,
@@ -223269,7 +223282,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SMOOTH_STONE: Block = Block {
+    pub const SMOOTH_STONE: Self = Block {
         id: 624,
         name: "smooth_stone",
         hardness: 2f32,
@@ -223325,7 +223338,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SMOOTH_SANDSTONE: Block = Block {
+    pub const SMOOTH_SANDSTONE: Self = Block {
         id: 625,
         name: "smooth_sandstone",
         hardness: 2f32,
@@ -223381,7 +223394,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SMOOTH_QUARTZ: Block = Block {
+    pub const SMOOTH_QUARTZ: Self = Block {
         id: 626,
         name: "smooth_quartz",
         hardness: 2f32,
@@ -223437,7 +223450,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SMOOTH_RED_SANDSTONE: Block = Block {
+    pub const SMOOTH_RED_SANDSTONE: Self = Block {
         id: 627,
         name: "smooth_red_sandstone",
         hardness: 2f32,
@@ -223493,7 +223506,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SPRUCE_FENCE_GATE: Block = Block {
+    pub const SPRUCE_FENCE_GATE: Self = Block {
         id: 628,
         name: "spruce_fence_gate",
         hardness: 2f32,
@@ -223957,7 +223970,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BIRCH_FENCE_GATE: Block = Block {
+    pub const BIRCH_FENCE_GATE: Self = Block {
         id: 629,
         name: "birch_fence_gate",
         hardness: 2f32,
@@ -224421,7 +224434,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const JUNGLE_FENCE_GATE: Block = Block {
+    pub const JUNGLE_FENCE_GATE: Self = Block {
         id: 630,
         name: "jungle_fence_gate",
         hardness: 2f32,
@@ -224885,7 +224898,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const ACACIA_FENCE_GATE: Block = Block {
+    pub const ACACIA_FENCE_GATE: Self = Block {
         id: 631,
         name: "acacia_fence_gate",
         hardness: 2f32,
@@ -225349,7 +225362,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CHERRY_FENCE_GATE: Block = Block {
+    pub const CHERRY_FENCE_GATE: Self = Block {
         id: 632,
         name: "cherry_fence_gate",
         hardness: 2f32,
@@ -225813,7 +225826,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DARK_OAK_FENCE_GATE: Block = Block {
+    pub const DARK_OAK_FENCE_GATE: Self = Block {
         id: 633,
         name: "dark_oak_fence_gate",
         hardness: 2f32,
@@ -226277,7 +226290,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PALE_OAK_FENCE_GATE: Block = Block {
+    pub const PALE_OAK_FENCE_GATE: Self = Block {
         id: 634,
         name: "pale_oak_fence_gate",
         hardness: 2f32,
@@ -226741,7 +226754,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MANGROVE_FENCE_GATE: Block = Block {
+    pub const MANGROVE_FENCE_GATE: Self = Block {
         id: 635,
         name: "mangrove_fence_gate",
         hardness: 2f32,
@@ -227205,7 +227218,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BAMBOO_FENCE_GATE: Block = Block {
+    pub const BAMBOO_FENCE_GATE: Self = Block {
         id: 636,
         name: "bamboo_fence_gate",
         hardness: 2f32,
@@ -227669,7 +227682,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SPRUCE_FENCE: Block = Block {
+    pub const SPRUCE_FENCE: Self = Block {
         id: 637,
         name: "spruce_fence",
         hardness: 2f32,
@@ -228133,7 +228146,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BIRCH_FENCE: Block = Block {
+    pub const BIRCH_FENCE: Self = Block {
         id: 638,
         name: "birch_fence",
         hardness: 2f32,
@@ -228597,7 +228610,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const JUNGLE_FENCE: Block = Block {
+    pub const JUNGLE_FENCE: Self = Block {
         id: 639,
         name: "jungle_fence",
         hardness: 2f32,
@@ -229061,7 +229074,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const ACACIA_FENCE: Block = Block {
+    pub const ACACIA_FENCE: Self = Block {
         id: 640,
         name: "acacia_fence",
         hardness: 2f32,
@@ -229525,7 +229538,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CHERRY_FENCE: Block = Block {
+    pub const CHERRY_FENCE: Self = Block {
         id: 641,
         name: "cherry_fence",
         hardness: 2f32,
@@ -229989,7 +230002,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DARK_OAK_FENCE: Block = Block {
+    pub const DARK_OAK_FENCE: Self = Block {
         id: 642,
         name: "dark_oak_fence",
         hardness: 2f32,
@@ -230453,7 +230466,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PALE_OAK_FENCE: Block = Block {
+    pub const PALE_OAK_FENCE: Self = Block {
         id: 643,
         name: "pale_oak_fence",
         hardness: 2f32,
@@ -230917,7 +230930,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MANGROVE_FENCE: Block = Block {
+    pub const MANGROVE_FENCE: Self = Block {
         id: 644,
         name: "mangrove_fence",
         hardness: 2f32,
@@ -231381,7 +231394,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BAMBOO_FENCE: Block = Block {
+    pub const BAMBOO_FENCE: Self = Block {
         id: 645,
         name: "bamboo_fence",
         hardness: 2f32,
@@ -231845,7 +231858,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SPRUCE_DOOR: Block = Block {
+    pub const SPRUCE_DOOR: Self = Block {
         id: 646,
         name: "spruce_door",
         hardness: 3f32,
@@ -232725,7 +232738,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BIRCH_DOOR: Block = Block {
+    pub const BIRCH_DOOR: Self = Block {
         id: 647,
         name: "birch_door",
         hardness: 3f32,
@@ -233605,7 +233618,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const JUNGLE_DOOR: Block = Block {
+    pub const JUNGLE_DOOR: Self = Block {
         id: 648,
         name: "jungle_door",
         hardness: 3f32,
@@ -234485,7 +234498,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const ACACIA_DOOR: Block = Block {
+    pub const ACACIA_DOOR: Self = Block {
         id: 649,
         name: "acacia_door",
         hardness: 3f32,
@@ -235365,7 +235378,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CHERRY_DOOR: Block = Block {
+    pub const CHERRY_DOOR: Self = Block {
         id: 650,
         name: "cherry_door",
         hardness: 3f32,
@@ -236245,7 +236258,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DARK_OAK_DOOR: Block = Block {
+    pub const DARK_OAK_DOOR: Self = Block {
         id: 651,
         name: "dark_oak_door",
         hardness: 3f32,
@@ -237125,7 +237138,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PALE_OAK_DOOR: Block = Block {
+    pub const PALE_OAK_DOOR: Self = Block {
         id: 652,
         name: "pale_oak_door",
         hardness: 3f32,
@@ -238005,7 +238018,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MANGROVE_DOOR: Block = Block {
+    pub const MANGROVE_DOOR: Self = Block {
         id: 653,
         name: "mangrove_door",
         hardness: 3f32,
@@ -238885,7 +238898,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BAMBOO_DOOR: Block = Block {
+    pub const BAMBOO_DOOR: Self = Block {
         id: 654,
         name: "bamboo_door",
         hardness: 3f32,
@@ -239765,7 +239778,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const END_ROD: Block = Block {
+    pub const END_ROD: Self = Block {
         id: 655,
         name: "end_rod",
         hardness: 0f32,
@@ -239888,7 +239901,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CHORUS_PLANT: Block = Block {
+    pub const CHORUS_PLANT: Self = Block {
         id: 656,
         name: "chorus_plant",
         hardness: 0.4f32,
@@ -240780,7 +240793,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CHORUS_FLOWER: Block = Block {
+    pub const CHORUS_FLOWER: Self = Block {
         id: 657,
         name: "chorus_flower",
         hardness: 0.4f32,
@@ -240906,7 +240919,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PURPUR_BLOCK: Block = Block {
+    pub const PURPUR_BLOCK: Self = Block {
         id: 658,
         name: "purpur_block",
         hardness: 1.5f32,
@@ -240962,7 +240975,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PURPUR_PILLAR: Block = Block {
+    pub const PURPUR_PILLAR: Self = Block {
         id: 659,
         name: "purpur_pillar",
         hardness: 1.5f32,
@@ -241046,7 +241059,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PURPUR_STAIRS: Block = Block {
+    pub const PURPUR_STAIRS: Self = Block {
         id: 660,
         name: "purpur_stairs",
         hardness: 1.5f32,
@@ -242131,7 +242144,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const END_STONE_BRICKS: Block = Block {
+    pub const END_STONE_BRICKS: Self = Block {
         id: 661,
         name: "end_stone_bricks",
         hardness: 3f32,
@@ -242187,7 +242200,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const TORCHFLOWER_CROP: Block = Block {
+    pub const TORCHFLOWER_CROP: Self = Block {
         id: 662,
         name: "torchflower_crop",
         hardness: 0f32,
@@ -242258,7 +242271,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PITCHER_CROP: Block = Block {
+    pub const PITCHER_CROP: Self = Block {
         id: 663,
         name: "pitcher_crop",
         hardness: 0f32,
@@ -242544,7 +242557,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PITCHER_PLANT: Block = Block {
+    pub const PITCHER_PLANT: Self = Block {
         id: 664,
         name: "pitcher_plant",
         hardness: 0f32,
@@ -242621,7 +242634,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BEETROOTS: Block = Block {
+    pub const BEETROOTS: Self = Block {
         id: 665,
         name: "beetroots",
         hardness: 0f32,
@@ -242764,7 +242777,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DIRT_PATH: Block = Block {
+    pub const DIRT_PATH: Self = Block {
         id: 666,
         name: "dirt_path",
         hardness: 0.65f32,
@@ -242820,7 +242833,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const END_GATEWAY: Block = Block {
+    pub const END_GATEWAY: Self = Block {
         id: 667,
         name: "end_gateway",
         hardness: -1f32,
@@ -242860,7 +242873,7 @@ impl Block {
         loot_table: None,
         experience: None,
     };
-    pub const REPEATING_COMMAND_BLOCK: Block = Block {
+    pub const REPEATING_COMMAND_BLOCK: Self = Block {
         id: 668,
         name: "repeating_command_block",
         hardness: -1f32,
@@ -243045,7 +243058,7 @@ impl Block {
         loot_table: None,
         experience: None,
     };
-    pub const CHAIN_COMMAND_BLOCK: Block = Block {
+    pub const CHAIN_COMMAND_BLOCK: Self = Block {
         id: 669,
         name: "chain_command_block",
         hardness: -1f32,
@@ -243230,7 +243243,7 @@ impl Block {
         loot_table: None,
         experience: None,
     };
-    pub const FROSTED_ICE: Block = Block {
+    pub const FROSTED_ICE: Self = Block {
         id: 670,
         name: "frosted_ice",
         hardness: 0.5f32,
@@ -243315,7 +243328,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MAGMA_BLOCK: Block = Block {
+    pub const MAGMA_BLOCK: Self = Block {
         id: 671,
         name: "magma_block",
         hardness: 0.5f32,
@@ -243371,7 +243384,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const NETHER_WART_BLOCK: Block = Block {
+    pub const NETHER_WART_BLOCK: Self = Block {
         id: 672,
         name: "nether_wart_block",
         hardness: 1f32,
@@ -243427,7 +243440,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const RED_NETHER_BRICKS: Block = Block {
+    pub const RED_NETHER_BRICKS: Self = Block {
         id: 673,
         name: "red_nether_bricks",
         hardness: 2f32,
@@ -243483,7 +243496,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BONE_BLOCK: Block = Block {
+    pub const BONE_BLOCK: Self = Block {
         id: 674,
         name: "bone_block",
         hardness: 2f32,
@@ -243567,7 +243580,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const STRUCTURE_VOID: Block = Block {
+    pub const STRUCTURE_VOID: Self = Block {
         id: 675,
         name: "structure_void",
         hardness: 0f32,
@@ -243607,7 +243620,7 @@ impl Block {
         loot_table: None,
         experience: None,
     };
-    pub const OBSERVER: Block = Block {
+    pub const OBSERVER: Self = Block {
         id: 676,
         name: "observer",
         hardness: 3f32,
@@ -243808,7 +243821,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SHULKER_BOX: Block = Block {
+    pub const SHULKER_BOX: Self = Block {
         id: 677,
         name: "shulker_box",
         hardness: 2f32,
@@ -243942,7 +243955,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WHITE_SHULKER_BOX: Block = Block {
+    pub const WHITE_SHULKER_BOX: Self = Block {
         id: 678,
         name: "white_shulker_box",
         hardness: 2f32,
@@ -244076,7 +244089,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const ORANGE_SHULKER_BOX: Block = Block {
+    pub const ORANGE_SHULKER_BOX: Self = Block {
         id: 679,
         name: "orange_shulker_box",
         hardness: 2f32,
@@ -244210,7 +244223,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MAGENTA_SHULKER_BOX: Block = Block {
+    pub const MAGENTA_SHULKER_BOX: Self = Block {
         id: 680,
         name: "magenta_shulker_box",
         hardness: 2f32,
@@ -244344,7 +244357,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LIGHT_BLUE_SHULKER_BOX: Block = Block {
+    pub const LIGHT_BLUE_SHULKER_BOX: Self = Block {
         id: 681,
         name: "light_blue_shulker_box",
         hardness: 2f32,
@@ -244478,7 +244491,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const YELLOW_SHULKER_BOX: Block = Block {
+    pub const YELLOW_SHULKER_BOX: Self = Block {
         id: 682,
         name: "yellow_shulker_box",
         hardness: 2f32,
@@ -244612,7 +244625,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LIME_SHULKER_BOX: Block = Block {
+    pub const LIME_SHULKER_BOX: Self = Block {
         id: 683,
         name: "lime_shulker_box",
         hardness: 2f32,
@@ -244746,7 +244759,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PINK_SHULKER_BOX: Block = Block {
+    pub const PINK_SHULKER_BOX: Self = Block {
         id: 684,
         name: "pink_shulker_box",
         hardness: 2f32,
@@ -244880,7 +244893,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const GRAY_SHULKER_BOX: Block = Block {
+    pub const GRAY_SHULKER_BOX: Self = Block {
         id: 685,
         name: "gray_shulker_box",
         hardness: 2f32,
@@ -245014,7 +245027,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LIGHT_GRAY_SHULKER_BOX: Block = Block {
+    pub const LIGHT_GRAY_SHULKER_BOX: Self = Block {
         id: 686,
         name: "light_gray_shulker_box",
         hardness: 2f32,
@@ -245148,7 +245161,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CYAN_SHULKER_BOX: Block = Block {
+    pub const CYAN_SHULKER_BOX: Self = Block {
         id: 687,
         name: "cyan_shulker_box",
         hardness: 2f32,
@@ -245282,7 +245295,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PURPLE_SHULKER_BOX: Block = Block {
+    pub const PURPLE_SHULKER_BOX: Self = Block {
         id: 688,
         name: "purple_shulker_box",
         hardness: 2f32,
@@ -245416,7 +245429,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BLUE_SHULKER_BOX: Block = Block {
+    pub const BLUE_SHULKER_BOX: Self = Block {
         id: 689,
         name: "blue_shulker_box",
         hardness: 2f32,
@@ -245550,7 +245563,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BROWN_SHULKER_BOX: Block = Block {
+    pub const BROWN_SHULKER_BOX: Self = Block {
         id: 690,
         name: "brown_shulker_box",
         hardness: 2f32,
@@ -245684,7 +245697,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const GREEN_SHULKER_BOX: Block = Block {
+    pub const GREEN_SHULKER_BOX: Self = Block {
         id: 691,
         name: "green_shulker_box",
         hardness: 2f32,
@@ -245818,7 +245831,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const RED_SHULKER_BOX: Block = Block {
+    pub const RED_SHULKER_BOX: Self = Block {
         id: 692,
         name: "red_shulker_box",
         hardness: 2f32,
@@ -245952,7 +245965,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BLACK_SHULKER_BOX: Block = Block {
+    pub const BLACK_SHULKER_BOX: Self = Block {
         id: 693,
         name: "black_shulker_box",
         hardness: 2f32,
@@ -246086,7 +246099,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WHITE_GLAZED_TERRACOTTA: Block = Block {
+    pub const WHITE_GLAZED_TERRACOTTA: Self = Block {
         id: 694,
         name: "white_glazed_terracotta",
         hardness: 1.4f32,
@@ -246183,7 +246196,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const ORANGE_GLAZED_TERRACOTTA: Block = Block {
+    pub const ORANGE_GLAZED_TERRACOTTA: Self = Block {
         id: 695,
         name: "orange_glazed_terracotta",
         hardness: 1.4f32,
@@ -246280,7 +246293,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MAGENTA_GLAZED_TERRACOTTA: Block = Block {
+    pub const MAGENTA_GLAZED_TERRACOTTA: Self = Block {
         id: 696,
         name: "magenta_glazed_terracotta",
         hardness: 1.4f32,
@@ -246377,7 +246390,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LIGHT_BLUE_GLAZED_TERRACOTTA: Block = Block {
+    pub const LIGHT_BLUE_GLAZED_TERRACOTTA: Self = Block {
         id: 697,
         name: "light_blue_glazed_terracotta",
         hardness: 1.4f32,
@@ -246474,7 +246487,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const YELLOW_GLAZED_TERRACOTTA: Block = Block {
+    pub const YELLOW_GLAZED_TERRACOTTA: Self = Block {
         id: 698,
         name: "yellow_glazed_terracotta",
         hardness: 1.4f32,
@@ -246571,7 +246584,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LIME_GLAZED_TERRACOTTA: Block = Block {
+    pub const LIME_GLAZED_TERRACOTTA: Self = Block {
         id: 699,
         name: "lime_glazed_terracotta",
         hardness: 1.4f32,
@@ -246668,7 +246681,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PINK_GLAZED_TERRACOTTA: Block = Block {
+    pub const PINK_GLAZED_TERRACOTTA: Self = Block {
         id: 700,
         name: "pink_glazed_terracotta",
         hardness: 1.4f32,
@@ -246765,7 +246778,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const GRAY_GLAZED_TERRACOTTA: Block = Block {
+    pub const GRAY_GLAZED_TERRACOTTA: Self = Block {
         id: 701,
         name: "gray_glazed_terracotta",
         hardness: 1.4f32,
@@ -246862,7 +246875,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LIGHT_GRAY_GLAZED_TERRACOTTA: Block = Block {
+    pub const LIGHT_GRAY_GLAZED_TERRACOTTA: Self = Block {
         id: 702,
         name: "light_gray_glazed_terracotta",
         hardness: 1.4f32,
@@ -246959,7 +246972,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CYAN_GLAZED_TERRACOTTA: Block = Block {
+    pub const CYAN_GLAZED_TERRACOTTA: Self = Block {
         id: 703,
         name: "cyan_glazed_terracotta",
         hardness: 1.4f32,
@@ -247056,7 +247069,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PURPLE_GLAZED_TERRACOTTA: Block = Block {
+    pub const PURPLE_GLAZED_TERRACOTTA: Self = Block {
         id: 704,
         name: "purple_glazed_terracotta",
         hardness: 1.4f32,
@@ -247153,7 +247166,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BLUE_GLAZED_TERRACOTTA: Block = Block {
+    pub const BLUE_GLAZED_TERRACOTTA: Self = Block {
         id: 705,
         name: "blue_glazed_terracotta",
         hardness: 1.4f32,
@@ -247250,7 +247263,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BROWN_GLAZED_TERRACOTTA: Block = Block {
+    pub const BROWN_GLAZED_TERRACOTTA: Self = Block {
         id: 706,
         name: "brown_glazed_terracotta",
         hardness: 1.4f32,
@@ -247347,7 +247360,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const GREEN_GLAZED_TERRACOTTA: Block = Block {
+    pub const GREEN_GLAZED_TERRACOTTA: Self = Block {
         id: 707,
         name: "green_glazed_terracotta",
         hardness: 1.4f32,
@@ -247444,7 +247457,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const RED_GLAZED_TERRACOTTA: Block = Block {
+    pub const RED_GLAZED_TERRACOTTA: Self = Block {
         id: 708,
         name: "red_glazed_terracotta",
         hardness: 1.4f32,
@@ -247541,7 +247554,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BLACK_GLAZED_TERRACOTTA: Block = Block {
+    pub const BLACK_GLAZED_TERRACOTTA: Self = Block {
         id: 709,
         name: "black_glazed_terracotta",
         hardness: 1.4f32,
@@ -247638,7 +247651,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WHITE_CONCRETE: Block = Block {
+    pub const WHITE_CONCRETE: Self = Block {
         id: 710,
         name: "white_concrete",
         hardness: 1.8f32,
@@ -247694,7 +247707,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const ORANGE_CONCRETE: Block = Block {
+    pub const ORANGE_CONCRETE: Self = Block {
         id: 711,
         name: "orange_concrete",
         hardness: 1.8f32,
@@ -247750,7 +247763,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MAGENTA_CONCRETE: Block = Block {
+    pub const MAGENTA_CONCRETE: Self = Block {
         id: 712,
         name: "magenta_concrete",
         hardness: 1.8f32,
@@ -247806,7 +247819,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LIGHT_BLUE_CONCRETE: Block = Block {
+    pub const LIGHT_BLUE_CONCRETE: Self = Block {
         id: 713,
         name: "light_blue_concrete",
         hardness: 1.8f32,
@@ -247862,7 +247875,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const YELLOW_CONCRETE: Block = Block {
+    pub const YELLOW_CONCRETE: Self = Block {
         id: 714,
         name: "yellow_concrete",
         hardness: 1.8f32,
@@ -247918,7 +247931,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LIME_CONCRETE: Block = Block {
+    pub const LIME_CONCRETE: Self = Block {
         id: 715,
         name: "lime_concrete",
         hardness: 1.8f32,
@@ -247974,7 +247987,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PINK_CONCRETE: Block = Block {
+    pub const PINK_CONCRETE: Self = Block {
         id: 716,
         name: "pink_concrete",
         hardness: 1.8f32,
@@ -248030,7 +248043,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const GRAY_CONCRETE: Block = Block {
+    pub const GRAY_CONCRETE: Self = Block {
         id: 717,
         name: "gray_concrete",
         hardness: 1.8f32,
@@ -248086,7 +248099,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LIGHT_GRAY_CONCRETE: Block = Block {
+    pub const LIGHT_GRAY_CONCRETE: Self = Block {
         id: 718,
         name: "light_gray_concrete",
         hardness: 1.8f32,
@@ -248142,7 +248155,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CYAN_CONCRETE: Block = Block {
+    pub const CYAN_CONCRETE: Self = Block {
         id: 719,
         name: "cyan_concrete",
         hardness: 1.8f32,
@@ -248198,7 +248211,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PURPLE_CONCRETE: Block = Block {
+    pub const PURPLE_CONCRETE: Self = Block {
         id: 720,
         name: "purple_concrete",
         hardness: 1.8f32,
@@ -248254,7 +248267,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BLUE_CONCRETE: Block = Block {
+    pub const BLUE_CONCRETE: Self = Block {
         id: 721,
         name: "blue_concrete",
         hardness: 1.8f32,
@@ -248310,7 +248323,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BROWN_CONCRETE: Block = Block {
+    pub const BROWN_CONCRETE: Self = Block {
         id: 722,
         name: "brown_concrete",
         hardness: 1.8f32,
@@ -248366,7 +248379,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const GREEN_CONCRETE: Block = Block {
+    pub const GREEN_CONCRETE: Self = Block {
         id: 723,
         name: "green_concrete",
         hardness: 1.8f32,
@@ -248422,7 +248435,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const RED_CONCRETE: Block = Block {
+    pub const RED_CONCRETE: Self = Block {
         id: 724,
         name: "red_concrete",
         hardness: 1.8f32,
@@ -248478,7 +248491,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BLACK_CONCRETE: Block = Block {
+    pub const BLACK_CONCRETE: Self = Block {
         id: 725,
         name: "black_concrete",
         hardness: 1.8f32,
@@ -248534,7 +248547,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WHITE_CONCRETE_POWDER: Block = Block {
+    pub const WHITE_CONCRETE_POWDER: Self = Block {
         id: 726,
         name: "white_concrete_powder",
         hardness: 0.5f32,
@@ -248590,7 +248603,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const ORANGE_CONCRETE_POWDER: Block = Block {
+    pub const ORANGE_CONCRETE_POWDER: Self = Block {
         id: 727,
         name: "orange_concrete_powder",
         hardness: 0.5f32,
@@ -248646,7 +248659,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MAGENTA_CONCRETE_POWDER: Block = Block {
+    pub const MAGENTA_CONCRETE_POWDER: Self = Block {
         id: 728,
         name: "magenta_concrete_powder",
         hardness: 0.5f32,
@@ -248702,7 +248715,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LIGHT_BLUE_CONCRETE_POWDER: Block = Block {
+    pub const LIGHT_BLUE_CONCRETE_POWDER: Self = Block {
         id: 729,
         name: "light_blue_concrete_powder",
         hardness: 0.5f32,
@@ -248758,7 +248771,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const YELLOW_CONCRETE_POWDER: Block = Block {
+    pub const YELLOW_CONCRETE_POWDER: Self = Block {
         id: 730,
         name: "yellow_concrete_powder",
         hardness: 0.5f32,
@@ -248814,7 +248827,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LIME_CONCRETE_POWDER: Block = Block {
+    pub const LIME_CONCRETE_POWDER: Self = Block {
         id: 731,
         name: "lime_concrete_powder",
         hardness: 0.5f32,
@@ -248870,7 +248883,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PINK_CONCRETE_POWDER: Block = Block {
+    pub const PINK_CONCRETE_POWDER: Self = Block {
         id: 732,
         name: "pink_concrete_powder",
         hardness: 0.5f32,
@@ -248926,7 +248939,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const GRAY_CONCRETE_POWDER: Block = Block {
+    pub const GRAY_CONCRETE_POWDER: Self = Block {
         id: 733,
         name: "gray_concrete_powder",
         hardness: 0.5f32,
@@ -248982,7 +248995,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LIGHT_GRAY_CONCRETE_POWDER: Block = Block {
+    pub const LIGHT_GRAY_CONCRETE_POWDER: Self = Block {
         id: 734,
         name: "light_gray_concrete_powder",
         hardness: 0.5f32,
@@ -249038,7 +249051,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CYAN_CONCRETE_POWDER: Block = Block {
+    pub const CYAN_CONCRETE_POWDER: Self = Block {
         id: 735,
         name: "cyan_concrete_powder",
         hardness: 0.5f32,
@@ -249094,7 +249107,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PURPLE_CONCRETE_POWDER: Block = Block {
+    pub const PURPLE_CONCRETE_POWDER: Self = Block {
         id: 736,
         name: "purple_concrete_powder",
         hardness: 0.5f32,
@@ -249150,7 +249163,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BLUE_CONCRETE_POWDER: Block = Block {
+    pub const BLUE_CONCRETE_POWDER: Self = Block {
         id: 737,
         name: "blue_concrete_powder",
         hardness: 0.5f32,
@@ -249206,7 +249219,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BROWN_CONCRETE_POWDER: Block = Block {
+    pub const BROWN_CONCRETE_POWDER: Self = Block {
         id: 738,
         name: "brown_concrete_powder",
         hardness: 0.5f32,
@@ -249262,7 +249275,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const GREEN_CONCRETE_POWDER: Block = Block {
+    pub const GREEN_CONCRETE_POWDER: Self = Block {
         id: 739,
         name: "green_concrete_powder",
         hardness: 0.5f32,
@@ -249318,7 +249331,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const RED_CONCRETE_POWDER: Block = Block {
+    pub const RED_CONCRETE_POWDER: Self = Block {
         id: 740,
         name: "red_concrete_powder",
         hardness: 0.5f32,
@@ -249374,7 +249387,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BLACK_CONCRETE_POWDER: Block = Block {
+    pub const BLACK_CONCRETE_POWDER: Self = Block {
         id: 741,
         name: "black_concrete_powder",
         hardness: 0.5f32,
@@ -249430,7 +249443,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const KELP: Block = Block {
+    pub const KELP: Self = Block {
         id: 742,
         name: "kelp",
         hardness: 0f32,
@@ -249813,7 +249826,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const KELP_PLANT: Block = Block {
+    pub const KELP_PLANT: Self = Block {
         id: 743,
         name: "kelp_plant",
         hardness: 0f32,
@@ -249869,7 +249882,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DRIED_KELP_BLOCK: Block = Block {
+    pub const DRIED_KELP_BLOCK: Self = Block {
         id: 744,
         name: "dried_kelp_block",
         hardness: 0.5f32,
@@ -249928,7 +249941,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const TURTLE_EGG: Block = Block {
+    pub const TURTLE_EGG: Self = Block {
         id: 745,
         name: "turtle_egg",
         hardness: 0.5f32,
@@ -250129,7 +250142,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SNIFFER_EGG: Block = Block {
+    pub const SNIFFER_EGG: Self = Block {
         id: 746,
         name: "sniffer_egg",
         hardness: 0.5f32,
@@ -250213,7 +250226,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DRIED_GHAST: Block = Block {
+    pub const DRIED_GHAST: Self = Block {
         id: 747,
         name: "dried_ghast",
         hardness: 0f32,
@@ -250674,7 +250687,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DEAD_TUBE_CORAL_BLOCK: Block = Block {
+    pub const DEAD_TUBE_CORAL_BLOCK: Self = Block {
         id: 748,
         name: "dead_tube_coral_block",
         hardness: 1.5f32,
@@ -250730,7 +250743,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DEAD_BRAIN_CORAL_BLOCK: Block = Block {
+    pub const DEAD_BRAIN_CORAL_BLOCK: Self = Block {
         id: 749,
         name: "dead_brain_coral_block",
         hardness: 1.5f32,
@@ -250786,7 +250799,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DEAD_BUBBLE_CORAL_BLOCK: Block = Block {
+    pub const DEAD_BUBBLE_CORAL_BLOCK: Self = Block {
         id: 750,
         name: "dead_bubble_coral_block",
         hardness: 1.5f32,
@@ -250842,7 +250855,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DEAD_FIRE_CORAL_BLOCK: Block = Block {
+    pub const DEAD_FIRE_CORAL_BLOCK: Self = Block {
         id: 751,
         name: "dead_fire_coral_block",
         hardness: 1.5f32,
@@ -250898,7 +250911,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DEAD_HORN_CORAL_BLOCK: Block = Block {
+    pub const DEAD_HORN_CORAL_BLOCK: Self = Block {
         id: 752,
         name: "dead_horn_coral_block",
         hardness: 1.5f32,
@@ -250954,7 +250967,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const TUBE_CORAL_BLOCK: Block = Block {
+    pub const TUBE_CORAL_BLOCK: Self = Block {
         id: 753,
         name: "tube_coral_block",
         hardness: 1.5f32,
@@ -251025,7 +251038,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BRAIN_CORAL_BLOCK: Block = Block {
+    pub const BRAIN_CORAL_BLOCK: Self = Block {
         id: 754,
         name: "brain_coral_block",
         hardness: 1.5f32,
@@ -251096,7 +251109,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BUBBLE_CORAL_BLOCK: Block = Block {
+    pub const BUBBLE_CORAL_BLOCK: Self = Block {
         id: 755,
         name: "bubble_coral_block",
         hardness: 1.5f32,
@@ -251167,7 +251180,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const FIRE_CORAL_BLOCK: Block = Block {
+    pub const FIRE_CORAL_BLOCK: Self = Block {
         id: 756,
         name: "fire_coral_block",
         hardness: 1.5f32,
@@ -251238,7 +251251,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const HORN_CORAL_BLOCK: Block = Block {
+    pub const HORN_CORAL_BLOCK: Self = Block {
         id: 757,
         name: "horn_coral_block",
         hardness: 1.5f32,
@@ -251309,7 +251322,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DEAD_TUBE_CORAL: Block = Block {
+    pub const DEAD_TUBE_CORAL: Self = Block {
         id: 758,
         name: "dead_tube_coral",
         hardness: 0f32,
@@ -251380,7 +251393,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DEAD_BRAIN_CORAL: Block = Block {
+    pub const DEAD_BRAIN_CORAL: Self = Block {
         id: 759,
         name: "dead_brain_coral",
         hardness: 0f32,
@@ -251451,7 +251464,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DEAD_BUBBLE_CORAL: Block = Block {
+    pub const DEAD_BUBBLE_CORAL: Self = Block {
         id: 760,
         name: "dead_bubble_coral",
         hardness: 0f32,
@@ -251522,7 +251535,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DEAD_FIRE_CORAL: Block = Block {
+    pub const DEAD_FIRE_CORAL: Self = Block {
         id: 761,
         name: "dead_fire_coral",
         hardness: 0f32,
@@ -251593,7 +251606,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DEAD_HORN_CORAL: Block = Block {
+    pub const DEAD_HORN_CORAL: Self = Block {
         id: 762,
         name: "dead_horn_coral",
         hardness: 0f32,
@@ -251664,7 +251677,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const TUBE_CORAL: Block = Block {
+    pub const TUBE_CORAL: Self = Block {
         id: 763,
         name: "tube_coral",
         hardness: 0f32,
@@ -251735,7 +251748,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BRAIN_CORAL: Block = Block {
+    pub const BRAIN_CORAL: Self = Block {
         id: 764,
         name: "brain_coral",
         hardness: 0f32,
@@ -251806,7 +251819,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BUBBLE_CORAL: Block = Block {
+    pub const BUBBLE_CORAL: Self = Block {
         id: 765,
         name: "bubble_coral",
         hardness: 0f32,
@@ -251877,7 +251890,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const FIRE_CORAL: Block = Block {
+    pub const FIRE_CORAL: Self = Block {
         id: 766,
         name: "fire_coral",
         hardness: 0f32,
@@ -251948,7 +251961,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const HORN_CORAL: Block = Block {
+    pub const HORN_CORAL: Self = Block {
         id: 767,
         name: "horn_coral",
         hardness: 0f32,
@@ -252019,7 +252032,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DEAD_TUBE_CORAL_FAN: Block = Block {
+    pub const DEAD_TUBE_CORAL_FAN: Self = Block {
         id: 768,
         name: "dead_tube_coral_fan",
         hardness: 0f32,
@@ -252090,7 +252103,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DEAD_BRAIN_CORAL_FAN: Block = Block {
+    pub const DEAD_BRAIN_CORAL_FAN: Self = Block {
         id: 769,
         name: "dead_brain_coral_fan",
         hardness: 0f32,
@@ -252161,7 +252174,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DEAD_BUBBLE_CORAL_FAN: Block = Block {
+    pub const DEAD_BUBBLE_CORAL_FAN: Self = Block {
         id: 770,
         name: "dead_bubble_coral_fan",
         hardness: 0f32,
@@ -252232,7 +252245,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DEAD_FIRE_CORAL_FAN: Block = Block {
+    pub const DEAD_FIRE_CORAL_FAN: Self = Block {
         id: 771,
         name: "dead_fire_coral_fan",
         hardness: 0f32,
@@ -252303,7 +252316,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DEAD_HORN_CORAL_FAN: Block = Block {
+    pub const DEAD_HORN_CORAL_FAN: Self = Block {
         id: 772,
         name: "dead_horn_coral_fan",
         hardness: 0f32,
@@ -252374,7 +252387,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const TUBE_CORAL_FAN: Block = Block {
+    pub const TUBE_CORAL_FAN: Self = Block {
         id: 773,
         name: "tube_coral_fan",
         hardness: 0f32,
@@ -252445,7 +252458,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BRAIN_CORAL_FAN: Block = Block {
+    pub const BRAIN_CORAL_FAN: Self = Block {
         id: 774,
         name: "brain_coral_fan",
         hardness: 0f32,
@@ -252516,7 +252529,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BUBBLE_CORAL_FAN: Block = Block {
+    pub const BUBBLE_CORAL_FAN: Self = Block {
         id: 775,
         name: "bubble_coral_fan",
         hardness: 0f32,
@@ -252587,7 +252600,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const FIRE_CORAL_FAN: Block = Block {
+    pub const FIRE_CORAL_FAN: Self = Block {
         id: 776,
         name: "fire_coral_fan",
         hardness: 0f32,
@@ -252658,7 +252671,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const HORN_CORAL_FAN: Block = Block {
+    pub const HORN_CORAL_FAN: Self = Block {
         id: 777,
         name: "horn_coral_fan",
         hardness: 0f32,
@@ -252729,7 +252742,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DEAD_TUBE_CORAL_WALL_FAN: Block = Block {
+    pub const DEAD_TUBE_CORAL_WALL_FAN: Self = Block {
         id: 778,
         name: "dead_tube_coral_wall_fan",
         hardness: 0f32,
@@ -252878,7 +252891,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DEAD_BRAIN_CORAL_WALL_FAN: Block = Block {
+    pub const DEAD_BRAIN_CORAL_WALL_FAN: Self = Block {
         id: 779,
         name: "dead_brain_coral_wall_fan",
         hardness: 0f32,
@@ -253027,7 +253040,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DEAD_BUBBLE_CORAL_WALL_FAN: Block = Block {
+    pub const DEAD_BUBBLE_CORAL_WALL_FAN: Self = Block {
         id: 780,
         name: "dead_bubble_coral_wall_fan",
         hardness: 0f32,
@@ -253176,7 +253189,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DEAD_FIRE_CORAL_WALL_FAN: Block = Block {
+    pub const DEAD_FIRE_CORAL_WALL_FAN: Self = Block {
         id: 781,
         name: "dead_fire_coral_wall_fan",
         hardness: 0f32,
@@ -253325,7 +253338,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DEAD_HORN_CORAL_WALL_FAN: Block = Block {
+    pub const DEAD_HORN_CORAL_WALL_FAN: Self = Block {
         id: 782,
         name: "dead_horn_coral_wall_fan",
         hardness: 0f32,
@@ -253474,7 +253487,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const TUBE_CORAL_WALL_FAN: Block = Block {
+    pub const TUBE_CORAL_WALL_FAN: Self = Block {
         id: 783,
         name: "tube_coral_wall_fan",
         hardness: 0f32,
@@ -253623,7 +253636,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BRAIN_CORAL_WALL_FAN: Block = Block {
+    pub const BRAIN_CORAL_WALL_FAN: Self = Block {
         id: 784,
         name: "brain_coral_wall_fan",
         hardness: 0f32,
@@ -253772,7 +253785,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BUBBLE_CORAL_WALL_FAN: Block = Block {
+    pub const BUBBLE_CORAL_WALL_FAN: Self = Block {
         id: 785,
         name: "bubble_coral_wall_fan",
         hardness: 0f32,
@@ -253921,7 +253934,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const FIRE_CORAL_WALL_FAN: Block = Block {
+    pub const FIRE_CORAL_WALL_FAN: Self = Block {
         id: 786,
         name: "fire_coral_wall_fan",
         hardness: 0f32,
@@ -254070,7 +254083,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const HORN_CORAL_WALL_FAN: Block = Block {
+    pub const HORN_CORAL_WALL_FAN: Self = Block {
         id: 787,
         name: "horn_coral_wall_fan",
         hardness: 0f32,
@@ -254219,7 +254232,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SEA_PICKLE: Block = Block {
+    pub const SEA_PICKLE: Self = Block {
         id: 788,
         name: "sea_pickle",
         hardness: 0f32,
@@ -254403,7 +254416,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BLUE_ICE: Block = Block {
+    pub const BLUE_ICE: Self = Block {
         id: 789,
         name: "blue_ice",
         hardness: 2.8f32,
@@ -254459,7 +254472,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CONDUIT: Block = Block {
+    pub const CONDUIT: Self = Block {
         id: 790,
         name: "conduit",
         hardness: 3f32,
@@ -254530,7 +254543,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BAMBOO_SAPLING: Block = Block {
+    pub const BAMBOO_SAPLING: Self = Block {
         id: 791,
         name: "bamboo_sapling",
         hardness: 1f32,
@@ -254586,7 +254599,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BAMBOO: Block = Block {
+    pub const BAMBOO: Self = Block {
         id: 792,
         name: "bamboo",
         hardness: 1f32,
@@ -254790,7 +254803,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POTTED_BAMBOO: Block = Block {
+    pub const POTTED_BAMBOO: Self = Block {
         id: 793,
         name: "potted_bamboo",
         hardness: 0f32,
@@ -254861,7 +254874,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const VOID_AIR: Block = Block {
+    pub const VOID_AIR: Self = Block {
         id: 794,
         name: "void_air",
         hardness: 0f32,
@@ -254901,7 +254914,7 @@ impl Block {
         loot_table: None,
         experience: None,
     };
-    pub const CAVE_AIR: Block = Block {
+    pub const CAVE_AIR: Self = Block {
         id: 795,
         name: "cave_air",
         hardness: 0f32,
@@ -254941,7 +254954,7 @@ impl Block {
         loot_table: None,
         experience: None,
     };
-    pub const BUBBLE_COLUMN: Block = Block {
+    pub const BUBBLE_COLUMN: Self = Block {
         id: 796,
         name: "bubble_column",
         hardness: 0f32,
@@ -254996,7 +255009,7 @@ impl Block {
         loot_table: None,
         experience: None,
     };
-    pub const POLISHED_GRANITE_STAIRS: Block = Block {
+    pub const POLISHED_GRANITE_STAIRS: Self = Block {
         id: 797,
         name: "polished_granite_stairs",
         hardness: 1.5f32,
@@ -256081,7 +256094,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SMOOTH_RED_SANDSTONE_STAIRS: Block = Block {
+    pub const SMOOTH_RED_SANDSTONE_STAIRS: Self = Block {
         id: 798,
         name: "smooth_red_sandstone_stairs",
         hardness: 2f32,
@@ -257166,7 +257179,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MOSSY_STONE_BRICK_STAIRS: Block = Block {
+    pub const MOSSY_STONE_BRICK_STAIRS: Self = Block {
         id: 799,
         name: "mossy_stone_brick_stairs",
         hardness: 1.5f32,
@@ -258251,7 +258264,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POLISHED_DIORITE_STAIRS: Block = Block {
+    pub const POLISHED_DIORITE_STAIRS: Self = Block {
         id: 800,
         name: "polished_diorite_stairs",
         hardness: 1.5f32,
@@ -259336,7 +259349,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MOSSY_COBBLESTONE_STAIRS: Block = Block {
+    pub const MOSSY_COBBLESTONE_STAIRS: Self = Block {
         id: 801,
         name: "mossy_cobblestone_stairs",
         hardness: 2f32,
@@ -260421,7 +260434,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const END_STONE_BRICK_STAIRS: Block = Block {
+    pub const END_STONE_BRICK_STAIRS: Self = Block {
         id: 802,
         name: "end_stone_brick_stairs",
         hardness: 3f32,
@@ -261506,7 +261519,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const STONE_STAIRS: Block = Block {
+    pub const STONE_STAIRS: Self = Block {
         id: 803,
         name: "stone_stairs",
         hardness: 1.5f32,
@@ -262591,7 +262604,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SMOOTH_SANDSTONE_STAIRS: Block = Block {
+    pub const SMOOTH_SANDSTONE_STAIRS: Self = Block {
         id: 804,
         name: "smooth_sandstone_stairs",
         hardness: 2f32,
@@ -263676,7 +263689,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SMOOTH_QUARTZ_STAIRS: Block = Block {
+    pub const SMOOTH_QUARTZ_STAIRS: Self = Block {
         id: 805,
         name: "smooth_quartz_stairs",
         hardness: 2f32,
@@ -264761,7 +264774,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const GRANITE_STAIRS: Block = Block {
+    pub const GRANITE_STAIRS: Self = Block {
         id: 806,
         name: "granite_stairs",
         hardness: 1.5f32,
@@ -265846,7 +265859,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const ANDESITE_STAIRS: Block = Block {
+    pub const ANDESITE_STAIRS: Self = Block {
         id: 807,
         name: "andesite_stairs",
         hardness: 1.5f32,
@@ -266931,7 +266944,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const RED_NETHER_BRICK_STAIRS: Block = Block {
+    pub const RED_NETHER_BRICK_STAIRS: Self = Block {
         id: 808,
         name: "red_nether_brick_stairs",
         hardness: 2f32,
@@ -268016,7 +268029,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POLISHED_ANDESITE_STAIRS: Block = Block {
+    pub const POLISHED_ANDESITE_STAIRS: Self = Block {
         id: 809,
         name: "polished_andesite_stairs",
         hardness: 1.5f32,
@@ -269101,7 +269114,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DIORITE_STAIRS: Block = Block {
+    pub const DIORITE_STAIRS: Self = Block {
         id: 810,
         name: "diorite_stairs",
         hardness: 1.5f32,
@@ -270186,7 +270199,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POLISHED_GRANITE_SLAB: Block = Block {
+    pub const POLISHED_GRANITE_SLAB: Self = Block {
         id: 811,
         name: "polished_granite_slab",
         hardness: 1.5f32,
@@ -270324,7 +270337,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SMOOTH_RED_SANDSTONE_SLAB: Block = Block {
+    pub const SMOOTH_RED_SANDSTONE_SLAB: Self = Block {
         id: 812,
         name: "smooth_red_sandstone_slab",
         hardness: 2f32,
@@ -270462,7 +270475,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MOSSY_STONE_BRICK_SLAB: Block = Block {
+    pub const MOSSY_STONE_BRICK_SLAB: Self = Block {
         id: 813,
         name: "mossy_stone_brick_slab",
         hardness: 1.5f32,
@@ -270600,7 +270613,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POLISHED_DIORITE_SLAB: Block = Block {
+    pub const POLISHED_DIORITE_SLAB: Self = Block {
         id: 814,
         name: "polished_diorite_slab",
         hardness: 1.5f32,
@@ -270738,7 +270751,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MOSSY_COBBLESTONE_SLAB: Block = Block {
+    pub const MOSSY_COBBLESTONE_SLAB: Self = Block {
         id: 815,
         name: "mossy_cobblestone_slab",
         hardness: 2f32,
@@ -270876,7 +270889,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const END_STONE_BRICK_SLAB: Block = Block {
+    pub const END_STONE_BRICK_SLAB: Self = Block {
         id: 816,
         name: "end_stone_brick_slab",
         hardness: 3f32,
@@ -271014,7 +271027,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SMOOTH_SANDSTONE_SLAB: Block = Block {
+    pub const SMOOTH_SANDSTONE_SLAB: Self = Block {
         id: 817,
         name: "smooth_sandstone_slab",
         hardness: 2f32,
@@ -271152,7 +271165,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SMOOTH_QUARTZ_SLAB: Block = Block {
+    pub const SMOOTH_QUARTZ_SLAB: Self = Block {
         id: 818,
         name: "smooth_quartz_slab",
         hardness: 2f32,
@@ -271290,7 +271303,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const GRANITE_SLAB: Block = Block {
+    pub const GRANITE_SLAB: Self = Block {
         id: 819,
         name: "granite_slab",
         hardness: 1.5f32,
@@ -271428,7 +271441,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const ANDESITE_SLAB: Block = Block {
+    pub const ANDESITE_SLAB: Self = Block {
         id: 820,
         name: "andesite_slab",
         hardness: 1.5f32,
@@ -271566,7 +271579,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const RED_NETHER_BRICK_SLAB: Block = Block {
+    pub const RED_NETHER_BRICK_SLAB: Self = Block {
         id: 821,
         name: "red_nether_brick_slab",
         hardness: 2f32,
@@ -271704,7 +271717,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POLISHED_ANDESITE_SLAB: Block = Block {
+    pub const POLISHED_ANDESITE_SLAB: Self = Block {
         id: 822,
         name: "polished_andesite_slab",
         hardness: 1.5f32,
@@ -271842,7 +271855,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DIORITE_SLAB: Block = Block {
+    pub const DIORITE_SLAB: Self = Block {
         id: 823,
         name: "diorite_slab",
         hardness: 1.5f32,
@@ -271980,7 +271993,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BRICK_WALL: Block = Block {
+    pub const BRICK_WALL: Self = Block {
         id: 824,
         name: "brick_wall",
         hardness: 2f32,
@@ -276237,7 +276250,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PRISMARINE_WALL: Block = Block {
+    pub const PRISMARINE_WALL: Self = Block {
         id: 825,
         name: "prismarine_wall",
         hardness: 1.5f32,
@@ -280494,7 +280507,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const RED_SANDSTONE_WALL: Block = Block {
+    pub const RED_SANDSTONE_WALL: Self = Block {
         id: 826,
         name: "red_sandstone_wall",
         hardness: 0.8f32,
@@ -284751,7 +284764,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MOSSY_STONE_BRICK_WALL: Block = Block {
+    pub const MOSSY_STONE_BRICK_WALL: Self = Block {
         id: 827,
         name: "mossy_stone_brick_wall",
         hardness: 1.5f32,
@@ -289008,7 +289021,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const GRANITE_WALL: Block = Block {
+    pub const GRANITE_WALL: Self = Block {
         id: 828,
         name: "granite_wall",
         hardness: 1.5f32,
@@ -293265,7 +293278,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const STONE_BRICK_WALL: Block = Block {
+    pub const STONE_BRICK_WALL: Self = Block {
         id: 829,
         name: "stone_brick_wall",
         hardness: 1.5f32,
@@ -297522,7 +297535,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MUD_BRICK_WALL: Block = Block {
+    pub const MUD_BRICK_WALL: Self = Block {
         id: 830,
         name: "mud_brick_wall",
         hardness: 1.5f32,
@@ -301779,7 +301792,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const NETHER_BRICK_WALL: Block = Block {
+    pub const NETHER_BRICK_WALL: Self = Block {
         id: 831,
         name: "nether_brick_wall",
         hardness: 2f32,
@@ -306036,7 +306049,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const ANDESITE_WALL: Block = Block {
+    pub const ANDESITE_WALL: Self = Block {
         id: 832,
         name: "andesite_wall",
         hardness: 1.5f32,
@@ -310293,7 +310306,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const RED_NETHER_BRICK_WALL: Block = Block {
+    pub const RED_NETHER_BRICK_WALL: Self = Block {
         id: 833,
         name: "red_nether_brick_wall",
         hardness: 2f32,
@@ -314550,7 +314563,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SANDSTONE_WALL: Block = Block {
+    pub const SANDSTONE_WALL: Self = Block {
         id: 834,
         name: "sandstone_wall",
         hardness: 0.8f32,
@@ -318807,7 +318820,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const END_STONE_BRICK_WALL: Block = Block {
+    pub const END_STONE_BRICK_WALL: Self = Block {
         id: 835,
         name: "end_stone_brick_wall",
         hardness: 3f32,
@@ -323064,7 +323077,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DIORITE_WALL: Block = Block {
+    pub const DIORITE_WALL: Self = Block {
         id: 836,
         name: "diorite_wall",
         hardness: 1.5f32,
@@ -327321,7 +327334,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SCAFFOLDING: Block = Block {
+    pub const SCAFFOLDING: Self = Block {
         id: 837,
         name: "scaffolding",
         hardness: 0f32,
@@ -327785,7 +327798,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LOOM: Block = Block {
+    pub const LOOM: Self = Block {
         id: 838,
         name: "loom",
         hardness: 2.5f32,
@@ -327882,7 +327895,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BARREL: Block = Block {
+    pub const BARREL: Self = Block {
         id: 839,
         name: "barrel",
         hardness: 2.5f32,
@@ -328089,7 +328102,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SMOKER: Block = Block {
+    pub const SMOKER: Self = Block {
         id: 840,
         name: "smoker",
         hardness: 3.5f32,
@@ -328244,7 +328257,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BLAST_FURNACE: Block = Block {
+    pub const BLAST_FURNACE: Self = Block {
         id: 841,
         name: "blast_furnace",
         hardness: 3.5f32,
@@ -328399,7 +328412,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CARTOGRAPHY_TABLE: Block = Block {
+    pub const CARTOGRAPHY_TABLE: Self = Block {
         id: 842,
         name: "cartography_table",
         hardness: 2.5f32,
@@ -328455,7 +328468,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const FLETCHING_TABLE: Block = Block {
+    pub const FLETCHING_TABLE: Self = Block {
         id: 843,
         name: "fletching_table",
         hardness: 2.5f32,
@@ -328511,7 +328524,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const GRINDSTONE: Block = Block {
+    pub const GRINDSTONE: Self = Block {
         id: 844,
         name: "grindstone",
         hardness: 2f32,
@@ -328712,7 +328725,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LECTERN: Block = Block {
+    pub const LECTERN: Self = Block {
         id: 845,
         name: "lectern",
         hardness: 2.5f32,
@@ -328968,7 +328981,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SMITHING_TABLE: Block = Block {
+    pub const SMITHING_TABLE: Self = Block {
         id: 846,
         name: "smithing_table",
         hardness: 2.5f32,
@@ -329024,7 +329037,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const STONECUTTER: Block = Block {
+    pub const STONECUTTER: Self = Block {
         id: 847,
         name: "stonecutter",
         hardness: 3.5f32,
@@ -329121,7 +329134,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BELL: Block = Block {
+    pub const BELL: Self = Block {
         id: 848,
         name: "bell",
         hardness: 5f32,
@@ -329582,7 +329595,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LANTERN: Block = Block {
+    pub const LANTERN: Self = Block {
         id: 849,
         name: "lantern",
         hardness: 3.5f32,
@@ -329679,7 +329692,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SOUL_LANTERN: Block = Block {
+    pub const SOUL_LANTERN: Self = Block {
         id: 850,
         name: "soul_lantern",
         hardness: 3.5f32,
@@ -329776,7 +329789,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const COPPER_LANTERN: Block = Block {
+    pub const COPPER_LANTERN: Self = Block {
         id: 851,
         name: "copper_lantern",
         hardness: 3.5f32,
@@ -329873,7 +329886,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const EXPOSED_COPPER_LANTERN: Block = Block {
+    pub const EXPOSED_COPPER_LANTERN: Self = Block {
         id: 852,
         name: "exposed_copper_lantern",
         hardness: 3.5f32,
@@ -329970,7 +329983,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WEATHERED_COPPER_LANTERN: Block = Block {
+    pub const WEATHERED_COPPER_LANTERN: Self = Block {
         id: 853,
         name: "weathered_copper_lantern",
         hardness: 3.5f32,
@@ -330067,7 +330080,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const OXIDIZED_COPPER_LANTERN: Block = Block {
+    pub const OXIDIZED_COPPER_LANTERN: Self = Block {
         id: 854,
         name: "oxidized_copper_lantern",
         hardness: 3.5f32,
@@ -330164,7 +330177,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_COPPER_LANTERN: Block = Block {
+    pub const WAXED_COPPER_LANTERN: Self = Block {
         id: 855,
         name: "waxed_copper_lantern",
         hardness: 3.5f32,
@@ -330261,7 +330274,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_EXPOSED_COPPER_LANTERN: Block = Block {
+    pub const WAXED_EXPOSED_COPPER_LANTERN: Self = Block {
         id: 856,
         name: "waxed_exposed_copper_lantern",
         hardness: 3.5f32,
@@ -330358,7 +330371,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_WEATHERED_COPPER_LANTERN: Block = Block {
+    pub const WAXED_WEATHERED_COPPER_LANTERN: Self = Block {
         id: 857,
         name: "waxed_weathered_copper_lantern",
         hardness: 3.5f32,
@@ -330455,7 +330468,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_OXIDIZED_COPPER_LANTERN: Block = Block {
+    pub const WAXED_OXIDIZED_COPPER_LANTERN: Self = Block {
         id: 858,
         name: "waxed_oxidized_copper_lantern",
         hardness: 3.5f32,
@@ -330552,7 +330565,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CAMPFIRE: Block = Block {
+    pub const CAMPFIRE: Self = Block {
         id: 859,
         name: "campfire",
         hardness: 2f32,
@@ -331034,7 +331047,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SOUL_CAMPFIRE: Block = Block {
+    pub const SOUL_CAMPFIRE: Self = Block {
         id: 860,
         name: "soul_campfire",
         hardness: 2f32,
@@ -331516,7 +331529,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SWEET_BERRY_BUSH: Block = Block {
+    pub const SWEET_BERRY_BUSH: Self = Block {
         id: 861,
         name: "sweet_berry_bush",
         hardness: 0f32,
@@ -331679,7 +331692,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WARPED_STEM: Block = Block {
+    pub const WARPED_STEM: Self = Block {
         id: 862,
         name: "warped_stem",
         hardness: 2f32,
@@ -331763,7 +331776,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const STRIPPED_WARPED_STEM: Block = Block {
+    pub const STRIPPED_WARPED_STEM: Self = Block {
         id: 863,
         name: "stripped_warped_stem",
         hardness: 2f32,
@@ -331847,7 +331860,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WARPED_HYPHAE: Block = Block {
+    pub const WARPED_HYPHAE: Self = Block {
         id: 864,
         name: "warped_hyphae",
         hardness: 2f32,
@@ -331931,7 +331944,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const STRIPPED_WARPED_HYPHAE: Block = Block {
+    pub const STRIPPED_WARPED_HYPHAE: Self = Block {
         id: 865,
         name: "stripped_warped_hyphae",
         hardness: 2f32,
@@ -332015,7 +332028,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WARPED_NYLIUM: Block = Block {
+    pub const WARPED_NYLIUM: Self = Block {
         id: 866,
         name: "warped_nylium",
         hardness: 0.4f32,
@@ -332086,7 +332099,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WARPED_FUNGUS: Block = Block {
+    pub const WARPED_FUNGUS: Self = Block {
         id: 867,
         name: "warped_fungus",
         hardness: 0f32,
@@ -332142,7 +332155,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WARPED_WART_BLOCK: Block = Block {
+    pub const WARPED_WART_BLOCK: Self = Block {
         id: 868,
         name: "warped_wart_block",
         hardness: 1f32,
@@ -332198,7 +332211,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WARPED_ROOTS: Block = Block {
+    pub const WARPED_ROOTS: Self = Block {
         id: 869,
         name: "warped_roots",
         hardness: 0f32,
@@ -332254,7 +332267,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const NETHER_SPROUTS: Block = Block {
+    pub const NETHER_SPROUTS: Self = Block {
         id: 870,
         name: "nether_sprouts",
         hardness: 0f32,
@@ -332310,7 +332323,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CRIMSON_STEM: Block = Block {
+    pub const CRIMSON_STEM: Self = Block {
         id: 871,
         name: "crimson_stem",
         hardness: 2f32,
@@ -332394,7 +332407,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const STRIPPED_CRIMSON_STEM: Block = Block {
+    pub const STRIPPED_CRIMSON_STEM: Self = Block {
         id: 872,
         name: "stripped_crimson_stem",
         hardness: 2f32,
@@ -332478,7 +332491,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CRIMSON_HYPHAE: Block = Block {
+    pub const CRIMSON_HYPHAE: Self = Block {
         id: 873,
         name: "crimson_hyphae",
         hardness: 2f32,
@@ -332562,7 +332575,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const STRIPPED_CRIMSON_HYPHAE: Block = Block {
+    pub const STRIPPED_CRIMSON_HYPHAE: Self = Block {
         id: 874,
         name: "stripped_crimson_hyphae",
         hardness: 2f32,
@@ -332646,7 +332659,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CRIMSON_NYLIUM: Block = Block {
+    pub const CRIMSON_NYLIUM: Self = Block {
         id: 875,
         name: "crimson_nylium",
         hardness: 0.4f32,
@@ -332717,7 +332730,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CRIMSON_FUNGUS: Block = Block {
+    pub const CRIMSON_FUNGUS: Self = Block {
         id: 876,
         name: "crimson_fungus",
         hardness: 0f32,
@@ -332773,7 +332786,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SHROOMLIGHT: Block = Block {
+    pub const SHROOMLIGHT: Self = Block {
         id: 877,
         name: "shroomlight",
         hardness: 1f32,
@@ -332829,7 +332842,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WEEPING_VINES: Block = Block {
+    pub const WEEPING_VINES: Self = Block {
         id: 878,
         name: "weeping_vines",
         hardness: 0f32,
@@ -333227,7 +333240,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WEEPING_VINES_PLANT: Block = Block {
+    pub const WEEPING_VINES_PLANT: Self = Block {
         id: 879,
         name: "weeping_vines_plant",
         hardness: 0f32,
@@ -333298,7 +333311,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const TWISTING_VINES: Block = Block {
+    pub const TWISTING_VINES: Self = Block {
         id: 880,
         name: "twisting_vines",
         hardness: 0f32,
@@ -333696,7 +333709,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const TWISTING_VINES_PLANT: Block = Block {
+    pub const TWISTING_VINES_PLANT: Self = Block {
         id: 881,
         name: "twisting_vines_plant",
         hardness: 0f32,
@@ -333767,7 +333780,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CRIMSON_ROOTS: Block = Block {
+    pub const CRIMSON_ROOTS: Self = Block {
         id: 882,
         name: "crimson_roots",
         hardness: 0f32,
@@ -333823,7 +333836,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CRIMSON_PLANKS: Block = Block {
+    pub const CRIMSON_PLANKS: Self = Block {
         id: 883,
         name: "crimson_planks",
         hardness: 2f32,
@@ -333879,7 +333892,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WARPED_PLANKS: Block = Block {
+    pub const WARPED_PLANKS: Self = Block {
         id: 884,
         name: "warped_planks",
         hardness: 2f32,
@@ -333935,7 +333948,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CRIMSON_SLAB: Block = Block {
+    pub const CRIMSON_SLAB: Self = Block {
         id: 885,
         name: "crimson_slab",
         hardness: 2f32,
@@ -334073,7 +334086,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WARPED_SLAB: Block = Block {
+    pub const WARPED_SLAB: Self = Block {
         id: 886,
         name: "warped_slab",
         hardness: 2f32,
@@ -334211,7 +334224,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CRIMSON_PRESSURE_PLATE: Block = Block {
+    pub const CRIMSON_PRESSURE_PLATE: Self = Block {
         id: 887,
         name: "crimson_pressure_plate",
         hardness: 0.5f32,
@@ -334282,7 +334295,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WARPED_PRESSURE_PLATE: Block = Block {
+    pub const WARPED_PRESSURE_PLATE: Self = Block {
         id: 888,
         name: "warped_pressure_plate",
         hardness: 0.5f32,
@@ -334353,7 +334366,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CRIMSON_FENCE: Block = Block {
+    pub const CRIMSON_FENCE: Self = Block {
         id: 889,
         name: "crimson_fence",
         hardness: 2f32,
@@ -334814,7 +334827,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WARPED_FENCE: Block = Block {
+    pub const WARPED_FENCE: Self = Block {
         id: 890,
         name: "warped_fence",
         hardness: 2f32,
@@ -335275,7 +335288,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CRIMSON_TRAPDOOR: Block = Block {
+    pub const CRIMSON_TRAPDOOR: Self = Block {
         id: 891,
         name: "crimson_trapdoor",
         hardness: 3f32,
@@ -336152,7 +336165,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WARPED_TRAPDOOR: Block = Block {
+    pub const WARPED_TRAPDOOR: Self = Block {
         id: 892,
         name: "warped_trapdoor",
         hardness: 3f32,
@@ -337029,7 +337042,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CRIMSON_FENCE_GATE: Block = Block {
+    pub const CRIMSON_FENCE_GATE: Self = Block {
         id: 893,
         name: "crimson_fence_gate",
         hardness: 2f32,
@@ -337490,7 +337503,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WARPED_FENCE_GATE: Block = Block {
+    pub const WARPED_FENCE_GATE: Self = Block {
         id: 894,
         name: "warped_fence_gate",
         hardness: 2f32,
@@ -337951,7 +337964,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CRIMSON_STAIRS: Block = Block {
+    pub const CRIMSON_STAIRS: Self = Block {
         id: 895,
         name: "crimson_stairs",
         hardness: 2f32,
@@ -339036,7 +339049,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WARPED_STAIRS: Block = Block {
+    pub const WARPED_STAIRS: Self = Block {
         id: 896,
         name: "warped_stairs",
         hardness: 2f32,
@@ -340121,7 +340134,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CRIMSON_BUTTON: Block = Block {
+    pub const CRIMSON_BUTTON: Self = Block {
         id: 897,
         name: "crimson_button",
         hardness: 0.5f32,
@@ -340478,7 +340491,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WARPED_BUTTON: Block = Block {
+    pub const WARPED_BUTTON: Self = Block {
         id: 898,
         name: "warped_button",
         hardness: 0.5f32,
@@ -340835,7 +340848,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CRIMSON_DOOR: Block = Block {
+    pub const CRIMSON_DOOR: Self = Block {
         id: 899,
         name: "crimson_door",
         hardness: 3f32,
@@ -341715,7 +341728,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WARPED_DOOR: Block = Block {
+    pub const WARPED_DOOR: Self = Block {
         id: 900,
         name: "warped_door",
         hardness: 3f32,
@@ -342595,7 +342608,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CRIMSON_SIGN: Block = Block {
+    pub const CRIMSON_SIGN: Self = Block {
         id: 901,
         name: "crimson_sign",
         hardness: 1f32,
@@ -343056,7 +343069,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WARPED_SIGN: Block = Block {
+    pub const WARPED_SIGN: Self = Block {
         id: 902,
         name: "warped_sign",
         hardness: 1f32,
@@ -343517,7 +343530,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CRIMSON_WALL_SIGN: Block = Block {
+    pub const CRIMSON_WALL_SIGN: Self = Block {
         id: 903,
         name: "crimson_wall_sign",
         hardness: 1f32,
@@ -343666,7 +343679,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WARPED_WALL_SIGN: Block = Block {
+    pub const WARPED_WALL_SIGN: Self = Block {
         id: 904,
         name: "warped_wall_sign",
         hardness: 1f32,
@@ -343815,7 +343828,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const STRUCTURE_BLOCK: Block = Block {
+    pub const STRUCTURE_BLOCK: Self = Block {
         id: 905,
         name: "structure_block",
         hardness: -1f32,
@@ -343896,7 +343909,7 @@ impl Block {
         loot_table: None,
         experience: None,
     };
-    pub const JIGSAW: Block = Block {
+    pub const JIGSAW: Self = Block {
         id: 906,
         name: "jigsaw",
         hardness: -1f32,
@@ -344081,7 +344094,7 @@ impl Block {
         loot_table: None,
         experience: None,
     };
-    pub const TEST_BLOCK: Block = Block {
+    pub const TEST_BLOCK: Self = Block {
         id: 907,
         name: "test_block",
         hardness: -1f32,
@@ -344162,7 +344175,7 @@ impl Block {
         loot_table: None,
         experience: None,
     };
-    pub const TEST_INSTANCE_BLOCK: Block = Block {
+    pub const TEST_INSTANCE_BLOCK: Self = Block {
         id: 908,
         name: "test_instance_block",
         hardness: -1f32,
@@ -344202,7 +344215,7 @@ impl Block {
         loot_table: None,
         experience: None,
     };
-    pub const COMPOSTER: Block = Block {
+    pub const COMPOSTER: Self = Block {
         id: 909,
         name: "composter",
         hardness: 0.6f32,
@@ -344388,7 +344401,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const TARGET: Block = Block {
+    pub const TARGET: Self = Block {
         id: 910,
         name: "target",
         hardness: 0.5f32,
@@ -344644,7 +344657,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BEE_NEST: Block = Block {
+    pub const BEE_NEST: Self = Block {
         id: 911,
         name: "bee_nest",
         hardness: 0.3f32,
@@ -345019,7 +345032,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BEEHIVE: Block = Block {
+    pub const BEEHIVE: Self = Block {
         id: 912,
         name: "beehive",
         hardness: 0.6f32,
@@ -345409,7 +345422,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const HONEY_BLOCK: Block = Block {
+    pub const HONEY_BLOCK: Self = Block {
         id: 913,
         name: "honey_block",
         hardness: 0f32,
@@ -345465,7 +345478,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const HONEYCOMB_BLOCK: Block = Block {
+    pub const HONEYCOMB_BLOCK: Self = Block {
         id: 914,
         name: "honeycomb_block",
         hardness: 0.6f32,
@@ -345521,7 +345534,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const NETHERITE_BLOCK: Block = Block {
+    pub const NETHERITE_BLOCK: Self = Block {
         id: 915,
         name: "netherite_block",
         hardness: 50f32,
@@ -345577,7 +345590,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const ANCIENT_DEBRIS: Block = Block {
+    pub const ANCIENT_DEBRIS: Self = Block {
         id: 916,
         name: "ancient_debris",
         hardness: 30f32,
@@ -345633,7 +345646,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CRYING_OBSIDIAN: Block = Block {
+    pub const CRYING_OBSIDIAN: Self = Block {
         id: 917,
         name: "crying_obsidian",
         hardness: 50f32,
@@ -345689,7 +345702,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const RESPAWN_ANCHOR: Block = Block {
+    pub const RESPAWN_ANCHOR: Self = Block {
         id: 918,
         name: "respawn_anchor",
         hardness: 50f32,
@@ -345799,7 +345812,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POTTED_CRIMSON_FUNGUS: Block = Block {
+    pub const POTTED_CRIMSON_FUNGUS: Self = Block {
         id: 919,
         name: "potted_crimson_fungus",
         hardness: 0f32,
@@ -345870,7 +345883,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POTTED_WARPED_FUNGUS: Block = Block {
+    pub const POTTED_WARPED_FUNGUS: Self = Block {
         id: 920,
         name: "potted_warped_fungus",
         hardness: 0f32,
@@ -345941,7 +345954,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POTTED_CRIMSON_ROOTS: Block = Block {
+    pub const POTTED_CRIMSON_ROOTS: Self = Block {
         id: 921,
         name: "potted_crimson_roots",
         hardness: 0f32,
@@ -346012,7 +346025,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POTTED_WARPED_ROOTS: Block = Block {
+    pub const POTTED_WARPED_ROOTS: Self = Block {
         id: 922,
         name: "potted_warped_roots",
         hardness: 0f32,
@@ -346083,7 +346096,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LODESTONE: Block = Block {
+    pub const LODESTONE: Self = Block {
         id: 923,
         name: "lodestone",
         hardness: 3.5f32,
@@ -346139,7 +346152,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BLACKSTONE: Block = Block {
+    pub const BLACKSTONE: Self = Block {
         id: 924,
         name: "blackstone",
         hardness: 1.5f32,
@@ -346195,7 +346208,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BLACKSTONE_STAIRS: Block = Block {
+    pub const BLACKSTONE_STAIRS: Self = Block {
         id: 925,
         name: "blackstone_stairs",
         hardness: 1.5f32,
@@ -347280,7 +347293,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BLACKSTONE_WALL: Block = Block {
+    pub const BLACKSTONE_WALL: Self = Block {
         id: 926,
         name: "blackstone_wall",
         hardness: 1.5f32,
@@ -351537,7 +351550,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BLACKSTONE_SLAB: Block = Block {
+    pub const BLACKSTONE_SLAB: Self = Block {
         id: 927,
         name: "blackstone_slab",
         hardness: 2f32,
@@ -351675,7 +351688,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POLISHED_BLACKSTONE: Block = Block {
+    pub const POLISHED_BLACKSTONE: Self = Block {
         id: 928,
         name: "polished_blackstone",
         hardness: 2f32,
@@ -351731,7 +351744,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POLISHED_BLACKSTONE_BRICKS: Block = Block {
+    pub const POLISHED_BLACKSTONE_BRICKS: Self = Block {
         id: 929,
         name: "polished_blackstone_bricks",
         hardness: 1.5f32,
@@ -351787,7 +351800,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CRACKED_POLISHED_BLACKSTONE_BRICKS: Block = Block {
+    pub const CRACKED_POLISHED_BLACKSTONE_BRICKS: Self = Block {
         id: 930,
         name: "cracked_polished_blackstone_bricks",
         hardness: 1.5f32,
@@ -351843,7 +351856,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CHISELED_POLISHED_BLACKSTONE: Block = Block {
+    pub const CHISELED_POLISHED_BLACKSTONE: Self = Block {
         id: 931,
         name: "chiseled_polished_blackstone",
         hardness: 1.5f32,
@@ -351899,7 +351912,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POLISHED_BLACKSTONE_BRICK_SLAB: Block = Block {
+    pub const POLISHED_BLACKSTONE_BRICK_SLAB: Self = Block {
         id: 932,
         name: "polished_blackstone_brick_slab",
         hardness: 2f32,
@@ -352037,7 +352050,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POLISHED_BLACKSTONE_BRICK_STAIRS: Block = Block {
+    pub const POLISHED_BLACKSTONE_BRICK_STAIRS: Self = Block {
         id: 933,
         name: "polished_blackstone_brick_stairs",
         hardness: 1.5f32,
@@ -353122,7 +353135,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POLISHED_BLACKSTONE_BRICK_WALL: Block = Block {
+    pub const POLISHED_BLACKSTONE_BRICK_WALL: Self = Block {
         id: 934,
         name: "polished_blackstone_brick_wall",
         hardness: 1.5f32,
@@ -357379,7 +357392,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const GILDED_BLACKSTONE: Block = Block {
+    pub const GILDED_BLACKSTONE: Self = Block {
         id: 935,
         name: "gilded_blackstone",
         hardness: 1.5f32,
@@ -357474,7 +357487,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POLISHED_BLACKSTONE_STAIRS: Block = Block {
+    pub const POLISHED_BLACKSTONE_STAIRS: Self = Block {
         id: 936,
         name: "polished_blackstone_stairs",
         hardness: 2f32,
@@ -358559,7 +358572,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POLISHED_BLACKSTONE_SLAB: Block = Block {
+    pub const POLISHED_BLACKSTONE_SLAB: Self = Block {
         id: 937,
         name: "polished_blackstone_slab",
         hardness: 2f32,
@@ -358697,7 +358710,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POLISHED_BLACKSTONE_PRESSURE_PLATE: Block = Block {
+    pub const POLISHED_BLACKSTONE_PRESSURE_PLATE: Self = Block {
         id: 938,
         name: "polished_blackstone_pressure_plate",
         hardness: 0.5f32,
@@ -358768,7 +358781,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POLISHED_BLACKSTONE_BUTTON: Block = Block {
+    pub const POLISHED_BLACKSTONE_BUTTON: Self = Block {
         id: 939,
         name: "polished_blackstone_button",
         hardness: 0.5f32,
@@ -359125,7 +359138,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POLISHED_BLACKSTONE_WALL: Block = Block {
+    pub const POLISHED_BLACKSTONE_WALL: Self = Block {
         id: 940,
         name: "polished_blackstone_wall",
         hardness: 2f32,
@@ -363382,7 +363395,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CHISELED_NETHER_BRICKS: Block = Block {
+    pub const CHISELED_NETHER_BRICKS: Self = Block {
         id: 941,
         name: "chiseled_nether_bricks",
         hardness: 2f32,
@@ -363438,7 +363451,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CRACKED_NETHER_BRICKS: Block = Block {
+    pub const CRACKED_NETHER_BRICKS: Self = Block {
         id: 942,
         name: "cracked_nether_bricks",
         hardness: 2f32,
@@ -363494,7 +363507,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const QUARTZ_BRICKS: Block = Block {
+    pub const QUARTZ_BRICKS: Self = Block {
         id: 943,
         name: "quartz_bricks",
         hardness: 0.8f32,
@@ -363550,7 +363563,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CANDLE: Block = Block {
+    pub const CANDLE: Self = Block {
         id: 944,
         name: "candle",
         hardness: 0.1f32,
@@ -363838,7 +363851,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WHITE_CANDLE: Block = Block {
+    pub const WHITE_CANDLE: Self = Block {
         id: 945,
         name: "white_candle",
         hardness: 0.1f32,
@@ -364126,7 +364139,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const ORANGE_CANDLE: Block = Block {
+    pub const ORANGE_CANDLE: Self = Block {
         id: 946,
         name: "orange_candle",
         hardness: 0.1f32,
@@ -364414,7 +364427,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MAGENTA_CANDLE: Block = Block {
+    pub const MAGENTA_CANDLE: Self = Block {
         id: 947,
         name: "magenta_candle",
         hardness: 0.1f32,
@@ -364702,7 +364715,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LIGHT_BLUE_CANDLE: Block = Block {
+    pub const LIGHT_BLUE_CANDLE: Self = Block {
         id: 948,
         name: "light_blue_candle",
         hardness: 0.1f32,
@@ -364990,7 +365003,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const YELLOW_CANDLE: Block = Block {
+    pub const YELLOW_CANDLE: Self = Block {
         id: 949,
         name: "yellow_candle",
         hardness: 0.1f32,
@@ -365278,7 +365291,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LIME_CANDLE: Block = Block {
+    pub const LIME_CANDLE: Self = Block {
         id: 950,
         name: "lime_candle",
         hardness: 0.1f32,
@@ -365566,7 +365579,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PINK_CANDLE: Block = Block {
+    pub const PINK_CANDLE: Self = Block {
         id: 951,
         name: "pink_candle",
         hardness: 0.1f32,
@@ -365854,7 +365867,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const GRAY_CANDLE: Block = Block {
+    pub const GRAY_CANDLE: Self = Block {
         id: 952,
         name: "gray_candle",
         hardness: 0.1f32,
@@ -366142,7 +366155,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LIGHT_GRAY_CANDLE: Block = Block {
+    pub const LIGHT_GRAY_CANDLE: Self = Block {
         id: 953,
         name: "light_gray_candle",
         hardness: 0.1f32,
@@ -366430,7 +366443,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CYAN_CANDLE: Block = Block {
+    pub const CYAN_CANDLE: Self = Block {
         id: 954,
         name: "cyan_candle",
         hardness: 0.1f32,
@@ -366718,7 +366731,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PURPLE_CANDLE: Block = Block {
+    pub const PURPLE_CANDLE: Self = Block {
         id: 955,
         name: "purple_candle",
         hardness: 0.1f32,
@@ -367006,7 +367019,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BLUE_CANDLE: Block = Block {
+    pub const BLUE_CANDLE: Self = Block {
         id: 956,
         name: "blue_candle",
         hardness: 0.1f32,
@@ -367294,7 +367307,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BROWN_CANDLE: Block = Block {
+    pub const BROWN_CANDLE: Self = Block {
         id: 957,
         name: "brown_candle",
         hardness: 0.1f32,
@@ -367582,7 +367595,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const GREEN_CANDLE: Block = Block {
+    pub const GREEN_CANDLE: Self = Block {
         id: 958,
         name: "green_candle",
         hardness: 0.1f32,
@@ -367870,7 +367883,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const RED_CANDLE: Block = Block {
+    pub const RED_CANDLE: Self = Block {
         id: 959,
         name: "red_candle",
         hardness: 0.1f32,
@@ -368158,7 +368171,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BLACK_CANDLE: Block = Block {
+    pub const BLACK_CANDLE: Self = Block {
         id: 960,
         name: "black_candle",
         hardness: 0.1f32,
@@ -368446,7 +368459,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CANDLE_CAKE: Block = Block {
+    pub const CANDLE_CAKE: Self = Block {
         id: 961,
         name: "candle_cake",
         hardness: 0.5f32,
@@ -368517,7 +368530,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WHITE_CANDLE_CAKE: Block = Block {
+    pub const WHITE_CANDLE_CAKE: Self = Block {
         id: 962,
         name: "white_candle_cake",
         hardness: 0.5f32,
@@ -368588,7 +368601,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const ORANGE_CANDLE_CAKE: Block = Block {
+    pub const ORANGE_CANDLE_CAKE: Self = Block {
         id: 963,
         name: "orange_candle_cake",
         hardness: 0.5f32,
@@ -368659,7 +368672,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MAGENTA_CANDLE_CAKE: Block = Block {
+    pub const MAGENTA_CANDLE_CAKE: Self = Block {
         id: 964,
         name: "magenta_candle_cake",
         hardness: 0.5f32,
@@ -368730,7 +368743,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LIGHT_BLUE_CANDLE_CAKE: Block = Block {
+    pub const LIGHT_BLUE_CANDLE_CAKE: Self = Block {
         id: 965,
         name: "light_blue_candle_cake",
         hardness: 0.5f32,
@@ -368801,7 +368814,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const YELLOW_CANDLE_CAKE: Block = Block {
+    pub const YELLOW_CANDLE_CAKE: Self = Block {
         id: 966,
         name: "yellow_candle_cake",
         hardness: 0.5f32,
@@ -368872,7 +368885,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LIME_CANDLE_CAKE: Block = Block {
+    pub const LIME_CANDLE_CAKE: Self = Block {
         id: 967,
         name: "lime_candle_cake",
         hardness: 0.5f32,
@@ -368943,7 +368956,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PINK_CANDLE_CAKE: Block = Block {
+    pub const PINK_CANDLE_CAKE: Self = Block {
         id: 968,
         name: "pink_candle_cake",
         hardness: 0.5f32,
@@ -369014,7 +369027,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const GRAY_CANDLE_CAKE: Block = Block {
+    pub const GRAY_CANDLE_CAKE: Self = Block {
         id: 969,
         name: "gray_candle_cake",
         hardness: 0.5f32,
@@ -369085,7 +369098,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LIGHT_GRAY_CANDLE_CAKE: Block = Block {
+    pub const LIGHT_GRAY_CANDLE_CAKE: Self = Block {
         id: 970,
         name: "light_gray_candle_cake",
         hardness: 0.5f32,
@@ -369156,7 +369169,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CYAN_CANDLE_CAKE: Block = Block {
+    pub const CYAN_CANDLE_CAKE: Self = Block {
         id: 971,
         name: "cyan_candle_cake",
         hardness: 0.5f32,
@@ -369227,7 +369240,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PURPLE_CANDLE_CAKE: Block = Block {
+    pub const PURPLE_CANDLE_CAKE: Self = Block {
         id: 972,
         name: "purple_candle_cake",
         hardness: 0.5f32,
@@ -369298,7 +369311,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BLUE_CANDLE_CAKE: Block = Block {
+    pub const BLUE_CANDLE_CAKE: Self = Block {
         id: 973,
         name: "blue_candle_cake",
         hardness: 0.5f32,
@@ -369369,7 +369382,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BROWN_CANDLE_CAKE: Block = Block {
+    pub const BROWN_CANDLE_CAKE: Self = Block {
         id: 974,
         name: "brown_candle_cake",
         hardness: 0.5f32,
@@ -369440,7 +369453,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const GREEN_CANDLE_CAKE: Block = Block {
+    pub const GREEN_CANDLE_CAKE: Self = Block {
         id: 975,
         name: "green_candle_cake",
         hardness: 0.5f32,
@@ -369511,7 +369524,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const RED_CANDLE_CAKE: Block = Block {
+    pub const RED_CANDLE_CAKE: Self = Block {
         id: 976,
         name: "red_candle_cake",
         hardness: 0.5f32,
@@ -369582,7 +369595,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BLACK_CANDLE_CAKE: Block = Block {
+    pub const BLACK_CANDLE_CAKE: Self = Block {
         id: 977,
         name: "black_candle_cake",
         hardness: 0.5f32,
@@ -369653,7 +369666,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const AMETHYST_BLOCK: Block = Block {
+    pub const AMETHYST_BLOCK: Self = Block {
         id: 978,
         name: "amethyst_block",
         hardness: 1.5f32,
@@ -369709,7 +369722,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BUDDING_AMETHYST: Block = Block {
+    pub const BUDDING_AMETHYST: Self = Block {
         id: 979,
         name: "budding_amethyst",
         hardness: 1.5f32,
@@ -369753,7 +369766,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const AMETHYST_CLUSTER: Block = Block {
+    pub const AMETHYST_CLUSTER: Self = Block {
         id: 980,
         name: "amethyst_cluster",
         hardness: 1.5f32,
@@ -370018,7 +370031,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LARGE_AMETHYST_BUD: Block = Block {
+    pub const LARGE_AMETHYST_BUD: Self = Block {
         id: 981,
         name: "large_amethyst_bud",
         hardness: 1.5f32,
@@ -370219,7 +370232,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MEDIUM_AMETHYST_BUD: Block = Block {
+    pub const MEDIUM_AMETHYST_BUD: Self = Block {
         id: 982,
         name: "medium_amethyst_bud",
         hardness: 1.5f32,
@@ -370420,7 +370433,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SMALL_AMETHYST_BUD: Block = Block {
+    pub const SMALL_AMETHYST_BUD: Self = Block {
         id: 983,
         name: "small_amethyst_bud",
         hardness: 1.5f32,
@@ -370621,7 +370634,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const TUFF: Block = Block {
+    pub const TUFF: Self = Block {
         id: 984,
         name: "tuff",
         hardness: 1.5f32,
@@ -370677,7 +370690,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const TUFF_SLAB: Block = Block {
+    pub const TUFF_SLAB: Self = Block {
         id: 985,
         name: "tuff_slab",
         hardness: 1.5f32,
@@ -370815,7 +370828,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const TUFF_STAIRS: Block = Block {
+    pub const TUFF_STAIRS: Self = Block {
         id: 986,
         name: "tuff_stairs",
         hardness: 1.5f32,
@@ -371900,7 +371913,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const TUFF_WALL: Block = Block {
+    pub const TUFF_WALL: Self = Block {
         id: 987,
         name: "tuff_wall",
         hardness: 1.5f32,
@@ -376157,7 +376170,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POLISHED_TUFF: Block = Block {
+    pub const POLISHED_TUFF: Self = Block {
         id: 988,
         name: "polished_tuff",
         hardness: 1.5f32,
@@ -376213,7 +376226,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POLISHED_TUFF_SLAB: Block = Block {
+    pub const POLISHED_TUFF_SLAB: Self = Block {
         id: 989,
         name: "polished_tuff_slab",
         hardness: 1.5f32,
@@ -376351,7 +376364,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POLISHED_TUFF_STAIRS: Block = Block {
+    pub const POLISHED_TUFF_STAIRS: Self = Block {
         id: 990,
         name: "polished_tuff_stairs",
         hardness: 1.5f32,
@@ -377436,7 +377449,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POLISHED_TUFF_WALL: Block = Block {
+    pub const POLISHED_TUFF_WALL: Self = Block {
         id: 991,
         name: "polished_tuff_wall",
         hardness: 1.5f32,
@@ -381693,7 +381706,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CHISELED_TUFF: Block = Block {
+    pub const CHISELED_TUFF: Self = Block {
         id: 992,
         name: "chiseled_tuff",
         hardness: 1.5f32,
@@ -381749,7 +381762,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const TUFF_BRICKS: Block = Block {
+    pub const TUFF_BRICKS: Self = Block {
         id: 993,
         name: "tuff_bricks",
         hardness: 1.5f32,
@@ -381805,7 +381818,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const TUFF_BRICK_SLAB: Block = Block {
+    pub const TUFF_BRICK_SLAB: Self = Block {
         id: 994,
         name: "tuff_brick_slab",
         hardness: 1.5f32,
@@ -381943,7 +381956,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const TUFF_BRICK_STAIRS: Block = Block {
+    pub const TUFF_BRICK_STAIRS: Self = Block {
         id: 995,
         name: "tuff_brick_stairs",
         hardness: 1.5f32,
@@ -383028,7 +383041,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const TUFF_BRICK_WALL: Block = Block {
+    pub const TUFF_BRICK_WALL: Self = Block {
         id: 996,
         name: "tuff_brick_wall",
         hardness: 1.5f32,
@@ -387285,7 +387298,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CHISELED_TUFF_BRICKS: Block = Block {
+    pub const CHISELED_TUFF_BRICKS: Self = Block {
         id: 997,
         name: "chiseled_tuff_bricks",
         hardness: 1.5f32,
@@ -387341,7 +387354,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CALCITE: Block = Block {
+    pub const CALCITE: Self = Block {
         id: 998,
         name: "calcite",
         hardness: 0.75f32,
@@ -387397,7 +387410,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const TINTED_GLASS: Block = Block {
+    pub const TINTED_GLASS: Self = Block {
         id: 999,
         name: "tinted_glass",
         hardness: 0.3f32,
@@ -387453,7 +387466,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POWDER_SNOW: Block = Block {
+    pub const POWDER_SNOW: Self = Block {
         id: 1000,
         name: "powder_snow",
         hardness: 0.25f32,
@@ -387497,7 +387510,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SCULK_SENSOR: Block = Block {
+    pub const SCULK_SENSOR: Self = Block {
         id: 1001,
         name: "sculk_sensor",
         hardness: 1.5f32,
@@ -388790,7 +388803,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CALIBRATED_SCULK_SENSOR: Block = Block {
+    pub const CALIBRATED_SCULK_SENSOR: Self = Block {
         id: 1002,
         name: "calibrated_sculk_sensor",
         hardness: 1.5f32,
@@ -393827,7 +393840,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SCULK: Block = Block {
+    pub const SCULK: Self = Block {
         id: 1003,
         name: "sculk",
         hardness: 0.2f32,
@@ -393885,7 +393898,7 @@ impl Block {
             experience: IntProvider::Constant(1i32),
         }),
     };
-    pub const SCULK_VEIN: Block = Block {
+    pub const SCULK_VEIN: Self = Block {
         id: 1004,
         name: "sculk_vein",
         hardness: 0.2f32,
@@ -395666,7 +395679,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SCULK_CATALYST: Block = Block {
+    pub const SCULK_CATALYST: Self = Block {
         id: 1005,
         name: "sculk_catalyst",
         hardness: 3f32,
@@ -395737,7 +395750,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SCULK_SHRIEKER: Block = Block {
+    pub const SCULK_SHRIEKER: Self = Block {
         id: 1006,
         name: "sculk_shrieker",
         hardness: 3f32,
@@ -395886,7 +395899,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const COPPER_BLOCK: Block = Block {
+    pub const COPPER_BLOCK: Self = Block {
         id: 1007,
         name: "copper_block",
         hardness: 3f32,
@@ -395942,7 +395955,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const EXPOSED_COPPER: Block = Block {
+    pub const EXPOSED_COPPER: Self = Block {
         id: 1008,
         name: "exposed_copper",
         hardness: 3f32,
@@ -395998,7 +396011,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WEATHERED_COPPER: Block = Block {
+    pub const WEATHERED_COPPER: Self = Block {
         id: 1009,
         name: "weathered_copper",
         hardness: 3f32,
@@ -396054,7 +396067,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const OXIDIZED_COPPER: Block = Block {
+    pub const OXIDIZED_COPPER: Self = Block {
         id: 1010,
         name: "oxidized_copper",
         hardness: 3f32,
@@ -396110,7 +396123,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const COPPER_ORE: Block = Block {
+    pub const COPPER_ORE: Self = Block {
         id: 1011,
         name: "copper_ore",
         hardness: 3f32,
@@ -396206,7 +396219,7 @@ impl Block {
             experience: IntProvider::Constant(0i32),
         }),
     };
-    pub const DEEPSLATE_COPPER_ORE: Block = Block {
+    pub const DEEPSLATE_COPPER_ORE: Self = Block {
         id: 1012,
         name: "deepslate_copper_ore",
         hardness: 4.5f32,
@@ -396302,7 +396315,7 @@ impl Block {
             experience: IntProvider::Constant(0i32),
         }),
     };
-    pub const OXIDIZED_CUT_COPPER: Block = Block {
+    pub const OXIDIZED_CUT_COPPER: Self = Block {
         id: 1013,
         name: "oxidized_cut_copper",
         hardness: 3f32,
@@ -396358,7 +396371,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WEATHERED_CUT_COPPER: Block = Block {
+    pub const WEATHERED_CUT_COPPER: Self = Block {
         id: 1014,
         name: "weathered_cut_copper",
         hardness: 3f32,
@@ -396414,7 +396427,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const EXPOSED_CUT_COPPER: Block = Block {
+    pub const EXPOSED_CUT_COPPER: Self = Block {
         id: 1015,
         name: "exposed_cut_copper",
         hardness: 3f32,
@@ -396470,7 +396483,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CUT_COPPER: Block = Block {
+    pub const CUT_COPPER: Self = Block {
         id: 1016,
         name: "cut_copper",
         hardness: 3f32,
@@ -396526,7 +396539,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const OXIDIZED_CHISELED_COPPER: Block = Block {
+    pub const OXIDIZED_CHISELED_COPPER: Self = Block {
         id: 1017,
         name: "oxidized_chiseled_copper",
         hardness: 3f32,
@@ -396582,7 +396595,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WEATHERED_CHISELED_COPPER: Block = Block {
+    pub const WEATHERED_CHISELED_COPPER: Self = Block {
         id: 1018,
         name: "weathered_chiseled_copper",
         hardness: 3f32,
@@ -396638,7 +396651,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const EXPOSED_CHISELED_COPPER: Block = Block {
+    pub const EXPOSED_CHISELED_COPPER: Self = Block {
         id: 1019,
         name: "exposed_chiseled_copper",
         hardness: 3f32,
@@ -396694,7 +396707,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CHISELED_COPPER: Block = Block {
+    pub const CHISELED_COPPER: Self = Block {
         id: 1020,
         name: "chiseled_copper",
         hardness: 3f32,
@@ -396750,7 +396763,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_OXIDIZED_CHISELED_COPPER: Block = Block {
+    pub const WAXED_OXIDIZED_CHISELED_COPPER: Self = Block {
         id: 1021,
         name: "waxed_oxidized_chiseled_copper",
         hardness: 3f32,
@@ -396806,7 +396819,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_WEATHERED_CHISELED_COPPER: Block = Block {
+    pub const WAXED_WEATHERED_CHISELED_COPPER: Self = Block {
         id: 1022,
         name: "waxed_weathered_chiseled_copper",
         hardness: 3f32,
@@ -396862,7 +396875,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_EXPOSED_CHISELED_COPPER: Block = Block {
+    pub const WAXED_EXPOSED_CHISELED_COPPER: Self = Block {
         id: 1023,
         name: "waxed_exposed_chiseled_copper",
         hardness: 3f32,
@@ -396918,7 +396931,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_CHISELED_COPPER: Block = Block {
+    pub const WAXED_CHISELED_COPPER: Self = Block {
         id: 1024,
         name: "waxed_chiseled_copper",
         hardness: 3f32,
@@ -396974,7 +396987,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const OXIDIZED_CUT_COPPER_STAIRS: Block = Block {
+    pub const OXIDIZED_CUT_COPPER_STAIRS: Self = Block {
         id: 1025,
         name: "oxidized_cut_copper_stairs",
         hardness: 3f32,
@@ -398059,7 +398072,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WEATHERED_CUT_COPPER_STAIRS: Block = Block {
+    pub const WEATHERED_CUT_COPPER_STAIRS: Self = Block {
         id: 1026,
         name: "weathered_cut_copper_stairs",
         hardness: 3f32,
@@ -399144,7 +399157,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const EXPOSED_CUT_COPPER_STAIRS: Block = Block {
+    pub const EXPOSED_CUT_COPPER_STAIRS: Self = Block {
         id: 1027,
         name: "exposed_cut_copper_stairs",
         hardness: 3f32,
@@ -400229,7 +400242,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CUT_COPPER_STAIRS: Block = Block {
+    pub const CUT_COPPER_STAIRS: Self = Block {
         id: 1028,
         name: "cut_copper_stairs",
         hardness: 3f32,
@@ -401314,7 +401327,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const OXIDIZED_CUT_COPPER_SLAB: Block = Block {
+    pub const OXIDIZED_CUT_COPPER_SLAB: Self = Block {
         id: 1029,
         name: "oxidized_cut_copper_slab",
         hardness: 3f32,
@@ -401452,7 +401465,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WEATHERED_CUT_COPPER_SLAB: Block = Block {
+    pub const WEATHERED_CUT_COPPER_SLAB: Self = Block {
         id: 1030,
         name: "weathered_cut_copper_slab",
         hardness: 3f32,
@@ -401590,7 +401603,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const EXPOSED_CUT_COPPER_SLAB: Block = Block {
+    pub const EXPOSED_CUT_COPPER_SLAB: Self = Block {
         id: 1031,
         name: "exposed_cut_copper_slab",
         hardness: 3f32,
@@ -401728,7 +401741,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CUT_COPPER_SLAB: Block = Block {
+    pub const CUT_COPPER_SLAB: Self = Block {
         id: 1032,
         name: "cut_copper_slab",
         hardness: 3f32,
@@ -401866,7 +401879,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_COPPER_BLOCK: Block = Block {
+    pub const WAXED_COPPER_BLOCK: Self = Block {
         id: 1033,
         name: "waxed_copper_block",
         hardness: 3f32,
@@ -401922,7 +401935,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_WEATHERED_COPPER: Block = Block {
+    pub const WAXED_WEATHERED_COPPER: Self = Block {
         id: 1034,
         name: "waxed_weathered_copper",
         hardness: 3f32,
@@ -401978,7 +401991,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_EXPOSED_COPPER: Block = Block {
+    pub const WAXED_EXPOSED_COPPER: Self = Block {
         id: 1035,
         name: "waxed_exposed_copper",
         hardness: 3f32,
@@ -402034,7 +402047,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_OXIDIZED_COPPER: Block = Block {
+    pub const WAXED_OXIDIZED_COPPER: Self = Block {
         id: 1036,
         name: "waxed_oxidized_copper",
         hardness: 3f32,
@@ -402090,7 +402103,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_OXIDIZED_CUT_COPPER: Block = Block {
+    pub const WAXED_OXIDIZED_CUT_COPPER: Self = Block {
         id: 1037,
         name: "waxed_oxidized_cut_copper",
         hardness: 3f32,
@@ -402146,7 +402159,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_WEATHERED_CUT_COPPER: Block = Block {
+    pub const WAXED_WEATHERED_CUT_COPPER: Self = Block {
         id: 1038,
         name: "waxed_weathered_cut_copper",
         hardness: 3f32,
@@ -402202,7 +402215,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_EXPOSED_CUT_COPPER: Block = Block {
+    pub const WAXED_EXPOSED_CUT_COPPER: Self = Block {
         id: 1039,
         name: "waxed_exposed_cut_copper",
         hardness: 3f32,
@@ -402258,7 +402271,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_CUT_COPPER: Block = Block {
+    pub const WAXED_CUT_COPPER: Self = Block {
         id: 1040,
         name: "waxed_cut_copper",
         hardness: 3f32,
@@ -402314,7 +402327,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_OXIDIZED_CUT_COPPER_STAIRS: Block = Block {
+    pub const WAXED_OXIDIZED_CUT_COPPER_STAIRS: Self = Block {
         id: 1041,
         name: "waxed_oxidized_cut_copper_stairs",
         hardness: 3f32,
@@ -403399,7 +403412,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_WEATHERED_CUT_COPPER_STAIRS: Block = Block {
+    pub const WAXED_WEATHERED_CUT_COPPER_STAIRS: Self = Block {
         id: 1042,
         name: "waxed_weathered_cut_copper_stairs",
         hardness: 3f32,
@@ -404484,7 +404497,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_EXPOSED_CUT_COPPER_STAIRS: Block = Block {
+    pub const WAXED_EXPOSED_CUT_COPPER_STAIRS: Self = Block {
         id: 1043,
         name: "waxed_exposed_cut_copper_stairs",
         hardness: 3f32,
@@ -405569,7 +405582,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_CUT_COPPER_STAIRS: Block = Block {
+    pub const WAXED_CUT_COPPER_STAIRS: Self = Block {
         id: 1044,
         name: "waxed_cut_copper_stairs",
         hardness: 3f32,
@@ -406654,7 +406667,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_OXIDIZED_CUT_COPPER_SLAB: Block = Block {
+    pub const WAXED_OXIDIZED_CUT_COPPER_SLAB: Self = Block {
         id: 1045,
         name: "waxed_oxidized_cut_copper_slab",
         hardness: 3f32,
@@ -406792,7 +406805,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_WEATHERED_CUT_COPPER_SLAB: Block = Block {
+    pub const WAXED_WEATHERED_CUT_COPPER_SLAB: Self = Block {
         id: 1046,
         name: "waxed_weathered_cut_copper_slab",
         hardness: 3f32,
@@ -406930,7 +406943,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_EXPOSED_CUT_COPPER_SLAB: Block = Block {
+    pub const WAXED_EXPOSED_CUT_COPPER_SLAB: Self = Block {
         id: 1047,
         name: "waxed_exposed_cut_copper_slab",
         hardness: 3f32,
@@ -407068,7 +407081,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_CUT_COPPER_SLAB: Block = Block {
+    pub const WAXED_CUT_COPPER_SLAB: Self = Block {
         id: 1048,
         name: "waxed_cut_copper_slab",
         hardness: 3f32,
@@ -407206,7 +407219,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const COPPER_DOOR: Block = Block {
+    pub const COPPER_DOOR: Self = Block {
         id: 1049,
         name: "copper_door",
         hardness: 3f32,
@@ -408086,7 +408099,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const EXPOSED_COPPER_DOOR: Block = Block {
+    pub const EXPOSED_COPPER_DOOR: Self = Block {
         id: 1050,
         name: "exposed_copper_door",
         hardness: 3f32,
@@ -408966,7 +408979,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const OXIDIZED_COPPER_DOOR: Block = Block {
+    pub const OXIDIZED_COPPER_DOOR: Self = Block {
         id: 1051,
         name: "oxidized_copper_door",
         hardness: 3f32,
@@ -409846,7 +409859,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WEATHERED_COPPER_DOOR: Block = Block {
+    pub const WEATHERED_COPPER_DOOR: Self = Block {
         id: 1052,
         name: "weathered_copper_door",
         hardness: 3f32,
@@ -410726,7 +410739,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_COPPER_DOOR: Block = Block {
+    pub const WAXED_COPPER_DOOR: Self = Block {
         id: 1053,
         name: "waxed_copper_door",
         hardness: 3f32,
@@ -411606,7 +411619,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_EXPOSED_COPPER_DOOR: Block = Block {
+    pub const WAXED_EXPOSED_COPPER_DOOR: Self = Block {
         id: 1054,
         name: "waxed_exposed_copper_door",
         hardness: 3f32,
@@ -412486,7 +412499,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_OXIDIZED_COPPER_DOOR: Block = Block {
+    pub const WAXED_OXIDIZED_COPPER_DOOR: Self = Block {
         id: 1055,
         name: "waxed_oxidized_copper_door",
         hardness: 3f32,
@@ -413366,7 +413379,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_WEATHERED_COPPER_DOOR: Block = Block {
+    pub const WAXED_WEATHERED_COPPER_DOOR: Self = Block {
         id: 1056,
         name: "waxed_weathered_copper_door",
         hardness: 3f32,
@@ -414246,7 +414259,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const COPPER_TRAPDOOR: Block = Block {
+    pub const COPPER_TRAPDOOR: Self = Block {
         id: 1057,
         name: "copper_trapdoor",
         hardness: 3f32,
@@ -415123,7 +415136,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const EXPOSED_COPPER_TRAPDOOR: Block = Block {
+    pub const EXPOSED_COPPER_TRAPDOOR: Self = Block {
         id: 1058,
         name: "exposed_copper_trapdoor",
         hardness: 3f32,
@@ -416000,7 +416013,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const OXIDIZED_COPPER_TRAPDOOR: Block = Block {
+    pub const OXIDIZED_COPPER_TRAPDOOR: Self = Block {
         id: 1059,
         name: "oxidized_copper_trapdoor",
         hardness: 3f32,
@@ -416877,7 +416890,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WEATHERED_COPPER_TRAPDOOR: Block = Block {
+    pub const WEATHERED_COPPER_TRAPDOOR: Self = Block {
         id: 1060,
         name: "weathered_copper_trapdoor",
         hardness: 3f32,
@@ -417754,7 +417767,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_COPPER_TRAPDOOR: Block = Block {
+    pub const WAXED_COPPER_TRAPDOOR: Self = Block {
         id: 1061,
         name: "waxed_copper_trapdoor",
         hardness: 3f32,
@@ -418631,7 +418644,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_EXPOSED_COPPER_TRAPDOOR: Block = Block {
+    pub const WAXED_EXPOSED_COPPER_TRAPDOOR: Self = Block {
         id: 1062,
         name: "waxed_exposed_copper_trapdoor",
         hardness: 3f32,
@@ -419508,7 +419521,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_OXIDIZED_COPPER_TRAPDOOR: Block = Block {
+    pub const WAXED_OXIDIZED_COPPER_TRAPDOOR: Self = Block {
         id: 1063,
         name: "waxed_oxidized_copper_trapdoor",
         hardness: 3f32,
@@ -420385,7 +420398,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_WEATHERED_COPPER_TRAPDOOR: Block = Block {
+    pub const WAXED_WEATHERED_COPPER_TRAPDOOR: Self = Block {
         id: 1064,
         name: "waxed_weathered_copper_trapdoor",
         hardness: 3f32,
@@ -421262,7 +421275,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const COPPER_GRATE: Block = Block {
+    pub const COPPER_GRATE: Self = Block {
         id: 1065,
         name: "copper_grate",
         hardness: 3f32,
@@ -421333,7 +421346,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const EXPOSED_COPPER_GRATE: Block = Block {
+    pub const EXPOSED_COPPER_GRATE: Self = Block {
         id: 1066,
         name: "exposed_copper_grate",
         hardness: 3f32,
@@ -421404,7 +421417,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WEATHERED_COPPER_GRATE: Block = Block {
+    pub const WEATHERED_COPPER_GRATE: Self = Block {
         id: 1067,
         name: "weathered_copper_grate",
         hardness: 3f32,
@@ -421475,7 +421488,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const OXIDIZED_COPPER_GRATE: Block = Block {
+    pub const OXIDIZED_COPPER_GRATE: Self = Block {
         id: 1068,
         name: "oxidized_copper_grate",
         hardness: 3f32,
@@ -421546,7 +421559,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_COPPER_GRATE: Block = Block {
+    pub const WAXED_COPPER_GRATE: Self = Block {
         id: 1069,
         name: "waxed_copper_grate",
         hardness: 3f32,
@@ -421617,7 +421630,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_EXPOSED_COPPER_GRATE: Block = Block {
+    pub const WAXED_EXPOSED_COPPER_GRATE: Self = Block {
         id: 1070,
         name: "waxed_exposed_copper_grate",
         hardness: 3f32,
@@ -421688,7 +421701,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_WEATHERED_COPPER_GRATE: Block = Block {
+    pub const WAXED_WEATHERED_COPPER_GRATE: Self = Block {
         id: 1071,
         name: "waxed_weathered_copper_grate",
         hardness: 3f32,
@@ -421759,7 +421772,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_OXIDIZED_COPPER_GRATE: Block = Block {
+    pub const WAXED_OXIDIZED_COPPER_GRATE: Self = Block {
         id: 1072,
         name: "waxed_oxidized_copper_grate",
         hardness: 3f32,
@@ -421830,7 +421843,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const COPPER_BULB: Block = Block {
+    pub const COPPER_BULB: Self = Block {
         id: 1073,
         name: "copper_bulb",
         hardness: 3f32,
@@ -421927,7 +421940,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const EXPOSED_COPPER_BULB: Block = Block {
+    pub const EXPOSED_COPPER_BULB: Self = Block {
         id: 1074,
         name: "exposed_copper_bulb",
         hardness: 3f32,
@@ -422024,7 +422037,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WEATHERED_COPPER_BULB: Block = Block {
+    pub const WEATHERED_COPPER_BULB: Self = Block {
         id: 1075,
         name: "weathered_copper_bulb",
         hardness: 3f32,
@@ -422121,7 +422134,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const OXIDIZED_COPPER_BULB: Block = Block {
+    pub const OXIDIZED_COPPER_BULB: Self = Block {
         id: 1076,
         name: "oxidized_copper_bulb",
         hardness: 3f32,
@@ -422218,7 +422231,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_COPPER_BULB: Block = Block {
+    pub const WAXED_COPPER_BULB: Self = Block {
         id: 1077,
         name: "waxed_copper_bulb",
         hardness: 3f32,
@@ -422315,7 +422328,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_EXPOSED_COPPER_BULB: Block = Block {
+    pub const WAXED_EXPOSED_COPPER_BULB: Self = Block {
         id: 1078,
         name: "waxed_exposed_copper_bulb",
         hardness: 3f32,
@@ -422412,7 +422425,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_WEATHERED_COPPER_BULB: Block = Block {
+    pub const WAXED_WEATHERED_COPPER_BULB: Self = Block {
         id: 1079,
         name: "waxed_weathered_copper_bulb",
         hardness: 3f32,
@@ -422509,7 +422522,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_OXIDIZED_COPPER_BULB: Block = Block {
+    pub const WAXED_OXIDIZED_COPPER_BULB: Self = Block {
         id: 1080,
         name: "waxed_oxidized_copper_bulb",
         hardness: 3f32,
@@ -422606,7 +422619,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const COPPER_CHEST: Block = Block {
+    pub const COPPER_CHEST: Self = Block {
         id: 1081,
         name: "copper_chest",
         hardness: 3f32,
@@ -422969,7 +422982,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const EXPOSED_COPPER_CHEST: Block = Block {
+    pub const EXPOSED_COPPER_CHEST: Self = Block {
         id: 1082,
         name: "exposed_copper_chest",
         hardness: 3f32,
@@ -423332,7 +423345,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WEATHERED_COPPER_CHEST: Block = Block {
+    pub const WEATHERED_COPPER_CHEST: Self = Block {
         id: 1083,
         name: "weathered_copper_chest",
         hardness: 3f32,
@@ -423695,7 +423708,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const OXIDIZED_COPPER_CHEST: Block = Block {
+    pub const OXIDIZED_COPPER_CHEST: Self = Block {
         id: 1084,
         name: "oxidized_copper_chest",
         hardness: 3f32,
@@ -424058,7 +424071,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_COPPER_CHEST: Block = Block {
+    pub const WAXED_COPPER_CHEST: Self = Block {
         id: 1085,
         name: "waxed_copper_chest",
         hardness: 3f32,
@@ -424421,7 +424434,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_EXPOSED_COPPER_CHEST: Block = Block {
+    pub const WAXED_EXPOSED_COPPER_CHEST: Self = Block {
         id: 1086,
         name: "waxed_exposed_copper_chest",
         hardness: 3f32,
@@ -424784,7 +424797,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_WEATHERED_COPPER_CHEST: Block = Block {
+    pub const WAXED_WEATHERED_COPPER_CHEST: Self = Block {
         id: 1087,
         name: "waxed_weathered_copper_chest",
         hardness: 3f32,
@@ -425147,7 +425160,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_OXIDIZED_COPPER_CHEST: Block = Block {
+    pub const WAXED_OXIDIZED_COPPER_CHEST: Self = Block {
         id: 1088,
         name: "waxed_oxidized_copper_chest",
         hardness: 3f32,
@@ -425510,7 +425523,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const COPPER_GOLEM_STATUE: Block = Block {
+    pub const COPPER_GOLEM_STATUE: Self = Block {
         id: 1089,
         name: "copper_golem_statue",
         hardness: 3f32,
@@ -425986,7 +425999,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const EXPOSED_COPPER_GOLEM_STATUE: Block = Block {
+    pub const EXPOSED_COPPER_GOLEM_STATUE: Self = Block {
         id: 1090,
         name: "exposed_copper_golem_statue",
         hardness: 3f32,
@@ -426462,7 +426475,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WEATHERED_COPPER_GOLEM_STATUE: Block = Block {
+    pub const WEATHERED_COPPER_GOLEM_STATUE: Self = Block {
         id: 1091,
         name: "weathered_copper_golem_statue",
         hardness: 3f32,
@@ -426938,7 +426951,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const OXIDIZED_COPPER_GOLEM_STATUE: Block = Block {
+    pub const OXIDIZED_COPPER_GOLEM_STATUE: Self = Block {
         id: 1092,
         name: "oxidized_copper_golem_statue",
         hardness: 3f32,
@@ -427414,7 +427427,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_COPPER_GOLEM_STATUE: Block = Block {
+    pub const WAXED_COPPER_GOLEM_STATUE: Self = Block {
         id: 1093,
         name: "waxed_copper_golem_statue",
         hardness: 3f32,
@@ -427890,7 +427903,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_EXPOSED_COPPER_GOLEM_STATUE: Block = Block {
+    pub const WAXED_EXPOSED_COPPER_GOLEM_STATUE: Self = Block {
         id: 1094,
         name: "waxed_exposed_copper_golem_statue",
         hardness: 3f32,
@@ -428366,7 +428379,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_WEATHERED_COPPER_GOLEM_STATUE: Block = Block {
+    pub const WAXED_WEATHERED_COPPER_GOLEM_STATUE: Self = Block {
         id: 1095,
         name: "waxed_weathered_copper_golem_statue",
         hardness: 3f32,
@@ -428842,7 +428855,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_OXIDIZED_COPPER_GOLEM_STATUE: Block = Block {
+    pub const WAXED_OXIDIZED_COPPER_GOLEM_STATUE: Self = Block {
         id: 1096,
         name: "waxed_oxidized_copper_golem_statue",
         hardness: 3f32,
@@ -429318,7 +429331,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LIGHTNING_ROD: Block = Block {
+    pub const LIGHTNING_ROD: Self = Block {
         id: 1097,
         name: "lightning_rod",
         hardness: 3f32,
@@ -429675,7 +429688,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const EXPOSED_LIGHTNING_ROD: Block = Block {
+    pub const EXPOSED_LIGHTNING_ROD: Self = Block {
         id: 1098,
         name: "exposed_lightning_rod",
         hardness: 3f32,
@@ -430032,7 +430045,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WEATHERED_LIGHTNING_ROD: Block = Block {
+    pub const WEATHERED_LIGHTNING_ROD: Self = Block {
         id: 1099,
         name: "weathered_lightning_rod",
         hardness: 3f32,
@@ -430389,7 +430402,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const OXIDIZED_LIGHTNING_ROD: Block = Block {
+    pub const OXIDIZED_LIGHTNING_ROD: Self = Block {
         id: 1100,
         name: "oxidized_lightning_rod",
         hardness: 3f32,
@@ -430746,7 +430759,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_LIGHTNING_ROD: Block = Block {
+    pub const WAXED_LIGHTNING_ROD: Self = Block {
         id: 1101,
         name: "waxed_lightning_rod",
         hardness: 3f32,
@@ -431103,7 +431116,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_EXPOSED_LIGHTNING_ROD: Block = Block {
+    pub const WAXED_EXPOSED_LIGHTNING_ROD: Self = Block {
         id: 1102,
         name: "waxed_exposed_lightning_rod",
         hardness: 3f32,
@@ -431460,7 +431473,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_WEATHERED_LIGHTNING_ROD: Block = Block {
+    pub const WAXED_WEATHERED_LIGHTNING_ROD: Self = Block {
         id: 1103,
         name: "waxed_weathered_lightning_rod",
         hardness: 3f32,
@@ -431817,7 +431830,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WAXED_OXIDIZED_LIGHTNING_ROD: Block = Block {
+    pub const WAXED_OXIDIZED_LIGHTNING_ROD: Self = Block {
         id: 1104,
         name: "waxed_oxidized_lightning_rod",
         hardness: 3f32,
@@ -432174,7 +432187,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POINTED_DRIPSTONE: Block = Block {
+    pub const POINTED_DRIPSTONE: Self = Block {
         id: 1105,
         name: "pointed_dripstone",
         hardness: 1.5f32,
@@ -432479,7 +432492,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DRIPSTONE_BLOCK: Block = Block {
+    pub const DRIPSTONE_BLOCK: Self = Block {
         id: 1106,
         name: "dripstone_block",
         hardness: 1.5f32,
@@ -432535,7 +432548,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CAVE_VINES: Block = Block {
+    pub const CAVE_VINES: Self = Block {
         id: 1107,
         name: "cave_vines",
         hardness: 0f32,
@@ -433262,7 +433275,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CAVE_VINES_PLANT: Block = Block {
+    pub const CAVE_VINES_PLANT: Self = Block {
         id: 1108,
         name: "cave_vines_plant",
         hardness: 0f32,
@@ -433339,7 +433352,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SPORE_BLOSSOM: Block = Block {
+    pub const SPORE_BLOSSOM: Self = Block {
         id: 1109,
         name: "spore_blossom",
         hardness: 0f32,
@@ -433398,7 +433411,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const AZALEA: Block = Block {
+    pub const AZALEA: Self = Block {
         id: 1110,
         name: "azalea",
         hardness: 0f32,
@@ -433457,7 +433470,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const FLOWERING_AZALEA: Block = Block {
+    pub const FLOWERING_AZALEA: Self = Block {
         id: 1111,
         name: "flowering_azalea",
         hardness: 0f32,
@@ -433516,7 +433529,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MOSS_CARPET: Block = Block {
+    pub const MOSS_CARPET: Self = Block {
         id: 1112,
         name: "moss_carpet",
         hardness: 0.1f32,
@@ -433572,7 +433585,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PINK_PETALS: Block = Block {
+    pub const PINK_PETALS: Self = Block {
         id: 1113,
         name: "pink_petals",
         hardness: 0f32,
@@ -433873,7 +433886,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const WILDFLOWERS: Block = Block {
+    pub const WILDFLOWERS: Self = Block {
         id: 1114,
         name: "wildflowers",
         hardness: 0f32,
@@ -434174,7 +434187,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const LEAF_LITTER: Block = Block {
+    pub const LEAF_LITTER: Self = Block {
         id: 1115,
         name: "leaf_litter",
         hardness: 0f32,
@@ -434475,7 +434488,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MOSS_BLOCK: Block = Block {
+    pub const MOSS_BLOCK: Self = Block {
         id: 1116,
         name: "moss_block",
         hardness: 0.1f32,
@@ -434531,7 +434544,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BIG_DRIPLEAF: Block = Block {
+    pub const BIG_DRIPLEAF: Self = Block {
         id: 1117,
         name: "big_dripleaf",
         hardness: 0.1f32,
@@ -434995,7 +435008,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const BIG_DRIPLEAF_STEM: Block = Block {
+    pub const BIG_DRIPLEAF_STEM: Self = Block {
         id: 1118,
         name: "big_dripleaf_stem",
         hardness: 0.1f32,
@@ -435147,7 +435160,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SMALL_DRIPLEAF: Block = Block {
+    pub const SMALL_DRIPLEAF: Self = Block {
         id: 1119,
         name: "small_dripleaf",
         hardness: 0f32,
@@ -435403,7 +435416,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const HANGING_ROOTS: Block = Block {
+    pub const HANGING_ROOTS: Self = Block {
         id: 1120,
         name: "hanging_roots",
         hardness: 0f32,
@@ -435477,7 +435490,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const ROOTED_DIRT: Block = Block {
+    pub const ROOTED_DIRT: Self = Block {
         id: 1121,
         name: "rooted_dirt",
         hardness: 0.5f32,
@@ -435533,7 +435546,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const MUD: Block = Block {
+    pub const MUD: Self = Block {
         id: 1122,
         name: "mud",
         hardness: 0.5f32,
@@ -435589,7 +435602,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DEEPSLATE: Block = Block {
+    pub const DEEPSLATE: Self = Block {
         id: 1123,
         name: "deepslate",
         hardness: 3f32,
@@ -435688,7 +435701,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const COBBLED_DEEPSLATE: Block = Block {
+    pub const COBBLED_DEEPSLATE: Self = Block {
         id: 1124,
         name: "cobbled_deepslate",
         hardness: 3.5f32,
@@ -435744,7 +435757,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const COBBLED_DEEPSLATE_STAIRS: Block = Block {
+    pub const COBBLED_DEEPSLATE_STAIRS: Self = Block {
         id: 1125,
         name: "cobbled_deepslate_stairs",
         hardness: 3.5f32,
@@ -436829,7 +436842,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const COBBLED_DEEPSLATE_SLAB: Block = Block {
+    pub const COBBLED_DEEPSLATE_SLAB: Self = Block {
         id: 1126,
         name: "cobbled_deepslate_slab",
         hardness: 3.5f32,
@@ -436967,7 +436980,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const COBBLED_DEEPSLATE_WALL: Block = Block {
+    pub const COBBLED_DEEPSLATE_WALL: Self = Block {
         id: 1127,
         name: "cobbled_deepslate_wall",
         hardness: 3.5f32,
@@ -441224,7 +441237,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POLISHED_DEEPSLATE: Block = Block {
+    pub const POLISHED_DEEPSLATE: Self = Block {
         id: 1128,
         name: "polished_deepslate",
         hardness: 3.5f32,
@@ -441280,7 +441293,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POLISHED_DEEPSLATE_STAIRS: Block = Block {
+    pub const POLISHED_DEEPSLATE_STAIRS: Self = Block {
         id: 1129,
         name: "polished_deepslate_stairs",
         hardness: 3.5f32,
@@ -442365,7 +442378,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POLISHED_DEEPSLATE_SLAB: Block = Block {
+    pub const POLISHED_DEEPSLATE_SLAB: Self = Block {
         id: 1130,
         name: "polished_deepslate_slab",
         hardness: 3.5f32,
@@ -442503,7 +442516,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POLISHED_DEEPSLATE_WALL: Block = Block {
+    pub const POLISHED_DEEPSLATE_WALL: Self = Block {
         id: 1131,
         name: "polished_deepslate_wall",
         hardness: 3.5f32,
@@ -446760,7 +446773,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DEEPSLATE_TILES: Block = Block {
+    pub const DEEPSLATE_TILES: Self = Block {
         id: 1132,
         name: "deepslate_tiles",
         hardness: 3.5f32,
@@ -446816,7 +446829,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DEEPSLATE_TILE_STAIRS: Block = Block {
+    pub const DEEPSLATE_TILE_STAIRS: Self = Block {
         id: 1133,
         name: "deepslate_tile_stairs",
         hardness: 3.5f32,
@@ -447901,7 +447914,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DEEPSLATE_TILE_SLAB: Block = Block {
+    pub const DEEPSLATE_TILE_SLAB: Self = Block {
         id: 1134,
         name: "deepslate_tile_slab",
         hardness: 3.5f32,
@@ -448039,7 +448052,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DEEPSLATE_TILE_WALL: Block = Block {
+    pub const DEEPSLATE_TILE_WALL: Self = Block {
         id: 1135,
         name: "deepslate_tile_wall",
         hardness: 3.5f32,
@@ -452296,7 +452309,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DEEPSLATE_BRICKS: Block = Block {
+    pub const DEEPSLATE_BRICKS: Self = Block {
         id: 1136,
         name: "deepslate_bricks",
         hardness: 3.5f32,
@@ -452352,7 +452365,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DEEPSLATE_BRICK_STAIRS: Block = Block {
+    pub const DEEPSLATE_BRICK_STAIRS: Self = Block {
         id: 1137,
         name: "deepslate_brick_stairs",
         hardness: 3.5f32,
@@ -453437,7 +453450,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DEEPSLATE_BRICK_SLAB: Block = Block {
+    pub const DEEPSLATE_BRICK_SLAB: Self = Block {
         id: 1138,
         name: "deepslate_brick_slab",
         hardness: 3.5f32,
@@ -453575,7 +453588,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DEEPSLATE_BRICK_WALL: Block = Block {
+    pub const DEEPSLATE_BRICK_WALL: Self = Block {
         id: 1139,
         name: "deepslate_brick_wall",
         hardness: 3.5f32,
@@ -457832,7 +457845,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CHISELED_DEEPSLATE: Block = Block {
+    pub const CHISELED_DEEPSLATE: Self = Block {
         id: 1140,
         name: "chiseled_deepslate",
         hardness: 3.5f32,
@@ -457888,7 +457901,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CRACKED_DEEPSLATE_BRICKS: Block = Block {
+    pub const CRACKED_DEEPSLATE_BRICKS: Self = Block {
         id: 1141,
         name: "cracked_deepslate_bricks",
         hardness: 3.5f32,
@@ -457944,7 +457957,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CRACKED_DEEPSLATE_TILES: Block = Block {
+    pub const CRACKED_DEEPSLATE_TILES: Self = Block {
         id: 1142,
         name: "cracked_deepslate_tiles",
         hardness: 3.5f32,
@@ -458000,7 +458013,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const INFESTED_DEEPSLATE: Block = Block {
+    pub const INFESTED_DEEPSLATE: Self = Block {
         id: 1143,
         name: "infested_deepslate",
         hardness: 1.5f32,
@@ -458084,7 +458097,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const SMOOTH_BASALT: Block = Block {
+    pub const SMOOTH_BASALT: Self = Block {
         id: 1144,
         name: "smooth_basalt",
         hardness: 1.25f32,
@@ -458140,7 +458153,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const RAW_IRON_BLOCK: Block = Block {
+    pub const RAW_IRON_BLOCK: Self = Block {
         id: 1145,
         name: "raw_iron_block",
         hardness: 5f32,
@@ -458196,7 +458209,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const RAW_COPPER_BLOCK: Block = Block {
+    pub const RAW_COPPER_BLOCK: Self = Block {
         id: 1146,
         name: "raw_copper_block",
         hardness: 5f32,
@@ -458252,7 +458265,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const RAW_GOLD_BLOCK: Block = Block {
+    pub const RAW_GOLD_BLOCK: Self = Block {
         id: 1147,
         name: "raw_gold_block",
         hardness: 5f32,
@@ -458308,7 +458321,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POTTED_AZALEA_BUSH: Block = Block {
+    pub const POTTED_AZALEA_BUSH: Self = Block {
         id: 1148,
         name: "potted_azalea_bush",
         hardness: 0f32,
@@ -458379,7 +458392,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POTTED_FLOWERING_AZALEA_BUSH: Block = Block {
+    pub const POTTED_FLOWERING_AZALEA_BUSH: Self = Block {
         id: 1149,
         name: "potted_flowering_azalea_bush",
         hardness: 0f32,
@@ -458450,7 +458463,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const OCHRE_FROGLIGHT: Block = Block {
+    pub const OCHRE_FROGLIGHT: Self = Block {
         id: 1150,
         name: "ochre_froglight",
         hardness: 0.3f32,
@@ -458534,7 +458547,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const VERDANT_FROGLIGHT: Block = Block {
+    pub const VERDANT_FROGLIGHT: Self = Block {
         id: 1151,
         name: "verdant_froglight",
         hardness: 0.3f32,
@@ -458618,7 +458631,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PEARLESCENT_FROGLIGHT: Block = Block {
+    pub const PEARLESCENT_FROGLIGHT: Self = Block {
         id: 1152,
         name: "pearlescent_froglight",
         hardness: 0.3f32,
@@ -458702,7 +458715,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const FROGSPAWN: Block = Block {
+    pub const FROGSPAWN: Self = Block {
         id: 1153,
         name: "frogspawn",
         hardness: 0f32,
@@ -458746,7 +458759,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const REINFORCED_DEEPSLATE: Block = Block {
+    pub const REINFORCED_DEEPSLATE: Self = Block {
         id: 1154,
         name: "reinforced_deepslate",
         hardness: 55f32,
@@ -458790,7 +458803,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const DECORATED_POT: Block = Block {
+    pub const DECORATED_POT: Self = Block {
         id: 1155,
         name: "decorated_pot",
         hardness: 0f32,
@@ -459065,7 +459078,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CRAFTER: Block = Block {
+    pub const CRAFTER: Self = Block {
         id: 1156,
         name: "crafter",
         hardness: 1.5f32,
@@ -459734,7 +459747,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const TRIAL_SPAWNER: Block = Block {
+    pub const TRIAL_SPAWNER: Self = Block {
         id: 1157,
         name: "trial_spawner",
         hardness: 50f32,
@@ -459923,7 +459936,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const VAULT: Block = Block {
+    pub const VAULT: Self = Block {
         id: 1158,
         name: "vault",
         hardness: 50f32,
@@ -460372,7 +460385,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const HEAVY_CORE: Block = Block {
+    pub const HEAVY_CORE: Self = Block {
         id: 1159,
         name: "heavy_core",
         hardness: 10f32,
@@ -460443,7 +460456,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PALE_MOSS_BLOCK: Block = Block {
+    pub const PALE_MOSS_BLOCK: Self = Block {
         id: 1160,
         name: "pale_moss_block",
         hardness: 0.1f32,
@@ -460502,7 +460515,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PALE_MOSS_CARPET: Block = Block {
+    pub const PALE_MOSS_CARPET: Self = Block {
         id: 1161,
         name: "pale_moss_carpet",
         hardness: 0.1f32,
@@ -462662,7 +462675,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const PALE_HANGING_MOSS: Block = Block {
+    pub const PALE_HANGING_MOSS: Self = Block {
         id: 1162,
         name: "pale_hanging_moss",
         hardness: 0f32,
@@ -462736,7 +462749,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const OPEN_EYEBLOSSOM: Block = Block {
+    pub const OPEN_EYEBLOSSOM: Self = Block {
         id: 1163,
         name: "open_eyeblossom",
         hardness: 0f32,
@@ -462795,7 +462808,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const CLOSED_EYEBLOSSOM: Block = Block {
+    pub const CLOSED_EYEBLOSSOM: Self = Block {
         id: 1164,
         name: "closed_eyeblossom",
         hardness: 0f32,
@@ -462854,7 +462867,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POTTED_OPEN_EYEBLOSSOM: Block = Block {
+    pub const POTTED_OPEN_EYEBLOSSOM: Self = Block {
         id: 1165,
         name: "potted_open_eyeblossom",
         hardness: 0f32,
@@ -462925,7 +462938,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const POTTED_CLOSED_EYEBLOSSOM: Block = Block {
+    pub const POTTED_CLOSED_EYEBLOSSOM: Self = Block {
         id: 1166,
         name: "potted_closed_eyeblossom",
         hardness: 0f32,
@@ -462996,7 +463009,7 @@ impl Block {
         }),
         experience: None,
     };
-    pub const FIREFLY_BUSH: Block = Block {
+    pub const FIREFLY_BUSH: Self = Block {
         id: 1167,
         name: "firefly_bush",
         hardness: 0f32,
@@ -464769,7 +464782,7 @@ impl Block {
         1161, 1161, 1161, 1161, 1161, 1161, 1161, 1161, 1161, 1161, 1161, 1161, 1161, 1161, 1162,
         1162, 1163, 1164, 1165, 1166, 1167,
     ];
-    const TYPE_FROM_RAW_ID: [&'static Block; 1168usize] = [
+    const TYPE_FROM_RAW_ID: [&'static Self; 1168usize] = [
         &Self::AIR,
         &Self::STONE,
         &Self::GRANITE,
@@ -495816,16 +495829,19 @@ impl Block {
     ];
     #[doc = r" Try to parse a block from a resource location string."]
     #[inline]
+    #[must_use]
     pub fn from_registry_key(name: &str) -> Option<&'static Self> {
         Self::BLOCK_FROM_NAME_MAP.get(name)
     }
     #[doc = r" Try to get a block from a namespace prefixed name."]
+    #[must_use]
     pub fn from_name(name: &str) -> Option<&'static Self> {
         let key = name.strip_prefix("minecraft:").unwrap_or(name);
         Self::BLOCK_FROM_NAME_MAP.get(key)
     }
     #[doc = r" Get a block from a raw block id."]
     #[inline]
+    #[must_use]
     pub const fn from_id(id: u16) -> &'static Self {
         if id as usize >= Self::RAW_ID_FROM_STATE_ID.len() {
             &Self::AIR
@@ -495835,6 +495851,7 @@ impl Block {
     }
     #[doc = r" Get a raw ID from an State ID."]
     #[inline]
+    #[must_use]
     pub fn get_raw_id_from_state_id(state_id: u16) -> u16 {
         let index = state_id as usize;
         if index >= Self::RAW_ID_FROM_STATE_ID.len() {
@@ -495845,6 +495862,7 @@ impl Block {
     }
     #[doc = r" Get a block from a state id."]
     #[inline]
+    #[must_use]
     pub fn from_state_id(id: u16) -> &'static Self {
         let index = id as usize;
         if index >= Self::RAW_ID_FROM_STATE_ID.len() {
@@ -495854,6 +495872,7 @@ impl Block {
         Self::from_id(raw_id)
     }
     #[doc = r" Try to parse a block from an item id."]
+    #[must_use]
     pub const fn from_item_id(id: u16) -> Option<&'static Self> {
         #[allow(unreachable_patterns)]
         match id {
@@ -519375,26 +519394,24 @@ impl BlockProperties for JigsawLikeProperties {
     }
 }
 impl Facing {
-    pub fn opposite(&self) -> Self {
+    #[must_use]
+    pub const fn opposite(&self) -> Self {
         match self {
-            Facing::North => Facing::South,
-            Facing::South => Facing::North,
-            Facing::East => Facing::West,
-            Facing::West => Facing::East,
-            Facing::Up => Facing::Down,
-            Facing::Down => Facing::Up,
+            Self::North => Self::South,
+            Self::South => Self::North,
+            Self::East => Self::West,
+            Self::West => Self::East,
+            Self::Up => Self::Down,
+            Self::Down => Self::Up,
         }
     }
 }
 impl HorizontalFacing {
-    pub fn all() -> [HorizontalFacing; 4] {
-        [
-            HorizontalFacing::North,
-            HorizontalFacing::South,
-            HorizontalFacing::West,
-            HorizontalFacing::East,
-        ]
+    #[must_use]
+    pub fn all() -> [Self; 4] {
+        [Self::North, Self::South, Self::West, Self::East]
     }
+    #[must_use]
     pub fn to_offset(&self) -> Vector3<i32> {
         match self {
             Self::North => (0, 0, -1),
@@ -519404,7 +519421,8 @@ impl HorizontalFacing {
         }
         .into()
     }
-    pub fn opposite(&self) -> Self {
+    #[must_use]
+    pub const fn opposite(&self) -> Self {
         match self {
             Self::North => Self::South,
             Self::South => Self::North,
@@ -519412,7 +519430,8 @@ impl HorizontalFacing {
             Self::East => Self::West,
         }
     }
-    pub fn rotate_clockwise(&self) -> Self {
+    #[must_use]
+    pub const fn rotate_clockwise(&self) -> Self {
         match self {
             Self::North => Self::East,
             Self::South => Self::West,
@@ -519420,7 +519439,8 @@ impl HorizontalFacing {
             Self::East => Self::South,
         }
     }
-    pub fn rotate_counter_clockwise(&self) -> Self {
+    #[must_use]
+    pub const fn rotate_counter_clockwise(&self) -> Self {
         match self {
             Self::North => Self::West,
             Self::South => Self::East,
@@ -519430,7 +519450,8 @@ impl HorizontalFacing {
     }
 }
 impl RailShape {
-    pub fn is_ascending(&self) -> bool {
+    #[must_use]
+    pub const fn is_ascending(&self) -> bool {
         matches!(
             self,
             Self::AscendingEast | Self::AscendingWest | Self::AscendingNorth | Self::AscendingSouth
@@ -519438,7 +519459,8 @@ impl RailShape {
     }
 }
 impl RailShapeStraight {
-    pub fn is_ascending(&self) -> bool {
+    #[must_use]
+    pub const fn is_ascending(&self) -> bool {
         matches!(
             self,
             Self::AscendingEast | Self::AscendingWest | Self::AscendingNorth | Self::AscendingSouth
