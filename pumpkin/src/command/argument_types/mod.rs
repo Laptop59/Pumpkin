@@ -228,5 +228,6 @@ pub mod hex_color;
 pub mod identifier;
 pub mod nbt;
 pub mod range;
+pub mod slot;
 pub mod time;
 pub mod uuid;
