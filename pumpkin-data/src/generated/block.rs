@@ -16035,7 +16035,7 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::MatchTool]),
+                                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -16475,7 +16475,7 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::MatchTool]),
+                                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -16683,7 +16683,7 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::MatchTool]),
+                                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -19447,7 +19447,7 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::MatchTool]),
+                                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -19459,7 +19459,10 @@ impl Block {
                                             }),
                                             weight: 1i32,
                                             quality: 0i32,
-                                            conditions: Some(&[LootCondition::TableBonus]),
+                                            conditions: Some(&[LootCondition::TableBonus {
+                                                enchantment: "minecraft:fortune",
+                                                chances: &[0.1f32, 0.14285715f32, 0.25f32, 1f32],
+                                            }]),
                                             functions: None,
                                         },
                                         LootPoolEntry {
@@ -19628,7 +19631,7 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::MatchTool]),
+                                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -19720,7 +19723,7 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::MatchTool]),
+                                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -19812,7 +19815,7 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::MatchTool]),
+                                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -19904,7 +19907,7 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::MatchTool]),
+                                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -19996,7 +19999,7 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::MatchTool]),
+                                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -20091,7 +20094,7 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::MatchTool]),
+                                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -20186,7 +20189,7 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::MatchTool]),
+                                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -24103,7 +24106,12 @@ impl Block {
                                     }),
                                     weight: 1i32,
                                     quality: 0i32,
-                                    conditions: Some(&[LootCondition::AnyOf]),
+                                    conditions: Some(&[LootCondition::AnyOf(&[
+                                        LootCondition::MatchTool {
+                                            items: Some(&["minecraft:shears"]),
+                                        },
+                                        LootCondition::MatchTool { items: None },
+                                    ])]),
                                     functions: None,
                                 },
                                 LootPoolEntry {
@@ -24114,7 +24122,10 @@ impl Block {
                                     quality: 0i32,
                                     conditions: Some(&[
                                         LootCondition::SurvivesExplosion,
-                                        LootCondition::TableBonus,
+                                        LootCondition::TableBonus {
+                                            enchantment: "minecraft:fortune",
+                                            chances: &[0.05f32, 0.0625f32, 0.083333336f32, 0.1f32],
+                                        },
                                     ]),
                                     functions: None,
                                 },
@@ -24137,7 +24148,10 @@ impl Block {
                         }),
                         weight: 1i32,
                         quality: 0i32,
-                        conditions: Some(&[LootCondition::TableBonus]),
+                        conditions: Some(&[LootCondition::TableBonus {
+                            enchantment: "minecraft:fortune",
+                            chances: &[0.02f32, 0.022222223f32, 0.025f32, 0.033333335f32, 0.1f32],
+                        }]),
                         functions: Some(&[
                             LootFunction {
                                 content: LootFunctionTypes::SetCount {
@@ -24157,7 +24171,12 @@ impl Block {
                     }],
                     rolls: LootNumberProviderTypes::Constant(1f32),
                     bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                    conditions: Some(&[LootCondition::Inverted]),
+                    conditions: Some(&[LootCondition::Inverted(&LootCondition::AnyOf(&[
+                        LootCondition::MatchTool {
+                            items: Some(&["minecraft:shears"]),
+                        },
+                        LootCondition::MatchTool { items: None },
+                    ]))]),
                     functions: None,
                 },
                 LootPool {
@@ -24169,13 +24188,27 @@ impl Block {
                         quality: 0i32,
                         conditions: Some(&[
                             LootCondition::SurvivesExplosion,
-                            LootCondition::TableBonus,
+                            LootCondition::TableBonus {
+                                enchantment: "minecraft:fortune",
+                                chances: &[
+                                    0.005f32,
+                                    0.0055555557f32,
+                                    0.00625f32,
+                                    0.008333334f32,
+                                    0.025f32,
+                                ],
+                            },
                         ]),
                         functions: None,
                     }],
                     rolls: LootNumberProviderTypes::Constant(1f32),
                     bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                    conditions: Some(&[LootCondition::Inverted]),
+                    conditions: Some(&[LootCondition::Inverted(&LootCondition::AnyOf(&[
+                        LootCondition::MatchTool {
+                            items: Some(&["minecraft:shears"]),
+                        },
+                        LootCondition::MatchTool { items: None },
+                    ]))]),
                     functions: None,
                 },
             ]),
@@ -24589,7 +24622,12 @@ impl Block {
                                     }),
                                     weight: 1i32,
                                     quality: 0i32,
-                                    conditions: Some(&[LootCondition::AnyOf]),
+                                    conditions: Some(&[LootCondition::AnyOf(&[
+                                        LootCondition::MatchTool {
+                                            items: Some(&["minecraft:shears"]),
+                                        },
+                                        LootCondition::MatchTool { items: None },
+                                    ])]),
                                     functions: None,
                                 },
                                 LootPoolEntry {
@@ -24600,7 +24638,10 @@ impl Block {
                                     quality: 0i32,
                                     conditions: Some(&[
                                         LootCondition::SurvivesExplosion,
-                                        LootCondition::TableBonus,
+                                        LootCondition::TableBonus {
+                                            enchantment: "minecraft:fortune",
+                                            chances: &[0.05f32, 0.0625f32, 0.083333336f32, 0.1f32],
+                                        },
                                     ]),
                                     functions: None,
                                 },
@@ -24623,7 +24664,10 @@ impl Block {
                         }),
                         weight: 1i32,
                         quality: 0i32,
-                        conditions: Some(&[LootCondition::TableBonus]),
+                        conditions: Some(&[LootCondition::TableBonus {
+                            enchantment: "minecraft:fortune",
+                            chances: &[0.02f32, 0.022222223f32, 0.025f32, 0.033333335f32, 0.1f32],
+                        }]),
                         functions: Some(&[
                             LootFunction {
                                 content: LootFunctionTypes::SetCount {
@@ -24643,7 +24687,12 @@ impl Block {
                     }],
                     rolls: LootNumberProviderTypes::Constant(1f32),
                     bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                    conditions: Some(&[LootCondition::Inverted]),
+                    conditions: Some(&[LootCondition::Inverted(&LootCondition::AnyOf(&[
+                        LootCondition::MatchTool {
+                            items: Some(&["minecraft:shears"]),
+                        },
+                        LootCondition::MatchTool { items: None },
+                    ]))]),
                     functions: None,
                 },
             ]),
@@ -25057,7 +25106,12 @@ impl Block {
                                     }),
                                     weight: 1i32,
                                     quality: 0i32,
-                                    conditions: Some(&[LootCondition::AnyOf]),
+                                    conditions: Some(&[LootCondition::AnyOf(&[
+                                        LootCondition::MatchTool {
+                                            items: Some(&["minecraft:shears"]),
+                                        },
+                                        LootCondition::MatchTool { items: None },
+                                    ])]),
                                     functions: None,
                                 },
                                 LootPoolEntry {
@@ -25068,7 +25122,10 @@ impl Block {
                                     quality: 0i32,
                                     conditions: Some(&[
                                         LootCondition::SurvivesExplosion,
-                                        LootCondition::TableBonus,
+                                        LootCondition::TableBonus {
+                                            enchantment: "minecraft:fortune",
+                                            chances: &[0.05f32, 0.0625f32, 0.083333336f32, 0.1f32],
+                                        },
                                     ]),
                                     functions: None,
                                 },
@@ -25091,7 +25148,10 @@ impl Block {
                         }),
                         weight: 1i32,
                         quality: 0i32,
-                        conditions: Some(&[LootCondition::TableBonus]),
+                        conditions: Some(&[LootCondition::TableBonus {
+                            enchantment: "minecraft:fortune",
+                            chances: &[0.02f32, 0.022222223f32, 0.025f32, 0.033333335f32, 0.1f32],
+                        }]),
                         functions: Some(&[
                             LootFunction {
                                 content: LootFunctionTypes::SetCount {
@@ -25111,7 +25171,12 @@ impl Block {
                     }],
                     rolls: LootNumberProviderTypes::Constant(1f32),
                     bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                    conditions: Some(&[LootCondition::Inverted]),
+                    conditions: Some(&[LootCondition::Inverted(&LootCondition::AnyOf(&[
+                        LootCondition::MatchTool {
+                            items: Some(&["minecraft:shears"]),
+                        },
+                        LootCondition::MatchTool { items: None },
+                    ]))]),
                     functions: None,
                 },
             ]),
@@ -25525,7 +25590,12 @@ impl Block {
                                     }),
                                     weight: 1i32,
                                     quality: 0i32,
-                                    conditions: Some(&[LootCondition::AnyOf]),
+                                    conditions: Some(&[LootCondition::AnyOf(&[
+                                        LootCondition::MatchTool {
+                                            items: Some(&["minecraft:shears"]),
+                                        },
+                                        LootCondition::MatchTool { items: None },
+                                    ])]),
                                     functions: None,
                                 },
                                 LootPoolEntry {
@@ -25536,7 +25606,16 @@ impl Block {
                                     quality: 0i32,
                                     conditions: Some(&[
                                         LootCondition::SurvivesExplosion,
-                                        LootCondition::TableBonus,
+                                        LootCondition::TableBonus {
+                                            enchantment: "minecraft:fortune",
+                                            chances: &[
+                                                0.025f32,
+                                                0.027777778f32,
+                                                0.03125f32,
+                                                0.041666668f32,
+                                                0.1f32,
+                                            ],
+                                        },
                                     ]),
                                     functions: None,
                                 },
@@ -25559,7 +25638,10 @@ impl Block {
                         }),
                         weight: 1i32,
                         quality: 0i32,
-                        conditions: Some(&[LootCondition::TableBonus]),
+                        conditions: Some(&[LootCondition::TableBonus {
+                            enchantment: "minecraft:fortune",
+                            chances: &[0.02f32, 0.022222223f32, 0.025f32, 0.033333335f32, 0.1f32],
+                        }]),
                         functions: Some(&[
                             LootFunction {
                                 content: LootFunctionTypes::SetCount {
@@ -25579,7 +25661,12 @@ impl Block {
                     }],
                     rolls: LootNumberProviderTypes::Constant(1f32),
                     bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                    conditions: Some(&[LootCondition::Inverted]),
+                    conditions: Some(&[LootCondition::Inverted(&LootCondition::AnyOf(&[
+                        LootCondition::MatchTool {
+                            items: Some(&["minecraft:shears"]),
+                        },
+                        LootCondition::MatchTool { items: None },
+                    ]))]),
                     functions: None,
                 },
             ]),
@@ -25993,7 +26080,12 @@ impl Block {
                                     }),
                                     weight: 1i32,
                                     quality: 0i32,
-                                    conditions: Some(&[LootCondition::AnyOf]),
+                                    conditions: Some(&[LootCondition::AnyOf(&[
+                                        LootCondition::MatchTool {
+                                            items: Some(&["minecraft:shears"]),
+                                        },
+                                        LootCondition::MatchTool { items: None },
+                                    ])]),
                                     functions: None,
                                 },
                                 LootPoolEntry {
@@ -26004,7 +26096,10 @@ impl Block {
                                     quality: 0i32,
                                     conditions: Some(&[
                                         LootCondition::SurvivesExplosion,
-                                        LootCondition::TableBonus,
+                                        LootCondition::TableBonus {
+                                            enchantment: "minecraft:fortune",
+                                            chances: &[0.05f32, 0.0625f32, 0.083333336f32, 0.1f32],
+                                        },
                                     ]),
                                     functions: None,
                                 },
@@ -26027,7 +26122,10 @@ impl Block {
                         }),
                         weight: 1i32,
                         quality: 0i32,
-                        conditions: Some(&[LootCondition::TableBonus]),
+                        conditions: Some(&[LootCondition::TableBonus {
+                            enchantment: "minecraft:fortune",
+                            chances: &[0.02f32, 0.022222223f32, 0.025f32, 0.033333335f32, 0.1f32],
+                        }]),
                         functions: Some(&[
                             LootFunction {
                                 content: LootFunctionTypes::SetCount {
@@ -26047,7 +26145,12 @@ impl Block {
                     }],
                     rolls: LootNumberProviderTypes::Constant(1f32),
                     bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                    conditions: Some(&[LootCondition::Inverted]),
+                    conditions: Some(&[LootCondition::Inverted(&LootCondition::AnyOf(&[
+                        LootCondition::MatchTool {
+                            items: Some(&["minecraft:shears"]),
+                        },
+                        LootCondition::MatchTool { items: None },
+                    ]))]),
                     functions: None,
                 },
             ]),
@@ -26461,7 +26564,12 @@ impl Block {
                                     }),
                                     weight: 1i32,
                                     quality: 0i32,
-                                    conditions: Some(&[LootCondition::AnyOf]),
+                                    conditions: Some(&[LootCondition::AnyOf(&[
+                                        LootCondition::MatchTool {
+                                            items: Some(&["minecraft:shears"]),
+                                        },
+                                        LootCondition::MatchTool { items: None },
+                                    ])]),
                                     functions: None,
                                 },
                                 LootPoolEntry {
@@ -26472,7 +26580,10 @@ impl Block {
                                     quality: 0i32,
                                     conditions: Some(&[
                                         LootCondition::SurvivesExplosion,
-                                        LootCondition::TableBonus,
+                                        LootCondition::TableBonus {
+                                            enchantment: "minecraft:fortune",
+                                            chances: &[0.05f32, 0.0625f32, 0.083333336f32, 0.1f32],
+                                        },
                                     ]),
                                     functions: None,
                                 },
@@ -26495,7 +26606,10 @@ impl Block {
                         }),
                         weight: 1i32,
                         quality: 0i32,
-                        conditions: Some(&[LootCondition::TableBonus]),
+                        conditions: Some(&[LootCondition::TableBonus {
+                            enchantment: "minecraft:fortune",
+                            chances: &[0.02f32, 0.022222223f32, 0.025f32, 0.033333335f32, 0.1f32],
+                        }]),
                         functions: Some(&[
                             LootFunction {
                                 content: LootFunctionTypes::SetCount {
@@ -26515,7 +26629,12 @@ impl Block {
                     }],
                     rolls: LootNumberProviderTypes::Constant(1f32),
                     bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                    conditions: Some(&[LootCondition::Inverted]),
+                    conditions: Some(&[LootCondition::Inverted(&LootCondition::AnyOf(&[
+                        LootCondition::MatchTool {
+                            items: Some(&["minecraft:shears"]),
+                        },
+                        LootCondition::MatchTool { items: None },
+                    ]))]),
                     functions: None,
                 },
             ]),
@@ -26929,7 +27048,12 @@ impl Block {
                                     }),
                                     weight: 1i32,
                                     quality: 0i32,
-                                    conditions: Some(&[LootCondition::AnyOf]),
+                                    conditions: Some(&[LootCondition::AnyOf(&[
+                                        LootCondition::MatchTool {
+                                            items: Some(&["minecraft:shears"]),
+                                        },
+                                        LootCondition::MatchTool { items: None },
+                                    ])]),
                                     functions: None,
                                 },
                                 LootPoolEntry {
@@ -26940,7 +27064,10 @@ impl Block {
                                     quality: 0i32,
                                     conditions: Some(&[
                                         LootCondition::SurvivesExplosion,
-                                        LootCondition::TableBonus,
+                                        LootCondition::TableBonus {
+                                            enchantment: "minecraft:fortune",
+                                            chances: &[0.05f32, 0.0625f32, 0.083333336f32, 0.1f32],
+                                        },
                                     ]),
                                     functions: None,
                                 },
@@ -26963,7 +27090,10 @@ impl Block {
                         }),
                         weight: 1i32,
                         quality: 0i32,
-                        conditions: Some(&[LootCondition::TableBonus]),
+                        conditions: Some(&[LootCondition::TableBonus {
+                            enchantment: "minecraft:fortune",
+                            chances: &[0.02f32, 0.022222223f32, 0.025f32, 0.033333335f32, 0.1f32],
+                        }]),
                         functions: Some(&[
                             LootFunction {
                                 content: LootFunctionTypes::SetCount {
@@ -26983,7 +27113,12 @@ impl Block {
                     }],
                     rolls: LootNumberProviderTypes::Constant(1f32),
                     bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                    conditions: Some(&[LootCondition::Inverted]),
+                    conditions: Some(&[LootCondition::Inverted(&LootCondition::AnyOf(&[
+                        LootCondition::MatchTool {
+                            items: Some(&["minecraft:shears"]),
+                        },
+                        LootCondition::MatchTool { items: None },
+                    ]))]),
                     functions: None,
                 },
                 LootPool {
@@ -26995,13 +27130,27 @@ impl Block {
                         quality: 0i32,
                         conditions: Some(&[
                             LootCondition::SurvivesExplosion,
-                            LootCondition::TableBonus,
+                            LootCondition::TableBonus {
+                                enchantment: "minecraft:fortune",
+                                chances: &[
+                                    0.005f32,
+                                    0.0055555557f32,
+                                    0.00625f32,
+                                    0.008333334f32,
+                                    0.025f32,
+                                ],
+                            },
                         ]),
                         functions: None,
                     }],
                     rolls: LootNumberProviderTypes::Constant(1f32),
                     bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                    conditions: Some(&[LootCondition::Inverted]),
+                    conditions: Some(&[LootCondition::Inverted(&LootCondition::AnyOf(&[
+                        LootCondition::MatchTool {
+                            items: Some(&["minecraft:shears"]),
+                        },
+                        LootCondition::MatchTool { items: None },
+                    ]))]),
                     functions: None,
                 },
             ]),
@@ -27415,7 +27564,12 @@ impl Block {
                                     }),
                                     weight: 1i32,
                                     quality: 0i32,
-                                    conditions: Some(&[LootCondition::AnyOf]),
+                                    conditions: Some(&[LootCondition::AnyOf(&[
+                                        LootCondition::MatchTool {
+                                            items: Some(&["minecraft:shears"]),
+                                        },
+                                        LootCondition::MatchTool { items: None },
+                                    ])]),
                                     functions: None,
                                 },
                                 LootPoolEntry {
@@ -27426,7 +27580,10 @@ impl Block {
                                     quality: 0i32,
                                     conditions: Some(&[
                                         LootCondition::SurvivesExplosion,
-                                        LootCondition::TableBonus,
+                                        LootCondition::TableBonus {
+                                            enchantment: "minecraft:fortune",
+                                            chances: &[0.05f32, 0.0625f32, 0.083333336f32, 0.1f32],
+                                        },
                                     ]),
                                     functions: None,
                                 },
@@ -27449,7 +27606,10 @@ impl Block {
                         }),
                         weight: 1i32,
                         quality: 0i32,
-                        conditions: Some(&[LootCondition::TableBonus]),
+                        conditions: Some(&[LootCondition::TableBonus {
+                            enchantment: "minecraft:fortune",
+                            chances: &[0.02f32, 0.022222223f32, 0.025f32, 0.033333335f32, 0.1f32],
+                        }]),
                         functions: Some(&[
                             LootFunction {
                                 content: LootFunctionTypes::SetCount {
@@ -27469,7 +27629,12 @@ impl Block {
                     }],
                     rolls: LootNumberProviderTypes::Constant(1f32),
                     bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                    conditions: Some(&[LootCondition::Inverted]),
+                    conditions: Some(&[LootCondition::Inverted(&LootCondition::AnyOf(&[
+                        LootCondition::MatchTool {
+                            items: Some(&["minecraft:shears"]),
+                        },
+                        LootCondition::MatchTool { items: None },
+                    ]))]),
                     functions: None,
                 },
             ]),
@@ -27882,7 +28047,12 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::AnyOf]),
+                                conditions: Some(&[LootCondition::AnyOf(&[
+                                    LootCondition::MatchTool {
+                                        items: Some(&["minecraft:shears"]),
+                                    },
+                                    LootCondition::MatchTool { items: None },
+                                ])]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -27891,7 +28061,16 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::TableBonus]),
+                                conditions: Some(&[LootCondition::TableBonus {
+                                    enchantment: "minecraft:fortune",
+                                    chances: &[
+                                        0.02f32,
+                                        0.022222223f32,
+                                        0.025f32,
+                                        0.033333335f32,
+                                        0.1f32,
+                                    ],
+                                }]),
                                 functions: Some(&[
                                     LootFunction {
                                         content: LootFunctionTypes::SetCount {
@@ -28331,7 +28510,12 @@ impl Block {
                                     }),
                                     weight: 1i32,
                                     quality: 0i32,
-                                    conditions: Some(&[LootCondition::AnyOf]),
+                                    conditions: Some(&[LootCondition::AnyOf(&[
+                                        LootCondition::MatchTool {
+                                            items: Some(&["minecraft:shears"]),
+                                        },
+                                        LootCondition::MatchTool { items: None },
+                                    ])]),
                                     functions: None,
                                 },
                                 LootPoolEntry {
@@ -28342,7 +28526,10 @@ impl Block {
                                     quality: 0i32,
                                     conditions: Some(&[
                                         LootCondition::SurvivesExplosion,
-                                        LootCondition::TableBonus,
+                                        LootCondition::TableBonus {
+                                            enchantment: "minecraft:fortune",
+                                            chances: &[0.05f32, 0.0625f32, 0.083333336f32, 0.1f32],
+                                        },
                                     ]),
                                     functions: None,
                                 },
@@ -28365,7 +28552,10 @@ impl Block {
                         }),
                         weight: 1i32,
                         quality: 0i32,
-                        conditions: Some(&[LootCondition::TableBonus]),
+                        conditions: Some(&[LootCondition::TableBonus {
+                            enchantment: "minecraft:fortune",
+                            chances: &[0.02f32, 0.022222223f32, 0.025f32, 0.033333335f32, 0.1f32],
+                        }]),
                         functions: Some(&[
                             LootFunction {
                                 content: LootFunctionTypes::SetCount {
@@ -28385,7 +28575,12 @@ impl Block {
                     }],
                     rolls: LootNumberProviderTypes::Constant(1f32),
                     bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                    conditions: Some(&[LootCondition::Inverted]),
+                    conditions: Some(&[LootCondition::Inverted(&LootCondition::AnyOf(&[
+                        LootCondition::MatchTool {
+                            items: Some(&["minecraft:shears"]),
+                        },
+                        LootCondition::MatchTool { items: None },
+                    ]))]),
                     functions: None,
                 },
             ]),
@@ -28799,7 +28994,12 @@ impl Block {
                                     }),
                                     weight: 1i32,
                                     quality: 0i32,
-                                    conditions: Some(&[LootCondition::AnyOf]),
+                                    conditions: Some(&[LootCondition::AnyOf(&[
+                                        LootCondition::MatchTool {
+                                            items: Some(&["minecraft:shears"]),
+                                        },
+                                        LootCondition::MatchTool { items: None },
+                                    ])]),
                                     functions: None,
                                 },
                                 LootPoolEntry {
@@ -28810,7 +29010,10 @@ impl Block {
                                     quality: 0i32,
                                     conditions: Some(&[
                                         LootCondition::SurvivesExplosion,
-                                        LootCondition::TableBonus,
+                                        LootCondition::TableBonus {
+                                            enchantment: "minecraft:fortune",
+                                            chances: &[0.05f32, 0.0625f32, 0.083333336f32, 0.1f32],
+                                        },
                                     ]),
                                     functions: None,
                                 },
@@ -28833,7 +29036,10 @@ impl Block {
                         }),
                         weight: 1i32,
                         quality: 0i32,
-                        conditions: Some(&[LootCondition::TableBonus]),
+                        conditions: Some(&[LootCondition::TableBonus {
+                            enchantment: "minecraft:fortune",
+                            chances: &[0.02f32, 0.022222223f32, 0.025f32, 0.033333335f32, 0.1f32],
+                        }]),
                         functions: Some(&[
                             LootFunction {
                                 content: LootFunctionTypes::SetCount {
@@ -28853,7 +29059,12 @@ impl Block {
                     }],
                     rolls: LootNumberProviderTypes::Constant(1f32),
                     bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                    conditions: Some(&[LootCondition::Inverted]),
+                    conditions: Some(&[LootCondition::Inverted(&LootCondition::AnyOf(&[
+                        LootCondition::MatchTool {
+                            items: Some(&["minecraft:shears"]),
+                        },
+                        LootCondition::MatchTool { items: None },
+                    ]))]),
                     functions: None,
                 },
             ]),
@@ -29028,7 +29239,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -29084,7 +29295,7 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::MatchTool]),
+                                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -29189,7 +29400,7 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::MatchTool]),
+                                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -52381,7 +52592,12 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::AnyOf]),
+                                conditions: Some(&[LootCondition::AnyOf(&[
+                                    LootCondition::MatchTool {
+                                        items: Some(&["minecraft:shears"]),
+                                    },
+                                    LootCondition::MatchTool { items: None },
+                                ])]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -52461,7 +52677,9 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::MatchTool]),
+                                conditions: Some(&[LootCondition::MatchTool {
+                                    items: Some(&["minecraft:shears"]),
+                                }]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -52560,7 +52778,9 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::MatchTool]),
+                                conditions: Some(&[LootCondition::MatchTool {
+                                    items: Some(&["minecraft:shears"]),
+                                }]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -52659,7 +52879,9 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::MatchTool]),
+                                conditions: Some(&[LootCondition::MatchTool {
+                                    items: Some(&["minecraft:shears"]),
+                                }]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -52756,7 +52978,12 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::AnyOf]),
+                conditions: Some(&[LootCondition::AnyOf(&[
+                    LootCondition::MatchTool {
+                        items: Some(&["minecraft:shears"]),
+                    },
+                    LootCondition::MatchTool { items: None },
+                ])]),
                 functions: None,
             }]),
         }),
@@ -52817,7 +53044,12 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::AnyOf]),
+                conditions: Some(&[LootCondition::AnyOf(&[
+                    LootCondition::MatchTool {
+                        items: Some(&["minecraft:shears"]),
+                    },
+                    LootCondition::MatchTool { items: None },
+                ])]),
                 functions: None,
             }]),
         }),
@@ -52878,7 +53110,12 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::AnyOf]),
+                conditions: Some(&[LootCondition::AnyOf(&[
+                    LootCondition::MatchTool {
+                        items: Some(&["minecraft:shears"]),
+                    },
+                    LootCondition::MatchTool { items: None },
+                ])]),
                 functions: None,
             }]),
         }),
@@ -52936,7 +53173,9 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool {
+                    items: Some(&["minecraft:shears"]),
+                }]),
                 functions: None,
             }]),
         }),
@@ -53015,7 +53254,9 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool {
+                    items: Some(&["minecraft:shears"]),
+                }]),
                 functions: None,
             }]),
         }),
@@ -56063,7 +56304,7 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::MatchTool]),
+                                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -59473,7 +59714,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -77380,7 +77621,7 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::MatchTool]),
+                                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -95841,7 +96082,7 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::MatchTool]),
+                                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -95936,7 +96177,7 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::MatchTool]),
+                                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -119644,7 +119885,7 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::MatchTool]),
+                                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -119763,7 +120004,7 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::MatchTool]),
+                                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -120720,7 +120961,9 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::Inverted]),
+                                conditions: Some(&[LootCondition::Inverted(
+                                    &LootCondition::MatchTool { items: None },
+                                )]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -120905,7 +121148,10 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::EntityProperties]),
+                conditions: Some(&[LootCondition::EntityProperties {
+                    entity: "this",
+                    expected_type: None,
+                }]),
                 functions: None,
             }]),
         }),
@@ -120963,7 +121209,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -121019,7 +121265,7 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::MatchTool]),
+                                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -121426,7 +121672,7 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::MatchTool]),
+                                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -122971,7 +123217,7 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::MatchTool]),
+                                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -124344,7 +124590,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -124402,7 +124648,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -124460,7 +124706,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -124518,7 +124764,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -124576,7 +124822,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -124634,7 +124880,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -124692,7 +124938,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -124750,7 +124996,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -124808,7 +125054,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -124866,7 +125112,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -124924,7 +125170,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -124982,7 +125228,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -125040,7 +125286,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -125098,7 +125344,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -125156,7 +125402,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -125214,7 +125460,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -134410,7 +134656,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -134468,7 +134714,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -134526,7 +134772,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -134584,7 +134830,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -134642,7 +134888,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -134700,7 +134946,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -135577,7 +135823,7 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::MatchTool]),
+                                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -136497,7 +136743,7 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::MatchTool]),
+                                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -137419,7 +137665,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -143174,7 +143420,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -143288,7 +143534,7 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::MatchTool]),
+                                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -144537,7 +144783,9 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool {
+                    items: Some(&["minecraft:shears"]),
+                }]),
                 functions: None,
             }]),
         }),
@@ -146246,7 +146494,9 @@ impl Block {
                     }),
                     weight: 1i32,
                     quality: 0i32,
-                    conditions: Some(&[LootCondition::MatchTool]),
+                    conditions: Some(&[LootCondition::MatchTool {
+                        items: Some(&["minecraft:shears"]),
+                    }]),
                     functions: Some(&[
                         LootFunction {
                             content: LootFunctionTypes::SetCount {
@@ -151904,7 +152154,7 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::MatchTool]),
+                                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -161660,7 +161910,7 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::MatchTool]),
+                                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -161755,7 +162005,7 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::MatchTool]),
+                                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -161943,7 +162193,7 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::MatchTool]),
+                                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -188636,7 +188886,7 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::MatchTool]),
+                                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -192118,7 +192368,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -192581,7 +192831,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -193044,7 +193294,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -193507,7 +193757,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -193970,7 +194220,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -194433,7 +194683,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -194896,7 +195146,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -195359,7 +195609,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -195822,7 +196072,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -196285,7 +196535,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -196748,7 +196998,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -197211,7 +197461,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -197674,7 +197924,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -198137,7 +198387,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -198600,7 +198850,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -199063,7 +199313,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -212041,7 +212291,7 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::MatchTool]),
+                                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -213338,7 +213588,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -213729,7 +213979,9 @@ impl Block {
                                     }),
                                     weight: 1i32,
                                     quality: 0i32,
-                                    conditions: Some(&[LootCondition::MatchTool]),
+                                    conditions: Some(&[LootCondition::MatchTool {
+                                        items: Some(&["minecraft:shears"]),
+                                    }]),
                                     functions: Some(&[LootFunction {
                                         content: LootFunctionTypes::SetCount {
                                             count: LootFunctionNumberProvider::Constant {
@@ -213766,7 +214018,12 @@ impl Block {
                             block: "minecraft:tall_grass",
                             properties: &[("half", "lower")],
                         },
-                        LootCondition::LocationCheck,
+                        LootCondition::LocationCheck {
+                            offset_x: 0i32,
+                            offset_y: 1i32,
+                            offset_z: 0i32,
+                            expected_biome: None,
+                        },
                     ]),
                     functions: None,
                 },
@@ -213780,7 +214037,9 @@ impl Block {
                                     }),
                                     weight: 1i32,
                                     quality: 0i32,
-                                    conditions: Some(&[LootCondition::MatchTool]),
+                                    conditions: Some(&[LootCondition::MatchTool {
+                                        items: Some(&["minecraft:shears"]),
+                                    }]),
                                     functions: Some(&[LootFunction {
                                         content: LootFunctionTypes::SetCount {
                                             count: LootFunctionNumberProvider::Constant {
@@ -213817,7 +214076,12 @@ impl Block {
                             block: "minecraft:tall_grass",
                             properties: &[("half", "upper")],
                         },
-                        LootCondition::LocationCheck,
+                        LootCondition::LocationCheck {
+                            offset_x: 0i32,
+                            offset_y: -1i32,
+                            offset_z: 0i32,
+                            expected_biome: None,
+                        },
                     ]),
                     functions: None,
                 },
@@ -213894,7 +214158,9 @@ impl Block {
                                     }),
                                     weight: 1i32,
                                     quality: 0i32,
-                                    conditions: Some(&[LootCondition::MatchTool]),
+                                    conditions: Some(&[LootCondition::MatchTool {
+                                        items: Some(&["minecraft:shears"]),
+                                    }]),
                                     functions: Some(&[LootFunction {
                                         content: LootFunctionTypes::SetCount {
                                             count: LootFunctionNumberProvider::Constant {
@@ -213931,7 +214197,12 @@ impl Block {
                             block: "minecraft:large_fern",
                             properties: &[("half", "lower")],
                         },
-                        LootCondition::LocationCheck,
+                        LootCondition::LocationCheck {
+                            offset_x: 0i32,
+                            offset_y: 1i32,
+                            offset_z: 0i32,
+                            expected_biome: None,
+                        },
                     ]),
                     functions: None,
                 },
@@ -213945,7 +214216,9 @@ impl Block {
                                     }),
                                     weight: 1i32,
                                     quality: 0i32,
-                                    conditions: Some(&[LootCondition::MatchTool]),
+                                    conditions: Some(&[LootCondition::MatchTool {
+                                        items: Some(&["minecraft:shears"]),
+                                    }]),
                                     functions: Some(&[LootFunction {
                                         content: LootFunctionTypes::SetCount {
                                             count: LootFunctionNumberProvider::Constant {
@@ -213982,7 +214255,12 @@ impl Block {
                             block: "minecraft:large_fern",
                             properties: &[("half", "upper")],
                         },
-                        LootCondition::LocationCheck,
+                        LootCondition::LocationCheck {
+                            offset_x: 0i32,
+                            offset_y: -1i32,
+                            offset_z: 0i32,
+                            expected_biome: None,
+                        },
                     ]),
                     functions: None,
                 },
@@ -242525,7 +242803,10 @@ impl Block {
                     quality: 0i32,
                     conditions: Some(&[
                         LootCondition::SurvivesExplosion,
-                        LootCondition::EntityProperties,
+                        LootCondition::EntityProperties {
+                            entity: "this",
+                            expected_type: None,
+                        },
                     ]),
                     functions: None,
                 }],
@@ -251936,7 +252217,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -252831,7 +253112,7 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::MatchTool]),
+                                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -252908,7 +253189,7 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::MatchTool]),
+                                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -252985,7 +253266,7 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::MatchTool]),
+                                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -253062,7 +253343,7 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::MatchTool]),
+                                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -253139,7 +253420,7 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::MatchTool]),
+                                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -253233,7 +253514,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -253306,7 +253587,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -253379,7 +253660,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -253452,7 +253733,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -253525,7 +253806,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -253598,7 +253879,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -253671,7 +253952,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -253744,7 +254025,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -253817,7 +254098,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -253890,7 +254171,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -253963,7 +254244,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -254036,7 +254317,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -254109,7 +254390,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -254182,7 +254463,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -254255,7 +254536,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -254328,7 +254609,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -254401,7 +254682,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -254474,7 +254755,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -254547,7 +254828,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -254620,7 +254901,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -254771,7 +255052,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -254922,7 +255203,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -255073,7 +255354,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -255224,7 +255505,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -255375,7 +255656,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -255526,7 +255807,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -255677,7 +255958,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -255828,7 +256109,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -255979,7 +256260,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -256130,7 +256411,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -256374,7 +256655,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -333062,7 +333343,7 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::MatchTool]),
+                                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -333550,7 +333831,7 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::MatchTool]),
+                                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -334144,7 +334425,7 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::MatchTool]),
+                                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -334397,7 +334678,9 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool {
+                    items: Some(&["minecraft:shears"]),
+                }]),
                 functions: None,
             }]),
         }),
@@ -334797,7 +335080,7 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::MatchTool]),
+                                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -335317,7 +335600,12 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::AnyOf]),
+                                conditions: Some(&[LootCondition::AnyOf(&[
+                                    LootCondition::MatchTool {
+                                        items: Some(&["minecraft:shears"]),
+                                    },
+                                    LootCondition::MatchTool { items: None },
+                                ])]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -335326,7 +335614,10 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::TableBonus]),
+                                conditions: Some(&[LootCondition::TableBonus {
+                                    enchantment: "minecraft:fortune",
+                                    chances: &[0.33f32, 0.55f32, 0.77f32, 1f32],
+                                }]),
                                 functions: None,
                             },
                         ],
@@ -335394,7 +335685,12 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::AnyOf]),
+                                conditions: Some(&[LootCondition::AnyOf(&[
+                                    LootCondition::MatchTool {
+                                        items: Some(&["minecraft:shears"]),
+                                    },
+                                    LootCondition::MatchTool { items: None },
+                                ])]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -335403,7 +335699,10 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::TableBonus]),
+                                conditions: Some(&[LootCondition::TableBonus {
+                                    enchantment: "minecraft:fortune",
+                                    chances: &[0.33f32, 0.55f32, 0.77f32, 1f32],
+                                }]),
                                 functions: None,
                             },
                         ],
@@ -335798,7 +336097,12 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::AnyOf]),
+                                conditions: Some(&[LootCondition::AnyOf(&[
+                                    LootCondition::MatchTool {
+                                        items: Some(&["minecraft:shears"]),
+                                    },
+                                    LootCondition::MatchTool { items: None },
+                                ])]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -335807,7 +336111,10 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::TableBonus]),
+                                conditions: Some(&[LootCondition::TableBonus {
+                                    enchantment: "minecraft:fortune",
+                                    chances: &[0.33f32, 0.55f32, 0.77f32, 1f32],
+                                }]),
                                 functions: None,
                             },
                         ],
@@ -335875,7 +336182,12 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::AnyOf]),
+                                conditions: Some(&[LootCondition::AnyOf(&[
+                                    LootCondition::MatchTool {
+                                        items: Some(&["minecraft:shears"]),
+                                    },
+                                    LootCondition::MatchTool { items: None },
+                                ])]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -335884,7 +336196,10 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::TableBonus]),
+                                conditions: Some(&[LootCondition::TableBonus {
+                                    enchantment: "minecraft:fortune",
+                                    chances: &[0.33f32, 0.55f32, 0.77f32, 1f32],
+                                }]),
                                 functions: None,
                             },
                         ],
@@ -347202,7 +347517,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -347562,7 +347877,7 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::MatchTool]),
+                                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                                 functions: Some(&[
                                     LootFunction {
                                         content: LootFunctionTypes::CopyComponents {
@@ -359676,7 +359991,7 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::MatchTool]),
+                                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -359688,7 +360003,10 @@ impl Block {
                                             }),
                                             weight: 1i32,
                                             quality: 0i32,
-                                            conditions: Some(&[LootCondition::TableBonus]),
+                                            conditions: Some(&[LootCondition::TableBonus {
+                                                enchantment: "minecraft:fortune",
+                                                chances: &[0.1f32, 0.14285715f32, 0.25f32, 1f32],
+                                            }]),
                                             functions: Some(&[LootFunction {
                                                 content: LootFunctionTypes::SetCount {
                                                     count: LootFunctionNumberProvider::Uniform {
@@ -372291,7 +372609,7 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::MatchTool]),
+                                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -372303,7 +372621,11 @@ impl Block {
                                             }),
                                             weight: 1i32,
                                             quality: 0i32,
-                                            conditions: Some(&[LootCondition::MatchTool]),
+                                            conditions: Some(&[LootCondition::MatchTool {
+                                                items: Some(&[
+                                                    "#minecraft:cluster_max_harvestables",
+                                                ]),
+                                            }]),
                                             functions: Some(&[
                                                 LootFunction {
                                                     content: LootFunctionTypes::SetCount {
@@ -372568,7 +372890,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -372771,7 +373093,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -372974,7 +373296,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -391177,7 +391499,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -396216,7 +396538,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -396274,7 +396596,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -397982,7 +398304,7 @@ impl Block {
                     }),
                     weight: 1i32,
                     quality: 0i32,
-                    conditions: Some(&[LootCondition::MatchTool]),
+                    conditions: Some(&[LootCondition::MatchTool { items: None }]),
                     functions: Some(&[
                         LootFunction {
                             content: LootFunctionTypes::SetCount {
@@ -398132,7 +398454,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -398283,7 +398605,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -398571,7 +398893,7 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::MatchTool]),
+                                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -398673,7 +398995,7 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::MatchTool]),
+                                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -438034,7 +438356,9 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool {
+                    items: Some(&["minecraft:shears"]),
+                }]),
                 functions: None,
             }]),
         }),
@@ -438110,7 +438434,9 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool {
+                    items: Some(&["minecraft:shears"]),
+                }]),
                 functions: None,
             }]),
         }),
@@ -438310,7 +438636,7 @@ impl Block {
                                 }),
                                 weight: 1i32,
                                 quality: 0i32,
-                                conditions: Some(&[LootCondition::MatchTool]),
+                                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                                 functions: None,
                             },
                             LootPoolEntry {
@@ -460767,7 +461093,7 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::MatchTool]),
+                conditions: Some(&[LootCondition::MatchTool { items: None }]),
                 functions: None,
             }]),
         }),
@@ -465457,7 +465783,12 @@ impl Block {
                 }],
                 rolls: LootNumberProviderTypes::Constant(1f32),
                 bonus_rolls: LootNumberProviderTypes::Constant(0f32),
-                conditions: Some(&[LootCondition::AnyOf]),
+                conditions: Some(&[LootCondition::AnyOf(&[
+                    LootCondition::MatchTool {
+                        items: Some(&["minecraft:shears"]),
+                    },
+                    LootCondition::MatchTool { items: None },
+                ])]),
                 functions: None,
             }]),
         }),
