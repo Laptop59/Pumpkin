@@ -9,14 +9,15 @@ use pumpkin_config::networking::compression::CompressionInfo;
 use pumpkin_data::packet::CURRENT_MC_VERSION;
 use pumpkin_data::translation;
 use pumpkin_protocol::java::server::play::{
-    SAttack, SChangeGameMode, SChatCommand, SChatMessage, SChunkBatch, SClickSlot, SClientCommand,
-    SClientInformationPlay, SClientTickEnd, SCloseContainer, SCommandSuggestion, SConfirmTeleport,
-    SContainerButtonClick, SCookieResponse as SPCookieResponse, SCustomPayload, SInteract,
-    SMoveVehicle, SPaddleBoat, SPickItemFromBlock, SPlaceRecipe, SPlayPingRequest,
-    SPlayerAbilities, SPlayerAction, SPlayerCommand, SPlayerInput, SPlayerLoaded, SPlayerPosition,
-    SPlayerPositionRotation, SPlayerRotation, SPlayerSession, SRecipeBookChangeSettings,
-    SRecipeBookSeenRecipe, SRenameItem, SSelectTrade, SSetCommandBlock, SSetCreativeSlot,
-    SSetHeldItem, SSetPlayerGround, SSwingArm, SUpdateSign, SUseItem, SUseItemOn,
+    SAttack, SChangeGameMode, SChatCommand, SChatCommandSigned, SChatMessage, SChunkBatch,
+    SClickSlot, SClientCommand, SClientInformationPlay, SClientTickEnd, SCloseContainer,
+    SCommandSuggestion, SConfirmTeleport, SContainerButtonClick,
+    SCookieResponse as SPCookieResponse, SCustomPayload, SInteract, SMoveVehicle, SPaddleBoat,
+    SPickItemFromBlock, SPlaceRecipe, SPlayPingRequest, SPlayerAbilities, SPlayerAction,
+    SPlayerCommand, SPlayerInput, SPlayerLoaded, SPlayerPosition, SPlayerPositionRotation,
+    SPlayerRotation, SPlayerSession, SRecipeBookChangeSettings, SRecipeBookSeenRecipe, SRenameItem,
+    SSelectTrade, SSetCommandBlock, SSetCreativeSlot, SSetHeldItem, SSetPlayerGround, SSwingArm,
+    SUpdateSign, SUseItem, SUseItemOn,
 };
 use pumpkin_protocol::packet::MultiVersionJavaPacket;
 use pumpkin_protocol::{
@@ -809,6 +810,14 @@ impl JavaClient {
             id if id == SChatMessage::to_id(version) => {
                 self.handle_chat_message(server, player, SChatMessage::read(payload, &version)?)
                     .await;
+            }
+            id if id == SChatCommandSigned::to_id(version) => {
+                self.handle_chat_command_signed(
+                    player,
+                    server,
+                    &(SChatCommandSigned::read(payload, &version)?),
+                )
+                .await;
             }
             id if id == SClientInformationPlay::to_id(version) => {
                 self.handle_client_information(

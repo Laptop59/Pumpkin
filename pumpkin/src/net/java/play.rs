@@ -725,7 +725,7 @@ impl JavaClient {
             server;
             PlayerCommandSendEvent {
                 player: player.clone(),
-                command: command.command.clone(),
+                command: command.command.to_string(),
                 cancelled: false
             };
 
@@ -1454,7 +1454,7 @@ impl JavaClient {
             for signature in argument_signatures {
                 let expected_argument = signable_command_args
                     .iter()
-                    .find(|(id, _)| dispatcher.tree[*id].meta.name == signature.name);
+                    .find(|(id, _)| *dispatcher.tree[*id].meta.name == *signature.name);
 
                 if let Some(expected_argument) = expected_argument {
                     signed_args.push(&expected_argument.1);
