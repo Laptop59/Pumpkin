@@ -229,6 +229,7 @@ pub mod gamemode;
 pub mod identifier;
 pub mod nbt;
 pub mod range;
+pub mod resource_key;
 pub mod slot;
 pub mod time;
 pub mod uuid;
