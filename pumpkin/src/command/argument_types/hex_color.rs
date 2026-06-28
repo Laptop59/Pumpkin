@@ -34,7 +34,7 @@ impl ArgumentType for HexColorArgumentType {
         }
     }
 
-    fn client_side_parser(&'_ self) -> JavaClientArgumentType<'_> {
+    fn client_side_parser(&'_ self) -> JavaClientArgumentType {
         JavaClientArgumentType::HexColor
     }
 

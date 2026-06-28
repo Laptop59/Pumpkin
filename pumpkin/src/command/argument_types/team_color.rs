@@ -28,7 +28,7 @@ impl ArgumentType for TeamColorArgumentType {
         }
     }
 
-    fn client_side_parser(&'_ self) -> JavaClientArgumentType<'_> {
+    fn client_side_parser(&'_ self) -> JavaClientArgumentType {
         JavaClientArgumentType::Color
     }
 
@@ -55,8 +55,7 @@ impl ArgumentType for TeamColorArgumentType {
                     "red",
                     "light_purple",
                     "yellow",
-                    "white",
-                    "reset",
+                    "white"
                 ])
                 .build()
         })
